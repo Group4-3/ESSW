@@ -1,0 +1,13 @@
+version: "3"
+services:
+        node:
+                image: "node"
+                user: "node"
+                working_dir: /home/node/app
+                environment:
+                        - NODE_ENV=production
+                volumes:
+                        - ./mean_shard:/home/node/app
+                ports:
+                        - "8080:8080"
+                command: "npm start"
