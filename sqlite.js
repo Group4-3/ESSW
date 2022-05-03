@@ -44,7 +44,7 @@ function createSecretTables(db) { //Create the secret tables for the database. D
         Viewed BOOLEAN NOT NULL)`, (err) => {
             if (err) {
                 console.error("SQL Table creation error: " + err);
-                return err;
+                return;
             }
         }); //Run create statement (Remove Viewed Boolean? The secret can just be deleted when viewed)
     }
@@ -53,8 +53,22 @@ function createSecretTables(db) { //Create the secret tables for the database. D
 
 // --- Secret Storage Functions
 
-function getRow(db, table) { //Fetch data from row
+function getSecret(db, table, secret_id) { //Fetch data from row. Should return an object(?) [Needs checking]
+    return db.get(`SELECT * FROM ? WHERE secret_id = ?`, [table, secret_id], (err) => {
+        if (err) {
+            console.error("SQL Query error: " + err);
+            return;
+        }
+    })
+}
 
+function removeSecret(db, table, secret_id) {
+    if (db.run(`DELETE FROM ? WHERE secret_id = ?`, [table, secret_id])) {
+        return true;
+    }
+    else {
+        return false;
+    }
 }
 
 //--- Main Page Functions ---
