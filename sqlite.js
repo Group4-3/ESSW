@@ -1,5 +1,5 @@
 //Sqlite File
-const sqlite3 = require('sqlite3').verbose(); //Create global variable for SQLite
+const sqlite3 = require('sqlite3');//.verbose(); //Create global variable for SQLite
 
 
 //--- Core Database Functions ---
@@ -58,8 +58,8 @@ function getSecret(db, table, secret_id) { //Fetch data from row. Should return 
         if (err) {
             console.error("SQL Query error: " + err);
             return;
-        }
-    })
+        };
+    });
 }
 
 function removeSecret(db, table, secret_id) {
