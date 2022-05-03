@@ -41,7 +41,12 @@ function createSecretTables(db) { //Create the secret tables for the database. D
         secret_id TEXT PRIMARY KEY NOT NULL,
         passphrase TEXT NOT NULL,
         ExpiryDate DATE,
-        Viewed BOOLEAN NOT NULL)`); //Run create statement (Remove Viewed Boolean? The secret can just be deleted when viewed)
+        Viewed BOOLEAN NOT NULL)`, (err) => {
+            if (err) {
+                console.error("SQL Table creation error: " + err);
+                return err;
+            }
+        }); //Run create statement (Remove Viewed Boolean? The secret can just be deleted when viewed)
     }
     return tableExists;
 }
