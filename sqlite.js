@@ -16,24 +16,24 @@ function closeDatabase(db){ //Close the database
 
 //--- Table Creation Functions ---
 
-function checkTableExists(db, table) {
-    //check whether the table exists 
-    db.get(`SELECT name FROM sqlite_master WHERE type='table' AND name=?`, table, (err, row) => {
-        if (err) {
-            console.error("SQL table Check error: " + err);
-            return;
-        }
-
-        if (row) {
-            return true;
-        }
-        else {
-            return false;
-        }
-    }); //Return PRAGMA for table, and check the number of entries returned to get table name (https://stackoverflow.com/questions/59514987/how-to-check-if-a-table-exists-in-sqlite3-nodejs) https://www.sqlite.org/pragma.html#pragma_table_info
-}
-
 function createSecretTables(db) { //Create the secret tables for the database. DOES NOT CREATE SHARD DATABASE
+    function checkTableExists(db, table) {
+        //check whether the table exists 
+        db.get(`SELECT name FROM sqlite_master WHERE type='table' AND name=?`, table, (err, row) => {
+            if (err) {
+                console.error("SQL table Check error: " + err);
+                return;
+            }
+
+            if (row) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }); //Return PRAGMA for table, and check the number of entries returned to get table name (https://stackoverflow.com/questions/59514987/how-to-check-if-a-table-exists-in-sqlite3-nodejs) https://www.sqlite.org/pragma.html#pragma_table_info
+    }
+
     var tableExists = checkTableExists(db, "Secrets"); 
 
     if (!tableExists) { //Create table only if it does not exist
@@ -49,7 +49,7 @@ function createSecretTables(db) { //Create the secret tables for the database. D
 // --- Secret Storage Functions
 
 function getRow(db, table) { //Fetch data from row
-    
+
 }
 
 //--- Main Page Functions ---
