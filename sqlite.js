@@ -37,16 +37,20 @@ function createSecretTables(db) { //Create the secret tables for the database. D
     var tableExists = checkTableExists(db, "Secrets"); 
 
     if (!tableExists) { //Create table only if it does not exist
-        db.run(`CREATE TABLE IF NOT EXISTS 'Secrets'(
-        secret_id TEXT PRIMARY KEY NOT NULL,
-        passphrase TEXT NOT NULL,
-        ExpiryDate DATE,
-        Viewed BOOLEAN NOT NULL)`, (err) => {
-            if (err) {
-                console.error("SQL Table creation error: " + err);
-                return;
-            }
-        }); //Run create statement (Remove Viewed Boolean? The secret can just be deleted when viewed)
+        db.serialize(() => {
+            db.run(`BEGIN EXCLUSIVE TRANSACTION`); //Begin transaction and lockout database when creating table.
+            db.run(`CREATE TABLE IF NOT EXISTS 'Secrets'(
+            secret_id TEXT PRIMARY KEY NOT NULL,
+            passphrase TEXT NOT NULL,
+            ExpiryDate DATE,
+            Viewed BOOLEAN NOT NULL)`, (err) => {
+                if (err) {
+                    console.error("SQL Table creation error: " + err);
+                    return;
+                }
+            }); //Run create statement (Remove Viewed Boolean? The secret can just be deleted when viewed)
+            db.run(`COMMIT`);
+        });
     }
     return tableExists;
 }
