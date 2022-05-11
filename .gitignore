@@ -116,3 +116,6 @@ dist
 
 # Built Visual Studio Code Extensions
 *.vsix
+
+#Ignore the database file itself
+secrets.db
