@@ -71,12 +71,17 @@ var db = new function () { //https://stackoverflow.com/questions/881515/how-do-i
     // --- Secret Storage Functions
 
     this.getSecret = function (db, table, secret_id) { //Fetch data from row. Should return an object(?) [Needs checking]
-        return db.get(`SELECT * FROM ? WHERE secret_id = ?`, [table, secret_id], (err) => {
+        var rowData = db.get(`SELECT * FROM ? WHERE secret_id = ?`, [table, secret_id], (err) => {
             if (err) {
                 console.error("SQL Query error: " + err);
                 return;
             };
         });
+
+        //Remove secret when viewed
+        if (rowData) {
+            removeSecret(db, table, secret_id);
+        };
     };
 
     var removeSecret = function (db, table, secret_id) {
