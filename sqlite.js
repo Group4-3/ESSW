@@ -6,6 +6,7 @@ var db = new function () { //https://stackoverflow.com/questions/881515/how-do-i
     //Sqlite File
     const sqlite3 = require('sqlite3');//.verbose(); //Create global variable for SQLite
 
+
 //--- Core Database Functions ---
     var connectDatabase = function (databaseFileName) { //Open and connect to the database, if it does not exist  
         var db = new sqlite3.Database(databaseFileName);
@@ -49,6 +50,7 @@ var db = new function () { //https://stackoverflow.com/questions/881515/how-do-i
                 db.run(`CREATE TABLE IF NOT EXISTS 'Secrets'(
                 secret_id TEXT PRIMARY KEY NOT NULL,
                 passphrase TEXT NOT NULL,
+                passphrase_salt TEXT NOT NULL,
                 ExpiryDate DATE,
                 Viewed BOOLEAN NOT NULL)`, (err) => {
                     if (err) {
