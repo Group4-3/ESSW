@@ -1,13 +1,19 @@
-version: "3"
+version: '3.9'
 services:
-        node:
-                image: "node"
-                user: "node"
-                working_dir: /home/node/app
+        essw_node_app:
+                user: node
+                build:
+                        context: node_docker
+                        dockerfile: Dockerfile
+                ports:
+                        - 8080:8080
                 environment:
                         - NODE_ENV=production
-                volumes:
-                        - ./mean_shard:/home/node/app
-                ports:
-                        - "8080:8080"
-                command: "npm start"
+                        - NODE_PORT=8080
+                networks:
+                        - default
+                        - backend
+networks:
+        backend:
+                name: backend_connection
+                driver: bridge
