@@ -98,8 +98,24 @@ var db = new function () { //https://stackoverflow.com/questions/881515/how-do-i
         }
     };
 
-    this.addSecret = function () {//TODO: Add Secret (Maybe pass JSON object instead of variable?)
-        
+    this.addSecret = function (db, table, secret_id, passphrase, passphrase_salt, expiry) {//TODO: Add Secret (Maybe pass JSON object instead of variable?)
+        db.serialize(() => {
+            db.run(`BEGIN TRANSACTION`)
+            if (db.run(`INSERT INTO $table VALUES ($id, $passphrase, $salt, $expiry)`, {
+                $table:table
+                $id:secret_id,
+                $passphrase:passphrase, 
+                $salt:passphrase_salt,
+                $expiry:expiry
+            }, (err) => {
+                console.error("Insertion error: " + err)
+            })) {
+                db.run(`COMMIT`);
+            }
+            else {
+                db.run(`ROLLBACK`);
+            }
+        });
     };
 
     //--- Main Page Functions ---
