@@ -1,3 +1,5 @@
+//https://www.freecodecamp.org/news/javascript-modules-explained-with-examples/ Module Behaviour
+
 
 //Contain everything inside database namespace
 var db = new function () { //https://stackoverflow.com/questions/881515/how-do-i-declare-a-namespace-in-javascript
@@ -119,10 +121,11 @@ var db = new function () { //https://stackoverflow.com/questions/881515/how-do-i
     };
 
     //--- Main Page Functions ---
-    this.main = function () {
+    this.testDB = function () {
         var databaseFileName = "secrets.db"; //Database filename
+        const _DELETEORIGINAL = FALSE;
         db = connectDatabase(databaseFileName); //Create Database Object
-        createSecretTables(db);
+        createSecretTables(db, _DELETEORIGINAL);
 
         closeDatabase(db); //Close Database when finished
     };
@@ -134,4 +137,6 @@ var db = new function () { //https://stackoverflow.com/questions/881515/how-do-i
         createSecretTables(db, deleteOriginal);
         closeDatabase(db); //Close Database when finished
 }
-db.main();
+
+}
+db.testDB();
