@@ -104,7 +104,7 @@ var db = new function () { //https://stackoverflow.com/questions/881515/how-do-i
         db.serialize(() => {
             db.run(`BEGIN TRANSACTION`)
             if (db.run(`INSERT INTO $table VALUES ($id, $passphrase, $salt, $expiry)`, {
-                $table:table
+                $table:table,
                 $id:secret_id,
                 $passphrase:passphrase, 
                 $salt:passphrase_salt,
@@ -136,7 +136,7 @@ var db = new function () { //https://stackoverflow.com/questions/881515/how-do-i
         db = connectDatabase(databaseFileName); //Create Database Object
         createSecretTables(db, deleteOriginal);
         closeDatabase(db); //Close Database when finished
-}
+    }
 
 }
 db.testDB();
