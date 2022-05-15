@@ -54,8 +54,7 @@ var db = new function () { //https://stackoverflow.com/questions/881515/how-do-i
                 secret_id TEXT PRIMARY KEY NOT NULL,
                 passphrase TEXT NOT NULL,
                 passphrase_salt TEXT NOT NULL,
-                ExpiryDate DATE,
-                Viewed BOOLEAN NOT NULL)`, (err) => {
+                ExpiryDate DATE)`, (err) => {
                     if (err) {
                         console.error("SQL Table creation error: " + err);
                         TransactionSuccess = false;
