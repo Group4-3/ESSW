@@ -140,3 +140,9 @@ var db = new function () { //https://stackoverflow.com/questions/881515/how-do-i
 
 }
 db.testDB();
+
+export function initialiseDB () {
+    const databaseFileName = "secrets.db";
+    const _DELETEORIGINAL = FALSE;
+    db.initialiseDB(databaseFileName, _DELETEORIGINAL);
+}
