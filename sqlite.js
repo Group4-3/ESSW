@@ -41,9 +41,7 @@ var db = new function () { //https://stackoverflow.com/questions/881515/how-do-i
             }); //Return PRAGMA for table, and check the number of entries returned to get table name (https://stackoverflow.com/questions/59514987/how-to-check-if-a-table-exists-in-sqlite3-nodejs) https://www.sqlite.org/pragma.html#pragma_table_info
         }
 
-        var tableExists = checkTableExists(db, "Secrets"); 
-
-        if (!tableExists) { //Create table only if it does not exist
+        if (!checkTableExists(db, "Secrets")) { //Create table only if it does not exist
             db.serialize(() => {
                 if (deleteOriginal)
                     db.run(`DROP TABLE 'Secrets'`);
@@ -69,7 +67,7 @@ var db = new function () { //https://stackoverflow.com/questions/881515/how-do-i
                 }
             });
         }
-        return tableExists;
+        // return tableExists;
     };
 
     // --- Secret Storage Functions
