@@ -87,10 +87,13 @@ var db = new function () { //https://stackoverflow.com/questions/881515/how-do-i
     };
 
     var removeSecret = function (db, table, secret_id) {
+        db.run(`BEGIN TRANSACTION`)
         if (db.run(`DELETE FROM ? WHERE secret_id = ?`, [table, secret_id])) {
+            db.run(`COMMIT`)
             return true;
         }
         else {
+            db.run(`ROLLBACK`)
             return false;
         }
     };
