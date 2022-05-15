@@ -21,7 +21,7 @@ var db = new function () { //https://stackoverflow.com/questions/881515/how-do-i
 
     //--- Table Creation Functions ---
 
-    var createSecretTables = function (db) { //Create the secret tables for the database. DOES NOT CREATE SHARD DATABASE
+    var createSecretTables = function (db, deleteOriginal) { //Create the secret tables for the database. DOES NOT CREATE SHARD DATABASE
         function checkTableExists(db, table) {
             //check whether the table exists 
             db.get(`SELECT name FROM sqlite_master WHERE type='table' AND name=?`, table, (err, row) => {
@@ -45,6 +45,9 @@ var db = new function () { //https://stackoverflow.com/questions/881515/how-do-i
 
         if (!tableExists) { //Create table only if it does not exist
             db.serialize(() => {
+                if (deleteOriginal)
+                    db.run(`DROP TABLE 'Secrets'`);
+
                 var TransactionSuccess = true;
                 db.run(`BEGIN EXCLUSIVE TRANSACTION`); //Begin transaction and lockout database when creating table.
                 db.run(`CREATE TABLE IF NOT EXISTS 'Secrets'(
