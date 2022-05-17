@@ -13,7 +13,6 @@ app.use(helmet())
 app.use(bodyParser.json())
 app.use(cors())
 app.use(morgan('combined'))
-app.use(express.static(__dirname + '/public'))
 
 app.use('/api/v1', require('./routes/v1'))
 
