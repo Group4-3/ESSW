@@ -1,10 +1,13 @@
 var router = require('express').Router()
 var bodyParser = require('body-parser')
 var jsonParser = bodyParser.json()
+var { pwnedPassphrase } = require('./utilities/pwned')
 
 /**
  * @bodyParam {integer} length optional The length of the passphrase to generate.
- * @bodyParam {string} character_set optional A comma separated list of character sets to generate the passphrase with. Available options: lowercase uppercase numerical special
+ * @bodyParam {string} character_set optional A comma separated list of character sets to generate the passphrase with. Available options: lowercase uppercase numerical special.
+ *
+ * @returnParam {string} passphrase The generated passphrase.
  */
 router.get('/', jsonParser, (req, res) => {
   const MIN_LENGTH = 1
@@ -38,6 +41,21 @@ router.get('/', jsonParser, (req, res) => {
 
     res.status(200).send({
       'passphrase': passphrase
+    })
+  } catch (err) {
+    console.log(err)
+  }
+})
+
+/**
+ * @Param {string} passphrase required The passphrase to check.
+ *
+ * @returnParam {boolean} pwned True or false whether the passphrase has been exposed.
+ */
+router.get('/pwned/:passphrase', jsonParser, async (req, res) => {
+  try {
+    res.status(200).send({
+      'pwned': await pwnedPassphrase(req.params.passphrase)
     })
   } catch (err) {
     console.log(err)
