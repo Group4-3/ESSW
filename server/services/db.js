@@ -1,4 +1,6 @@
 // database connection
+// temp measure - need to better integrate Kevin's API
+
 const sqlite3 = require('sqlite3')
 const db = new sqlite3.Database('essw.db')
 
