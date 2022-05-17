@@ -9,16 +9,13 @@ const isProduction = process.env.NODE_ENV === 'production'
 
 const app = express()
 
-const db = require('./services/db')
-
-const v1 = require('./routes/v1')
-app.use('/api/v1/', v1)
-
 app.use(helmet())
 app.use(bodyParser.json())
 app.use(cors())
 app.use(morgan('combined'))
 app.use(express.static(__dirname + '/public'))
+
+app.use('/api/v1', require('./routes/v1'))
 
 let server = app.listen(process.env.PORT || 3001, () => {
   console.log('listening on port ' + server.address().port)
