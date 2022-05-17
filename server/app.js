@@ -11,6 +11,9 @@ const app = express()
 
 const db = require('./services/db')
 
+const v1 = require('./routes/v1')
+app.use('/api/v1/', v1)
+
 app.use(helmet())
 app.use(bodyParser.json())
 app.use(cors())
