@@ -1,9 +1,12 @@
 var router = require('express').Router()
 var bodyParser = require('body-parser')
 var jsonParser = bodyParser.json()
+var bcrypt = require('bcrypt')
+var db = require('../../services/db')
+var textUtils = require('./utilities/text')
+var cipher = require('./utilities/cipher')
+var { pwnedPassphrase } = require('./utilities/pwned')
 
-const Crypto = require('crypto-js')
-const db = require('../../services/db')
 
 router.post('/submit', jsonParser, (req, res) => {
   res.status(501).send({})

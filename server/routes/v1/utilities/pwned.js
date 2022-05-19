@@ -1,8 +1,8 @@
 var fetch = require('node-fetch')
-const Crypto = require('crypto-js')
+var crypto = require('crypto-js')
 
 exports.pwnedPassphrase = async (passphrase) => {
-  var sha1 = Crypto.SHA1(passphrase).toString()
+  var sha1 = crypto.SHA1(passphrase).toString()
   var prefix = sha1.substring(0, 5)
   var suffix = sha1.substring(5)
 
