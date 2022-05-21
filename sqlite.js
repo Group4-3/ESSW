@@ -141,8 +141,17 @@ var db = new function () { //https://stackoverflow.com/questions/881515/how-do-i
 }
 db.testDB();
 
+var db = "";
+var table = "secret";
+
 export function initialiseDB () {
     const databaseFileName = "secrets.db";
     const _DELETEORIGINAL = FALSE;
-    db.initialiseDB(databaseFileName, _DELETEORIGINAL);
+    db = db.initialiseDB(databaseFileName, _DELETEORIGINAL);
+}
+
+export function closeDB() {
+    db.close(db);
+}
+
 }
