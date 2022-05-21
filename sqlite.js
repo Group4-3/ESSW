@@ -139,6 +139,7 @@ db.testDB();
 
 var db = initialiseDB();
 const table = "Secrets";
+var readOnly = FALSE;
 
 var databaseExists = function () { //Checks whether the database exists or not.
     if (!db) {
@@ -153,7 +154,7 @@ export function initialiseDB () { //Set up the database
     return db.initialiseDB(databaseFileName, _DELETEORIGINAL);
 }
 
-export function closeDB() {
+export function closeDB() { //Shut down the database
     db.close(db);
 }
 
