@@ -140,6 +140,13 @@ db.testDB();
 var db = initialiseDB();
 const table = "Secrets";
 
+var databaseExists = function () { //Checks whether the database exists or not.
+    if (!db) {
+        console.error("Database has not been initialised!");
+        throw DatabaseNotStartedError;
+    }
+}
+
 export function initialiseDB () { //Set up the database
     const databaseFileName = "secrets.db";
     const _DELETEORIGINAL = FALSE;
