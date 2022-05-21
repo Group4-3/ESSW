@@ -81,11 +81,7 @@ var db = new function () { //https://stackoverflow.com/questions/881515/how-do-i
                 return;
             };
         });
-
-        //Remove secret when viewed
-        if (rowData) {
-            removeSecret(db, table, secret_id);
-        };
+        return rowData;
     };
 
     var removeSecret = function (db, table, secret_id) {
@@ -154,10 +150,14 @@ export function closeDB() {
     db.close(db);
 }
 
-export function addSecret(secretObject) {
-    if (!db) {
-        console.error("Database has not been initialised!");
-        throw DatabaseNotStartedError;
+export function retrieveSecret(secret_id, passphrase) { //only get the secret with the passphrase
+    databaseExists();
+    var secretData = db.getSecret(db, table, secret_id);
+    //TODO: We might need to fiddle about with the passphrase salt and the pasphrase for it to verify correctly
+    if (passphrase === secretData["passphrase"]) {
+        db.removeSecret(db, table, secret_id); //Remove the secret from the database if the passphrase checks out, since we're going to return it anyway
+        return secretData; //Only return information if the secret matches.
     }
+}
     db.addSecret(db, table, secretObject["id"], secretObject["passphrase"], secretObject["passphraseSalt"], secretObject["expiry"])
 }
