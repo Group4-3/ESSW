@@ -135,7 +135,7 @@ var db = new function () { //https://stackoverflow.com/questions/881515/how-do-i
         // const _DELETEORIGINAL = FALSE;
         db = connectDatabase(databaseFileName); //Create Database Object
         createSecretTables(db, deleteOriginal);
-        closeDatabase(db); //Close Database when finished
+        return db;
     }
 
 }
