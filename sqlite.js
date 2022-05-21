@@ -171,5 +171,27 @@ export function retrieveSecret(secret_id, passphrase) { //only get the secret wi
         return secretData; //Only return information if the secret matches.
     }
 }
-    db.addSecret(db, table, secretObject["id"], secretObject["passphrase"], secretObject["passphraseSalt"], secretObject["expiry"])
+
+export function purgeDatabase(unix_time_threshold) { //Command for regular purges of the database. Includes functions for locking out users from the database until purge completes, including rollback if errors are made.
+    databaseExists();
+    readOnlyOriginal = readOnly; //Copy readonly setting, so that it can restored later.
+    readOnly = TRUE; //Forcibly database to readonly during purge
+    db.serialize(() => {
+        var transactionSuccess = TRUE;
+        db.run(`BEGIN EXCLUSIVE TRANSACTION`); //Create lock to prevent database from being used, in case some users try to submit a secret anyway.
+        db.run(`DELETE FROM Secrets WHERE expiry < ?`, unix_time_threshold, (err) => {
+            if (err) {
+                console.error("Database purge error: " + err);
+            }
+            transactionSuccess = FALSE;
+        });
+        if (transactionSuccess) {
+            db.run(`COMMIT`);
+            //db.run(`VACUUM`); //Defragments the database by copying all table contents over to a new section. Will erase emptied space, but is also very intensive.
+        }
+        else {
+            db.run(`ROLLBACK`);
+        }
+    });
+    readOnly = readOnlyOriginal; //Restore setting to original values
 }
