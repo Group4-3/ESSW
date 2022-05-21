@@ -150,6 +150,11 @@ export function closeDB() {
     db.close(db);
 }
 
+export function addSecret(secretObject) {//Takes JSON Object, and adds secret to database.
+    databaseExists();
+    db.addSecret(db, table, secretObject["id"], secretObject["passphrase"], secretObject["passphraseSalt"], secretObject["expiry"])
+}
+
 export function retrieveSecret(secret_id, passphrase) { //only get the secret with the passphrase
     databaseExists();
     var secretData = db.getSecret(db, table, secret_id);
