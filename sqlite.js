@@ -138,6 +138,7 @@ var db = new function () { //https://stackoverflow.com/questions/881515/how-do-i
 db.testDB();
 
 var db = initialiseDB();
+const table = "Secrets";
 
 export function initialiseDB () { //Set up the database
     const databaseFileName = "secrets.db";
