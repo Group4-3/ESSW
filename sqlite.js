@@ -154,4 +154,10 @@ export function closeDB() {
     db.close(db);
 }
 
+export function addSecret(secretObject) {
+    if (!db) {
+        console.error("Database has not been initialised!");
+        throw DatabaseNotStartedError;
+    }
+    db.addSecret(db, table, secretObject["id"], secretObject["passphrase"], secretObject["passphraseSalt"], secretObject["expiry"])
 }
