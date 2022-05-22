@@ -72,17 +72,15 @@ const Secret = {
     return result
   },
 
-  get: (id, callback) => {
-    console.info('BEGIN SELECT * FROM Secrets')
-    console.log([id].join(" - "))
-
-    try {
+  get: async (id) => {
+    return new Promise((resolve, reject) => {
       db.get(`SELECT * FROM Secrets WHERE id = ?`, [id], (err, row) => {
-        callback(row)
+        if (err)
+          reject(err)
+        else
+          resolve(row)
       })
-    } catch (err) {
-      console.error(err.message)
-    }
+    })
   },
 
   destroy: (id) => {

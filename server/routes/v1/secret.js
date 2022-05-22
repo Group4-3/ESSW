@@ -60,16 +60,15 @@ router.post('/:id', jsonParser, async (req, res) => {
     if (!req.body.passphrase) throw 'Missing required body param: `passphrase`.'
     var passphrase = req.body.passphrase.toString()
 
-    Secret.get(req.params.id, (row) => {
-      if (!row) throw 'Secret with that Id does not exist or has been deleted.'
-      
-      bcrypt.compare(passphrase, row.encrypted_passphrase, (err, result) => {
-        if (!result) throw 'Incorrect passphrase.'
+    var row = await Secret.get(req.params.id)
+    if (!row) throw 'Secret with that Id does not exist or has been deleted.'
 
-        var body = cipher.decryptAesDemo(row.store, passphrase)
-        Secret.destroy(row.id)
-        res.status(200).send({auth: body})
-      })
+    bcrypt.compare(passphrase, row.encrypted_passphrase, (err, result) => {
+      if (!result) throw 'Incorrect passphrase.'
+
+      var body = cipher.decryptAesDemo(row.store, passphrase)
+      Secret.destroy(row.id)
+      res.status(200).send({auth: body})
     })
   } catch (err) {
     res.status(400).send({error: err})
