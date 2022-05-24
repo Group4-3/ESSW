@@ -64,11 +64,14 @@ router.post('/:id', jsonParser, async (req, res) => {
     if (!row) throw 'Secret with that Id does not exist or has been deleted.'
 
     bcrypt.compare(passphrase, row.encrypted_passphrase, (err, result) => {
-      if (!result) throw 'Incorrect passphrase.'
+      if (result) {
+        var body = cipher.decryptAesDemo(row.store, passphrase)
+        res.status(200).send({body: body})
 
-      var body = cipher.decryptAesDemo(row.store, passphrase)
-      Secret.destroy(row.id)
-      res.status(200).send({auth: body})
+        Secret.destroy(row.id)
+      } else {
+        res.status(400).send({error: 'Incorrect passphrase.'})
+      }
     })
   } catch (err) {
     res.status(400).send({error: err})
