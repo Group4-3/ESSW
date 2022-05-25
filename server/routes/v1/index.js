@@ -1,5 +1,8 @@
 var router = require('express').Router()
 var { import_test } = require('./utilities/test')
+var db = require('../../services/db')
+
+db.initialise()
 
 router.use('/secret', require('./secret'))
 router.use('/passphrase', require('./passphrase'))
