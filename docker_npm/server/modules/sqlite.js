@@ -8,7 +8,10 @@
 */
 
 let databaseFile = new sqlite3.Database("secrets.db", sqlite3.OPEN_READWRITE, (err) => {
-    console.log(`Error while opening database file: ${err}`);
+    if(err) {
+        console.log(`Error while opening database file: ${err}`);
+        throw { msg: `Fatal Exception while initialising the datbase: ${err}` };
+    }
 });
 
 export function addSecret(secretObject) {//Takes JSON Object, and adds secret to database.
