@@ -191,7 +191,6 @@ export function purgeDatabase(unix_time_threshold) { //Command for regular purge
         readOnlyOriginal = readOnly; //Copy readonly setting, so that it can restored later.
         readOnly = TRUE; //Forcibly database to readonly during purge
         db.serialize(() => {
-            var transactionSuccess = TRUE;
             db.run(`BEGIN EXCLUSIVE TRANSACTION`); //Create lock to prevent database from being used, in case some users try to submit a secret anyway.
             db.run(`DELETE FROM Secrets WHERE expiry < ?`, unix_time_threshold, (err) => {
                 if (err) {
