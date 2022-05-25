@@ -1,6 +1,6 @@
 /*
     ----- GROUP 4-3 Header -----
-    Component Name: SQLite Driver
+    Component Name: group43_database
     Date of Creation: 27/04/2022
     Description: Driver to interface with the SQLite database with functions required
     Author(s): Petri Bayley & Kevin Lew
