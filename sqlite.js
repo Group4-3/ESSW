@@ -1,4 +1,16 @@
-//https://www.freecodecamp.org/news/javascript-modules-explained-with-examples/ Module Behaviour
+/*
+    ----- GROUP 4-3 Header -----
+    Component Name: SQLite Driver
+    Date of Creation: 27/04/2022
+    Description: Driver to interface with the SQLite database with functions required
+    Author(s): Petri Bayley & Kevin Lew
+    
+    // Prints hello world followed by the name that is supplied to the function
+    void printHelloWorld(
+        firstName // Enter the name that will be printed with the message   
+    );
+
+*/
 
 
 //Contain everything inside database namespace
