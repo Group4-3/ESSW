@@ -185,7 +185,18 @@ export function retrieveSecret(secret_id, passphrase) { //only get the secret wi
     }
 }
 
-export function purgeDatabase(unix_time_threshold) { //Command for regular purges of the database. Includes functions for locking out users from the database until purge completes, including rollback if errors are made.
+export function db_retrieveSecret(secretID, passphrase) {
+    return new Promise((resolve, reject) => {
+        db.get(`SELECT {secret_field} FROM secrets WHERE secret_id = ?, passphrase = ?`, secretID, passphrase, (err, row) => {
+            if(err)
+                reject({data: err, code: 500, human_code: "failure, database error"});
+            else
+                resolve({ data: row, code: 200, human_readable_code: "Success" });
+        });
+    });
+}
+
+export function db_purgeDatabase(unix_time_threshold) { //Command for regular purges of the database. Includes functions for locking out users from the database until purge completes, including rollback if errors are made.
     return new Promise((resolve, reject) => {
         databaseExists(); // TODO: Is this required? a simple if statement should be ok.
         readOnlyOriginal = readOnly; //Copy readonly setting, so that it can restored later.
@@ -195,7 +206,7 @@ export function purgeDatabase(unix_time_threshold) { //Command for regular purge
             db.run(`DELETE FROM Secrets WHERE expiry < ?`, unix_time_threshold, (err) => {
                 if (err) {
                     db.run(`ROLLBACK`);
-                    reject({data: err, code: 500, human_code: "failure, database error"});
+                    reject({ data: err, code: 500, human_code: "failure, database error" });
                 }
                 else
                 {
