@@ -7,14 +7,9 @@
 
 */
 
-import * as sqlite3 from 'better-sqlite3';
+import Database from 'better-sqlite3';
 
-let databaseFile = new sqlite3.Database("secrets.db", sqlite3.OPEN_READWRITE, (err) => {
-    if(err) {
-        console.log(`Error while opening database file: ${err}`);
-        throw { msg: `Fatal Exception while initialising the datbase: ${err}` };
-    }
-});
+let databaseFile = new Database("secrets.db", {});
 
 export function addSecret(secretObject) {
     return new Promise((resolve, reject) => {
