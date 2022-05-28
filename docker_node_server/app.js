@@ -1,9 +1,22 @@
-const express = require('express')
-const bodyParser = require('body-parser')
-const cors = require('cors')
-const helmet = require('helmet')
-const morgan = require('morgan')
-const errorhandler = require('errorhandler')
+/*
+    ----- GROUP 4-3 Header -----
+    Component Name: Server Application
+    Date of Creation: 27/04/2022
+    Description: Main server application for the API
+    Author(s): Petri Bayley & Mitchell Sundstrom
+
+*/
+
+/*
+  Modules
+*/
+import * as express from 'express';
+import * as bodyParser from 'body-parser';
+import * as cors from 'cors';
+import * as helmet from 'helmet';
+import * as morgan from 'morgan';
+import * as errorhandler from 'errorhandler';
+import * as db from './modules/group43_database.js';
 
 const isProduction = process.env.NODE_ENV === 'production'
 

@@ -7,6 +7,8 @@
 
 */
 
+import * as sqlite3 from 'better-sqlite3';
+
 let databaseFile = new sqlite3.Database("secrets.db", sqlite3.OPEN_READWRITE, (err) => {
     if(err) {
         console.log(`Error while opening database file: ${err}`);
@@ -14,7 +16,7 @@ let databaseFile = new sqlite3.Database("secrets.db", sqlite3.OPEN_READWRITE, (e
     }
 });
 
-export function addSecret(secretObject) {//Takes JSON Object, and adds secret to database.
+export function addSecret(secretObject) {
     return new Promise((resolve, reject) => {
         if(!databaseFile) {
             reject({ data: err, code: 500, human_code: "failure, database not open" });
