@@ -9,43 +9,99 @@
 
 import Database from 'better-sqlite3';
 
-let databaseFile = new Database("secrets.db", {});
+const DROP_SECRET_TABLE_QUERY = `
+DROP TABLE IF EXISTS 
+secret;`;
 
-export function addSecret(secretObject) {
-    return new Promise((resolve, reject) => {
-        if(!databaseFile) {
-            reject({ data: err, code: 500, human_code: "failure, database not open" });
-        }
-        databaseFile.run(`INSERT INTO secret (password, secret_object, passphrase)`);
-    });
+/*
+  Create Table Query
+  Table name: secret
+    id: The primary key id for each secret
+    secret_text: The string of the secret
+    passphrase: The string of the hashed password
+    expiryDate: The date and time of when the secret should expire
+    method: A code to indicate which method was used for encryption
+    access_failed_attempts: The current number of failed attempts accesssing the secret
+*/
+const CREATE_TABLE_QUERY = `
+CREATE TABLE
+'secret'(
+    id TEXT PRIMARY KEY NOT NULL,
+    secret_text TEXT NOT NULL,
+    passphrase TEXT NOT NULL,
+    expiry_date DATE NOT NULL,
+    method TEXT NOT NULL,
+    access_failed_attempts INT NOT NULL DEFAULT 0
+    );`;
+const INSERT_SECRET_QUERY = `
+INSERT INTO
+secret
+(
+    id, 
+    secret_text,
+    passphrase, 
+    expiry_date, 
+    method
+)
+VALUES
+(
+    ?,
+    ?,
+    ?,
+    ?,
+    ?
+);`;
+const GET_SECRET_QUERY = `
+SELECT 
+secret_text 
+FROM 
+secret 
+WHERE 
+id = ? 
+AND 
+passphrase = ?
+;
+`
+const PRUNE_SECRETS_QUERY = `
+DELETE 
+FROM 
+secret 
+WHERE 
+expiry_date < CURRENT_TIMESTAMP
+;
+`
+
+var databaseFile;
+
+function initialise() {
+  databaseFile = new Database("secrets.db");
+  databaseFile.exec(DROP_SECRET_TABLE_QUERY);
+  databaseFile.exec(CREATE_TABLE_QUERY);
+}
+
+initialise();
+
+export function db_addSecret(secretObject) {
+  if(!databaseFile) {
+    return{ data: err, code: 500, human_code: "failure, database not open" };
+  }
+  databaseFile.exec(INSERT_SECRET_QUERY, secretObject.secret_id,secretObject.secret_text, secretObject.passphrase, secretObject.expiryDate, secretObject.method);
+  return { data: row, code: 200, human_readable_code: "Success" };
 }
 
 export function db_retrieveSecret(secretID, passphrase) {
-    return new Promise((resolve, reject) => {
-        if(!databaseFile) {
-            reject({ data: err, code: 500, human_code: "failure, database not open" });
-        }
-        databaseFile.get(`SELECT secret_object FROM secrets WHERE secret_id = ?, passphrase = ?`, secretID, passphrase, (err, row) => {
-            if(err)
-                reject({ data: err, code: 500, human_code: "failure, database error" });
-            else
-                resolve({ data: row, code: 200, human_readable_code: "Success" });
-        });
-    });
+  if(!databaseFile) {
+    return { data: err, code: 500, human_code: "failure, database not open" };
+  }
+  let query = databaseFile.prepare(GET_SECRET_QUERY);
+  let row = query.get(secretID, passphrase);
+  return { data: row, code: 200, human_readable_code: "Success" };
 }
 
 export function db_purgeDatabase() {
-    return new Promise((resolve, reject) => {
-        if(!databaseFile) {
-            reject({ data: err, code: 500, human_code: "failure, database not open" });
-        }
-        databaseFile.run(`DELETE FROM Secrets WHERE expiry < CURRENT_TIMESTAMP`, (err) => {
-            if(err) {
-                reject({ data: err, code: 500, human_code: "failure, database error" });
-            }
-            else {
-                resolve({ code: 200, human_readable_code: "Success" });
-            }
-        });
-    });
+  if(!databaseFile) {
+    return { data: err, code: 500, human_code: "failure, database not open" };
+  }
+  databaseFile.exec(PRUNE_SECRETS_QUERY);
+  return { code: 200, human_readable_code: "Success" };
 }

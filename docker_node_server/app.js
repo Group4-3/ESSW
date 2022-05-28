@@ -26,10 +26,9 @@ app.use(cors());
 app.use(morgan('combined'));
 
 /*
-  Routes
-
+  V1 Routes
+  imports of the routes from the v1 directory
 */
-
 import {router as secret_submit_route } from './v1/submit_secret.js';
 app.use(secret_submit_route);
 
