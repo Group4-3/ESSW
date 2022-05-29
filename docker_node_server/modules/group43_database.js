@@ -11,7 +11,8 @@ import Database from 'better-sqlite3';
 
 const DROP_SECRET_TABLE_QUERY = `
 DROP TABLE IF EXISTS 
-secret;`;
+secret;
+`;
 
 /*
   Create Table Query

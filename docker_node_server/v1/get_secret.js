@@ -9,6 +9,8 @@
 
 import express from 'express';
 import * as db from '../modules/group43_database.js';
+import * as secrets from '../modules/group43_secrets.js';
+import bcrypt from 'bcrypt';
 var router = express.Router();
 
 router.post('/api/v1/secret/get', (req, res) => {
@@ -27,8 +29,7 @@ router.post('/api/v1/secret/get', (req, res) => {
         return;
     }
 
-    //TODO: Compare passphrases using bcrypt
-    if (passphrase.data.passphrase === secret_passphrase) {
+    if (bcrypt.compareSync(secrets.pepper+secret_passphrase, passphrase.data.passphrase)) {
         let secret = db.db_retrieveSecret(secret_id);
         if(!secret.data)
         {

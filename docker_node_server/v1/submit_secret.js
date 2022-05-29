@@ -9,6 +9,8 @@
 
 import express from 'express';
 import * as db from '../modules/group43_database.js';
+import * as secrets from '../modules/group43_secrets.js';
+import bcrypt from 'bcrypt';
 var router = express.Router();
 
 router.post('/api/v1/secret/submit', (req, res) => {
@@ -18,10 +20,12 @@ router.post('/api/v1/secret/submit', (req, res) => {
     let expiryDate = "05/06/2022 02:02:02";
     let method = "1";
 
+    let passphrase_hashed = bcrypt.hashSync(secrets.pepper+passphrase, 10);
+
     let result = db.db_addSecret({
         "secret_id": secret_id, 
         "secret_text": secret_text, 
-        "passphrase": passphrase, 
+        "passphrase": passphrase_hashed, 
         "expiryDate": expiryDate, 
         "method": method
     });
