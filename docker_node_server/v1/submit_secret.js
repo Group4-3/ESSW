@@ -40,7 +40,7 @@ router.post('/api/v1/secret/submit', (req, res) => {
             def_res_url: req.url,
             def_res_code: 200,
             def_res_msg: "OK",
-            msg_data: { secret_url: `localhost:3001/getSecret/${secret_id}` } //TODO: Update the url to contain the appropriate url
+            msg_data: { "secret_id": secret_id }
         });
     }
     else

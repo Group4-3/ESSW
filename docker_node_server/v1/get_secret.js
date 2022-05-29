@@ -10,6 +10,7 @@
 import express from 'express';
 import * as db from '../modules/group43_database.js';
 import * as secrets from '../modules/group43_secrets.js';
+import { crypto_decryptAes } from '../modules/group43_crypto.js';
 import bcrypt from 'bcrypt';
 var router = express.Router();
 
@@ -26,7 +27,6 @@ router.post('/api/v1/secret/get', (req, res) => {
             def_res_msg: "Unauthorized",
             msg_data: null
         });
-        console.log("No pass for secret");
         return;
     }
 
@@ -40,14 +40,14 @@ router.post('/api/v1/secret/get', (req, res) => {
                 def_res_msg: "Unauthorized",
                 msg_data: null
             });
-            console.log("Secret fail not exist");
             return;
         }
+        let decyptedSecret = crypto_decryptAes(secret.data.secret_text, secrets.pepper+secret_passphrase);
         res.json({
             def_res_url: req.url,
             def_res_code: 200,
             def_res_msg: "OK",
-            msg_data: secret.data
+            msg_data: decyptedSecret
         });
         db.db_deleteSecret(secret_id);
     }
@@ -61,7 +61,6 @@ router.post('/api/v1/secret/get', (req, res) => {
                 msg_data: null
             }
         );
-        console.log("Incorrect Pass");
     }
 });
 

@@ -7,6 +7,9 @@
 
 */
 
+
+import Crypto from 'crypto-js';
+
 const keySize = 256
 const ivSize = 128
 const iterations = 100
