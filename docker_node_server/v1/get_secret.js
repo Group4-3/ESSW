@@ -12,16 +12,52 @@ import * as db from '../modules/group43_database.js';
 var router = express.Router();
 
 router.post('/api/v1/secret/get', (req, res) => {
-    let result = db.db_retrieveSecret("0", "1");
-    console.log(result);
-    res.json(
-        { 
+    let secret_id = "0";
+    let secret_passphrase = "2";
+
+    //Insert password hashing
+    let passphrase = db.db_retrievePassphrase(secret_id);
+    if(!passphrase.data){
+        res.json({
+            def_res_url: req.url,
+            def_res_code: 401,
+            def_res_msg: "Unauthorized",
+            msg_data: null
+        });
+        return;
+    }
+
+    //TODO: Compare passphrases using bcrypt
+    if (passphrase.data.passphrase === secret_passphrase) {
+        let secret = db.db_retrieveSecret(secret_id);
+        if(!secret.data)
+        {
+            res.json({
+                def_res_url: req.url,
+                def_res_code: 401,
+                def_res_msg: "Unauthorized",
+                msg_data: null
+            });
+            return;
+        }
+        res.json({
             def_res_url: req.url,
             def_res_code: 200,
             def_res_msg: "OK",
-            msg_data: result.data
-        }
+            msg_data: secret.data
+        });
+    }
+    else {
+        db.db_incrementSecretFailedAccess(secret_id);
+        res.json(
+            {
+                def_res_url: req.url,
+                def_res_code: 401,
+                def_res_msg: "Unauthorized",
+                msg_data: null
+            }
         );
+    }
 });
 
 export { router }

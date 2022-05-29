@@ -14,7 +14,7 @@ router.post('/api/v1/info_for_nerds', (req, res) => {
     res.json(
         {
             def_res_url: req.url,
-            def_res_code: 200,
+            def_res_code: 418,
             def_res_msg: "OK",
             version_major: 0, version_minor: 1, version_patch: 0 
         }
