@@ -14,8 +14,8 @@ import bcrypt from 'bcrypt';
 var router = express.Router();
 
 router.post('/api/v1/secret/get', (req, res) => {
-    let secret_id = "0";
-    let secret_passphrase = "1";
+    let secret_id = req.body.secret_id;
+    let secret_passphrase = req.body.passphrase;
 
     //Insert password hashing
     let passphrase = db.db_retrievePassphrase(secret_id);
@@ -26,6 +26,7 @@ router.post('/api/v1/secret/get', (req, res) => {
             def_res_msg: "Unauthorized",
             msg_data: null
         });
+        console.log("No pass for secret");
         return;
     }
 
@@ -39,6 +40,7 @@ router.post('/api/v1/secret/get', (req, res) => {
                 def_res_msg: "Unauthorized",
                 msg_data: null
             });
+            console.log("Secret fail not exist");
             return;
         }
         res.json({
@@ -59,6 +61,7 @@ router.post('/api/v1/secret/get', (req, res) => {
                 msg_data: null
             }
         );
+        console.log("Incorrect Pass");
     }
 });
 

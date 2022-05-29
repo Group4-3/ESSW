@@ -14,11 +14,12 @@ import bcrypt from 'bcrypt';
 var router = express.Router();
 
 router.post('/api/v1/secret/submit', (req, res) => {
-    let secret_id = "0";
-    let secret_text = "Hello World";
-    let passphrase = "1";
-    let expiryDate = "05/06/2022 02:02:02";
-    let method = "1";
+    //TODO: Generate Secret ID
+    let secret_id = req.body.secret_id;
+    let secret_text = req.body.secret_text;
+    let passphrase = req.body.passphrase;
+    let expiry_date = req.body.expiry_date//"05/06/2022 02:02:02";
+    let method = req.body.encryption_method;
 
     let passphrase_hashed = bcrypt.hashSync(secrets.pepper+passphrase, 10);
 
@@ -26,7 +27,7 @@ router.post('/api/v1/secret/submit', (req, res) => {
         "secret_id": secret_id, 
         "secret_text": secret_text, 
         "passphrase": passphrase_hashed, 
-        "expiryDate": expiryDate, 
+        "expiry_date": expiry_date, 
         "method": method
     });
 

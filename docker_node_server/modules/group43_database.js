@@ -107,8 +107,8 @@ id = ?
 var databaseFile;
 
 function initialise() {
-  databaseFile = new Database("secrets.db");
-  //databaseFile = new Database("secrets.db", { verbose: console.log });
+  //databaseFile = new Database("secrets.db");
+  databaseFile = new Database("secrets.db", { verbose: console.log });
   databaseFile.exec(DROP_SECRET_TABLE_QUERY);
   databaseFile.exec(CREATE_TABLE_QUERY);
   console.log("Started Database");
@@ -118,7 +118,7 @@ initialise();
 
 export function db_addSecret(secretObject) {
   try {
-    databaseFile.prepare(INSERT_SECRET_QUERY).run(secretObject.secret_id,secretObject.secret_text, secretObject.passphrase, secretObject.expiryDate, secretObject.method);
+    databaseFile.prepare(INSERT_SECRET_QUERY).run(secretObject.secret_id,secretObject.secret_text, secretObject.passphrase, secretObject.expiry_date, secretObject.method);
   }
   catch (err) {
     return { data: null, code: 500, human_code: `failure, ${err}` };

@@ -16,7 +16,6 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import errorhandler from 'errorhandler';
-import * as db from './modules/group43_database.js';
 
 const isProduction = process.env.NODE_ENV === 'production'
 
@@ -24,6 +23,8 @@ const app = express();
 app.use(helmet());
 app.use(cors());
 app.use(morgan('combined'));
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
 /*
   V1 Routes
