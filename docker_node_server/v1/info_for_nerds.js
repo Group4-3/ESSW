@@ -11,7 +11,7 @@ import express from 'express';
 var router = express.Router();
 
 router.post('/api/v1/info_for_nerds', (req, res) => {
-    res.json(
+    res.status(200).json(
         {
             def_res_url: req.url,
             def_res_code: 418,

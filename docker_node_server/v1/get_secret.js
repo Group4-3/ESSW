@@ -21,7 +21,7 @@ router.post('/api/v1/secret/get', (req, res) => {
     //Insert password hashing
     let passphrase = db.db_retrievePassphrase(secret_id);
     if(!passphrase.data){
-        res.json({
+        res.status(401).json({
             def_res_url: req.url,
             def_res_code: 401,
             def_res_msg: "Unauthorized",
@@ -34,7 +34,7 @@ router.post('/api/v1/secret/get', (req, res) => {
         let secret = db.db_retrieveSecret(secret_id);
         if(!secret.data)
         {
-            res.json({
+            res.status(401).json({
                 def_res_url: req.url,
                 def_res_code: 401,
                 def_res_msg: "Unauthorized",
@@ -43,7 +43,7 @@ router.post('/api/v1/secret/get', (req, res) => {
             return;
         }
         let decyptedSecret = crypto_decryptAes(secret.data.secret_text, secrets.pepper+secret_passphrase);
-        res.json({
+        res.status(200).json({
             def_res_url: req.url,
             def_res_code: 200,
             def_res_msg: "OK",
@@ -53,7 +53,7 @@ router.post('/api/v1/secret/get', (req, res) => {
     }
     else {
         db.db_incrementSecretFailedAccess(secret_id);
-        res.json(
+        res.status(401).json(
             {
                 def_res_url: req.url,
                 def_res_code: 401,

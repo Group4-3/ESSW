@@ -14,6 +14,15 @@ const keySize = 256
 const ivSize = 128
 const iterations = 100
 
+export const METHODS = {
+  'aes': 0,
+  'des': 1,
+  'tripledes': 2,
+  'rabbit': 3,
+  'rc4': 4,
+  'rc4drop': 5
+}
+
 export function crypto_encryptAes(body, passphrase) {
     var salt = Crypto.lib.WordArray.random(128/8)
     var iv = Crypto.lib.WordArray.random(ivSize/8)
