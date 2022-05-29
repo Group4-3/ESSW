@@ -12,19 +12,19 @@
 
 </head>
 <body class="bg1">
- 
+
 <a href="viewsecret.html"><fieldset class="f1">
     <h2 class="head1">Ephemeral Secrets Sharing Website.</h2>
 </fieldset></a>
     <p class="lead">Enter secret message below.</p>
 
     <form id="createSecret"  autocomplete="off"  class="form1">
-      
-      
+
+
         <div class="text1">
           <textarea id="secretField" class="btn-block" name="secret" autocomplete="off" placeholder="Secret content goes here..."></textarea>
         </div>
-       
+
         <fieldset class="f2">
           <legend class="title">Privacy Options</legend>
           <div class="control-group">
@@ -33,6 +33,7 @@
               <input class="phrase" type="text" name="passphrase" id="passphraseField" value="" placeholder="A word or phrase that&#39;s difficult to guess" autocomplete="off" size="20" />
             </div>
           </div>
+          <!-- not applicable for the prototype
           <div class="control-group">
             <label class="control-label lighter" for="recipientField">Timeout:</label>
             <div class="controls">
@@ -47,7 +48,7 @@
                 <option value="300.0" >5 minutes</option>
               </select>
             </div>
-          </div>
+          </div>-->
         </fieldset>
         <div class="button2">
         <button class="btn-block2" type="submit" value="save" >Submit Secret*</button>
