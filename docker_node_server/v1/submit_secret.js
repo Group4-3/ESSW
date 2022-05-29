@@ -25,7 +25,7 @@ router.post('/api/v1/secret/submit', async (req, res) => {
     let secret_id = crypto.lib.WordArray.random(128/8).toString();
     let secret_text = req.body.secret_text;
     let passphrase = req.body.passphrase;
-    let expiry_date = req.body.expiry_date ? req.body.expiry_date : DEFAULT_EXPIRY//"05/06/2022 02:02:02";
+    let expiry_offset = req.body.expiry_offset ? req.body.expiry_offset : DEFAULT_EXPIRY//"05/06/2022 02:02:02";
     let method = req.body.encryption_method ? req.body.encryption_method : DEFAULT_METHOD;
 
     // Validation
@@ -66,7 +66,7 @@ router.post('/api/v1/secret/submit', async (req, res) => {
         return;
     }
 
-    if(req.body.expiry_date > 604800) {
+    if(expiry_offset > 604800) {
         res.status(400).json({
             def_res_url: req.url,
             def_res_code: 400,
@@ -93,7 +93,7 @@ router.post('/api/v1/secret/submit', async (req, res) => {
         "secret_id": secret_id, 
         "secret_text": secret_encrypted,
         "passphrase": passphrase_hashed, 
-        "expiry_date": expiry_date, 
+        "expiry_date": new Date(Date.now() + expiry_offset*1000).toISOString(), 
         "method": method
     });
 
