@@ -18,10 +18,18 @@ function submit(event) {
       "passphrase": passphraseValue
     }
 
-    xhr.send(data)
+    xhr.send(JSON.stringify(data))
 
     xhr.onreadystatechange = function () {
       if (xhr.readyState === 4) {
+        if(xhr.status == 400){
+            var error = JSON.parse(xhr.responseText)
+              window.alert(error.error)
+        }
+        if(xhr.status == 200){
+            var response = JSON.parse(xhr.responseText)
+              window.alert(response.id)
+        }
         console.log(xhr.status);
         console.log(xhr.responseText);
       }
