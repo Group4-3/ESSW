@@ -71,6 +71,14 @@ expiry_date < CURRENT_TIMESTAMP
 ;
 `
 
+const DELETE_SECRET_QUERY = `
+DELETE 
+FROM 
+secret 
+WHERE 
+id = ?
+`
+
 var databaseFile;
 
 function initialise() {
@@ -105,7 +113,7 @@ export function db_retrieveSecret(secretID, passphrase) {
 
 export function db_deleteSecret(secretID) {
   try {
-    databaseFile.exec(INSERT_SECRET_QUERY, secretObject.secret_id,secretObject.secret_text, secretObject.passphrase, secretObject.expiryDate, secretObject.method);
+    databaseFile.exec(DELETE_SECRET_QUERY, secretID);
   }
   catch (err) {
     return { data: null, code: 500, human_code: `failure, ${err}` };
