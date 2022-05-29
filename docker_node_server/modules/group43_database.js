@@ -106,7 +106,8 @@ id = ?
 var databaseFile;
 
 function initialise() {
-  databaseFile = new Database("secrets.db", { verbose: console.log });
+  databaseFile = new Database("secrets.db");
+  //databaseFile = new Database("secrets.db", { verbose: console.log });
   databaseFile.exec(DROP_SECRET_TABLE_QUERY);
   databaseFile.exec(CREATE_TABLE_QUERY);
   console.log("Started Database");

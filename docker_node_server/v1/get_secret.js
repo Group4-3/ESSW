@@ -13,7 +13,7 @@ var router = express.Router();
 
 router.post('/api/v1/secret/get', (req, res) => {
     let secret_id = "0";
-    let secret_passphrase = "2";
+    let secret_passphrase = "1";
 
     //Insert password hashing
     let passphrase = db.db_retrievePassphrase(secret_id);
@@ -46,6 +46,7 @@ router.post('/api/v1/secret/get', (req, res) => {
             def_res_msg: "OK",
             msg_data: secret.data
         });
+        db.db_deleteSecret(secret_id);
     }
     else {
         db.db_incrementSecretFailedAccess(secret_id);
