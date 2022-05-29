@@ -121,7 +121,7 @@ export function db_deleteSecret(secretID) {
   return { data: null, code: 200, human_readable_code: "Success" };
 }
 
-export function db_purgeDatabase() {
+export function db_purgeExpiredSecrets() {
   try {
     databaseFile.exec(PRUNE_SECRETS_QUERY);
   }
