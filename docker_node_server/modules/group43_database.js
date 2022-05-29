@@ -82,26 +82,43 @@ function initialise() {
 initialise();
 
 export function db_addSecret(secretObject) {
-  if(!databaseFile) {
-    return{ data: err, code: 500, human_code: "failure, database not open" };
+  try {
+    databaseFile.exec(INSERT_SECRET_QUERY, secretObject.secret_id,secretObject.secret_text, secretObject.passphrase, secretObject.expiryDate, secretObject.method);
   }
-  databaseFile.exec(INSERT_SECRET_QUERY, secretObject.secret_id,secretObject.secret_text, secretObject.passphrase, secretObject.expiryDate, secretObject.method);
-  return { data: row, code: 200, human_readable_code: "Success" };
+  catch (err) {
+    return { data: null, code: 500, human_code: `failure, ${err}` };
+  }
+  return { data: null, code: 200, human_readable_code: "Success" };
 }
 
 export function db_retrieveSecret(secretID, passphrase) {
-  if(!databaseFile) {
-    return { data: err, code: 500, human_code: "failure, database not open" };
+  let row;
+  try{
+    let query = databaseFile.prepare(GET_SECRET_QUERY);
+    row = query.get(secretID, passphrase);
   }
-  let query = databaseFile.prepare(GET_SECRET_QUERY);
-  let row = query.get(secretID, passphrase);
+  catch (err) {
+    return { data: null, code: 500, human_code: `failure, ${err}` };
+  }
   return { data: row, code: 200, human_readable_code: "Success" };
 }
 
-export function db_purgeDatabase() {
-  if(!databaseFile) {
-    return { data: err, code: 500, human_code: "failure, database not open" };
+export function db_deleteSecret(secretID) {
+  try {
+    databaseFile.exec(INSERT_SECRET_QUERY, secretObject.secret_id,secretObject.secret_text, secretObject.passphrase, secretObject.expiryDate, secretObject.method);
   }
-  databaseFile.exec(PRUNE_SECRETS_QUERY);
+  catch (err) {
+    return { data: null, code: 500, human_code: `failure, ${err}` };
+  }
+  return { data: null, code: 200, human_readable_code: "Success" };
+}
+
+export function db_purgeDatabase() {
+  try {
+    databaseFile.exec(PRUNE_SECRETS_QUERY);
+  }
+  catch (err) {
+    return { data: null, code: 500, human_code: `failure, ${err}` };
+  }
   return { code: 200, human_readable_code: "Success" };
 }

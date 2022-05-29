@@ -22,7 +22,6 @@ router.post('/api/v1/secret/get', (req, res) => {
             msg_data: result.data
         }
         );
-    db.db_purgeDatabase();
 });
 
 export { router }
