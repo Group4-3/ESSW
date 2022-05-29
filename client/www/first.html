@@ -1,0 +1,64 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Ephemeral Secrets Sharing Website</title>
+  <meta name="description" content="Keep sensitive information out of your chat logs and email. Share a secret link that is available only one time.">
+  <meta name="keywords" content="secret,password generator,share a secret,onetime">
+  <link rel="stylesheet" href="css/style.css">
+
+  <script src="scripts/submit.js"></script>
+
+</head>
+<body class="bg1">
+
+<a href="viewsecret.html"><fieldset class="f1">
+    <h2 class="head1">Ephemeral Secrets Sharing Website.</h2>
+</fieldset></a>
+    <p class="lead">Enter secret message below.</p>
+
+    <form id="createSecret"  autocomplete="off"  class="form1">
+
+
+        <div class="text1">
+          <textarea id="secretField" class="btn-block" name="secret" autocomplete="off" placeholder="Secret content goes here..."></textarea>
+        </div>
+
+        <fieldset class="f2">
+          <legend class="title">Privacy Options</legend>
+          <div class="control-group">
+            <label class="control-label lighter" for="passphraseField">Password:</label>
+            <div class="controls">
+              <input class="phrase" type="text" name="passphrase" id="passphraseField" value="" placeholder="A word or phrase that&#39;s difficult to guess" autocomplete="off" size="20" />
+            </div>
+          </div>
+          <!-- not applicable for the prototype
+          <div class="control-group">
+            <label class="control-label lighter" for="recipientField">Timeout:</label>
+            <div class="controls">
+              <select name="time" class="span3">
+                <option value="604800.0" selected>7 days</option>
+                <option value="259200.0" >3 days</option>
+                <option value="86400.0" >1 day</option>
+                <option value="43200.0" >12 hours</option>
+                <option value="14400.0" >4 hours</option>
+                <option value="3600.0" >1 hour</option>
+                <option value="1800.0" >30 minutes</option>
+                <option value="300.0" >5 minutes</option>
+              </select>
+            </div>
+          </div>-->
+        </fieldset>
+        <div class="button2">
+        <button class="btn-block2" type="submit" value="save" >Submit Secret*</button>
+        </div>
+    </form>
+
+</body>
+
+<footer>
+    <p>©2022 Ephemeral Secrets Sharing Website. All Rights Reserved.</p>
+    <p>Created for SWE40001-Software Engineering Project A</p>
+</footer>
+</html>
