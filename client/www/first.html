@@ -8,7 +8,7 @@
   <meta name="keywords" content="secret,password generator,share a secret,onetime">
   <link rel="stylesheet" href="css/style.css">
 
-  <script src="scripts/.js"></script>
+  <script src="scripts/main.js"></script>
 
 </head>
 <body class="bg1">
@@ -18,11 +18,11 @@
 </fieldset></a>
     <p class="lead">Enter secret message below.</p>
 
-    <form id="createSecret" method="post" action="https://mercury.swin.edu.au/it000000/formtest.php" autocomplete="off"  class="form1">
+    <form id="createSecret"  autocomplete="off"  class="form1">
       
       
         <div class="text1">
-          <textarea class="btn-block" name="secret" autocomplete="off" placeholder="Secret content goes here..."></textarea>
+          <textarea id="secretField" class="btn-block" name="secret" autocomplete="off" placeholder="Secret content goes here..."></textarea>
         </div>
        
         <fieldset class="f2">
