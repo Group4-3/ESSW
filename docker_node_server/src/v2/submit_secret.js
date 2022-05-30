@@ -43,7 +43,7 @@ router.post('/', async (req, res) => {
         res.status(400).json({
             def_res_url: req.url,
             def_res_code: 400,
-            def_res_msg: "Password found ot be insecure",
+            def_res_msg: "Missing required body param: `passphrase`.",
             msg_data: null
         });
         return;

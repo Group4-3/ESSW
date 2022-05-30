@@ -1,5 +1,5 @@
 import express from 'express'
-import { import_test } from './helpers/text.js'
+import { import_test } from './helpers/test.js'
 import { router as getSecretRoute } from './get_secret.js'
 import { router as submitSecretRoute } from './submit_secret.js'
 import { router as infoRoute } from './info_for_nerds.js'

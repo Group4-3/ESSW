@@ -11,7 +11,7 @@ db.initialise()
 
 router.use('/secret', secret)
 router.use('/passphrase', passphrase)
-router.use('/text', test)
+router.use('/test', test)
 
 router.get('/', (req, res) => {
   res.status(200).send({
