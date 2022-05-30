@@ -1,7 +1,7 @@
-var fetch = require('node-fetch')
-var crypto = require('crypto-js')
+import fetch from 'node-fetch'
+import crypto from 'crypto-js'
 
-exports.pwnedPassphrase = async (passphrase) => {
+export async function pwnedPassphrase(passphrase) {
   var sha1 = crypto.SHA1(passphrase).toString()
   var prefix = sha1.substring(0, 5)
   var suffix = sha1.substring(5)

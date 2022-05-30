@@ -1,7 +1,3 @@
-const escape = (str) => {
+export function escape(str) {
   return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;")
-}
-
-module.exports = {
-  escape
 }

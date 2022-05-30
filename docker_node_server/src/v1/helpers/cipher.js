@@ -1,25 +1,25 @@
-var crypto = require('crypto-js')
+import crypto from 'crypto-js';
 
 const keySize = 256
 const ivSize = 128
 const iterations = 100
 
-const encrypt = (body, passphrase, method) => {
+export function encrypt(body, passphrase, method) {
   return false
 }
 
-const decrypt = (encrypted_body, passphrase, method) => {
+export function decrypt(encrypted_body, passphrase, method) {
   return false
 }
 
-const generateIdentifier = () => {
+export function generateIdentifier() {
   return crypto.lib.WordArray.random(128/8).toString()
 }
 
 /**
  * @deprecated
  */
-const encryptAesDemo = (body, pass) => {
+export function encryptAesDemo(body, pass) {
   var salt = crypto.lib.WordArray.random(128/8)
   var iv = crypto.lib.WordArray.random(ivSize/8)
   var key = crypto.PBKDF2(pass, salt, {
@@ -40,7 +40,7 @@ const encryptAesDemo = (body, pass) => {
 /**
  * @deprecated
  */
-const decryptAesDemo = (body, pass) => {
+export function decryptAesDemo(body, pass) {
   var salt = crypto.enc.Hex.parse(body.substr(0, 32))
   var iv = crypto.enc.Hex.parse(body.substr(32, 32))
   var encrypted = body.substring(64)
@@ -58,12 +58,4 @@ const decryptAesDemo = (body, pass) => {
   })
 
   return decrypted.toString(crypto.enc.Utf8)
-}
-
-module.exports = {
-  encrypt,
-  decrypt,
-  generateIdentifier,
-  encryptAesDemo,
-  decryptAesDemo
 }

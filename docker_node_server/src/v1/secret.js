@@ -1,13 +1,13 @@
-var router = require('express').Router()
-var bodyParser = require('body-parser')
-var jsonParser = bodyParser.json()
-var bcrypt = require('bcrypt')
-var textUtils = require('./utilities/text')
-var cipher = require('./utilities/cipher')
-var { pwnedPassphrase } = require('./utilities/pwned')
-var { Secret } = require('../../services/db')
+import express from 'express'
+import bcrypt from 'bcrypt'
+import * as db from './services/db.js'
+import * as textUtils from './helpers/text.js'
+import * as cipher from './helpers/cipher.js'
+import { pwnedPassphrase } from './helpers/pwned.js'
 
-router.post('/submit', jsonParser, async (req, res) => {
+var router = express.Router()
+
+router.post('/submit', async (req, res) => {
   const METHODS = {
     'aes': 0,
     'des': 1,
@@ -44,8 +44,8 @@ router.post('/submit', jsonParser, async (req, res) => {
     var hashed_passphrase = await bcrypt.hash(passphrase, 10).then(result => {
       return result
     })
-
-    if (Secret.create(id, encrypted_body, hashed_passphrase, method, expiryDate)) {
+    console.log(id)
+    if (db.secretCreate(id, encrypted_body, hashed_passphrase, method, expiryDate)) {
       res.status(200).send({id: id})
     } else {
       res.status(400).send({error: "sql insertation error"})
@@ -55,12 +55,12 @@ router.post('/submit', jsonParser, async (req, res) => {
   }
 })
 
-router.post('/:id', jsonParser, async (req, res) => {
+router.post('/:id', async (req, res) => {
   try {
     if (!req.body.passphrase) throw 'Missing required body param: `passphrase`.'
     var passphrase = req.body.passphrase.toString()
 
-    var row = await Secret.get(req.params.id)
+    var row = await db.secretGet(req.params.id)
     if (!row) throw 'Secret with that Id does not exist or has been deleted.'
 
     bcrypt.compare(passphrase, row.encrypted_passphrase, (err, result) => {
@@ -68,7 +68,7 @@ router.post('/:id', jsonParser, async (req, res) => {
         var body = cipher.decryptAesDemo(row.store, passphrase)
         res.status(200).send({body: body})
 
-        Secret.destroy(row.id)
+        db.secretDestroy(row.id)
       } else {
         res.status(400).send({error: 'Incorrect passphrase.'})
       }
@@ -78,8 +78,8 @@ router.post('/:id', jsonParser, async (req, res) => {
   }
 })
 
-router.delete('/:id', jsonParser, (req, res) => {
+router.delete('/:id', (req, res) => {
   res.status(501).send({})
 })
 
-module.exports = router
+export { router }
