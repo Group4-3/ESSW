@@ -20,6 +20,8 @@
     "helmet": "^5.0.2",
     "morgan": "^1.10.0",
     "nodemon": "^2.0.16",
-    "sqlite3": "^5.0.8"
+    "sqlite3": "^5.0.8",
+    "swagger-jsdoc": "^6.2.1",
+    "swagger-ui-express": "^4.4.0"
   }
 }

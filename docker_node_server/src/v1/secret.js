@@ -7,6 +7,51 @@ import { pwnedPassphrase } from './helpers/pwned.js'
 
 var router = express.Router()
 
+/**
+ * @swagger
+ * /v1/secret/submit:
+ *  post:
+ *    tags:
+ *      - Secrets
+ *    description: Submits a new secret
+ *    produces:
+ *      - application/json
+ *    parameters:
+ *      - name: body
+ *        description: The secret text body
+ *        in: body
+ *        required: true
+ *        type: string
+ *      - name: passphrase
+ *        description: The secret key to encrypt and protect the secret
+ *        in: body
+ *        required: true
+ *        type: string
+ *      - name: method
+ *        description: The encryption method to use
+ *        in: body
+ *        required: false
+ *        type: string
+ *      - name: expiry
+ *        description: The duration in seconds until the secret automatically expires
+ *        in: body
+ *        type: integer
+ *        minimum: "1"
+ *        maximum: '20'
+ *    responses:
+ *      '200':
+ *        description: An ID of the new secret
+ *        content:
+ *          application/json:
+ *            schema:
+ *            type: object
+ *            properties:
+ *              id:
+ *                type: integer
+ *                description: The secret ID
+ *      400:
+ *        description: Param error
+ */
 router.post('/submit', async (req, res) => {
   const METHODS = {
     'aes': 0,
@@ -55,6 +100,33 @@ router.post('/submit', async (req, res) => {
   }
 })
 
+/**
+ * @swagger
+ * /v1/secret/{id}:
+ *  post:
+ *    tags:
+ *      - Secrets
+ *    description: Get secret
+ *    produces:
+ *      - application/json
+ *    parameters:
+ *      - name: id
+ *        description: The secret ID
+ *        in: path
+ *        required: true
+ *      - name: passphrase
+ *        description: The secret key to decrypt the secret
+ *        in: body
+ *        required: true
+ *        schema:
+ *          type: string
+ *    responses:
+ *      200:
+ *        description: The decrypted secret body
+ *        schema:
+ *      400:
+ *        description: Param error
+ */
 router.post('/:id', async (req, res) => {
   try {
     if (!req.body.passphrase) throw 'Missing required body param: `passphrase`.'
