@@ -1,8 +1,8 @@
 /*
-    ----- GROUP 4-3 Header -----
+    ----- GROUP 43 Header -----
     Component Name: group43_secrets
-    Date of Creation: 29/05/2022
     Description: Load and generation of secrets
+    Date of Creation: 29/05/2022
     Author(s): Petri Bayley
 
 */

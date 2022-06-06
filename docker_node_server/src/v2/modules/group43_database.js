@@ -1,16 +1,16 @@
 /*
-    ----- GROUP 4-3 Header -----
+    ----- GROUP 43 Header -----
     Component Name: group43_database
-    Date of Creation: 27/04/2022
     Description: Driver to interface with the SQLite database with functions required
-    Author(s): Petri Bayley & Kevin Lew
+    Date of Creation: 27/04/2022
+    Author(s): Petri Bayley, Kevin Lew
 
 */
 
 import Database from 'better-sqlite3';
 
 const DROP_SECRET_TABLE_QUERY = `
-DROP TABLE IF EXISTS 
+DROP TABLE IF EXISTS
 secret;
 `;
 
@@ -40,10 +40,10 @@ const INSERT_SECRET_QUERY = `
 INSERT INTO
 secret
 (
-    id, 
+    id,
     secret_text,
-    passphrase, 
-    expiry_date, 
+    passphrase,
+    expiry_date,
     method
 )
 VALUES
@@ -57,36 +57,36 @@ VALUES
 ;
 `;
 const GET_SECRET_QUERY = `
-SELECT 
-secret_text 
-FROM 
-secret 
-WHERE 
+SELECT
+*
+FROM
+secret
+WHERE
 id = ?
 ;
 `;
 const GET_PASSPHRASE_QUERY = `
-SELECT 
-passphrase 
-FROM 
-secret 
-WHERE 
-id = ? 
+SELECT
+passphrase
+FROM
+secret
+WHERE
+id = ?
 ;
 `
 const PRUNE_SECRETS_QUERY = `
-DELETE 
-FROM 
-secret 
-WHERE 
+DELETE
+FROM
+secret
+WHERE
 expiry_date < CURRENT_TIMESTAMP
 ;
 `;
 const DELETE_SECRET_QUERY = `
-DELETE 
-FROM 
-secret 
-WHERE 
+DELETE
+FROM
+secret
+WHERE
 id = ?
 ;
 `;

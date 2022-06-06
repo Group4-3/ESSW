@@ -15,8 +15,6 @@ import cors from 'cors'
 import helmet from 'helmet'
 import morgan from 'morgan'
 import errorhandler from 'errorhandler'
-import swagger from 'swagger-jsdoc'
-import swaggerui from 'swagger-ui-express'
 
 const isProduction = process.env.NODE_ENV === 'production'
 
@@ -28,26 +26,26 @@ app.use(express.urlencoded({ extended: false }))
 app.use(express.json())
 
 import { router as v1 } from './src/v1/index.js'
-import { router as v2 } from './src/v2/index.js'
+import { router as v2 } from './src/v2/routes/index.js'
 
 app.use('/api/v1', v1)
 app.use('/api/v2', v2)
 
+app.use((err, req, res, next) => {
+  res.status(err.status || 400).json({
+    success: false,
+    message: err.message || 'An unexpected error occurred.',
+    errors: err.error || []
+  })
+})
+
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    message: 'The requested resource could not be found.'
+  })
+})
+
 const server = app.listen(process.env.PORT || 3001, () => {
   console.log('listening on port ' + server.address().port)
 })
-
-const swaggerOptions = {
-  swaggerDefinition: {
-    info: {
-      title: "ESSW",
-      description: "test",
-      servers: []
-    }
-  },
-  apis: [
-    './src/v1/secret.js'
-  ]
-}
-const swaggerDocs = swagger(swaggerOptions)
-app.use('/api-docs', swaggerui.serve, swaggerui.setup(swaggerDocs))
