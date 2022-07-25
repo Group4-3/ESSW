@@ -13,12 +13,13 @@ import { validate } from './validate.js'
 var router = express.Router()
 
 /**
- * @api {get} /api/v2/passphrase/generate
+ * @api {get} /api/v2/passphrase/generate Generate a random passphrase
+ * @apiVersion 2.0.0
  * @apiName GeneratePassphrase
  * @apiGroup Passphrase
  *
- * @apiBody {String} character_sets="lowercase,uppercase,numerical,special" Optional Comma separated list of character sets to use. Available options: lowercase uppercase numerical special.
- * @apiBody {Integer} length="32" Optional Length of the passphrase.
+ * @apiBody {String} [character_sets="lowercase,uppercase,numerical,special"] Comma separated list of character sets to use. Available options: lowercase uppercase numerical special.
+ * @apiBody {Integer} [length="32"] Length of the passphrase.
  *
  * @apiSuccess {String} passphrase Generated passphrase.
  * @apiSuccessExample {json} Success-Response:
@@ -30,11 +31,12 @@ var router = express.Router()
 router.get('/generate', generate)
 
 /**
- * @api {get} /api/v2/passphrase/pwned/:passphrase
+ * @api {get} /api/v2/passphrase/pwned/:passphrase Validate if passphrase has been exposed
+ * @apiVersion 2.0.0
  * @apiName ValidatePassphrase
  * @apiGroup Passphrase
  *
- * @apiParam {String} passphrase Passphrase to test to see if it has been leaked online; aka pwned.
+ * @apiParam {String} passphrase Passphrase to test to see if it has been leaked online aka pwned.
  *
  * @apiSuccess {Boolean} pwned Passphrase has been leaked online.
  * @apiSuccess {String} sha1 SHA1 hash of the passphrase.

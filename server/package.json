@@ -24,6 +24,13 @@
     "sqlite3": "^5.0.8"
   },
   "apidoc": {
-    "title": "ESSW API"
+    "title": "ESSW API",
+    "version": "2.0.0",
+    "header": {
+      "title": "Ephemeral Secrets API"
+    },
+    "template": {
+      "showRequiredLabels": true
+    }
   }
 }

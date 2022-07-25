@@ -14,14 +14,15 @@ import { secretDestroy } from './destroy.js'
 var router = express.Router()
 
 /**
- * @api {post} /api/v2/secret/submit
+ * @api {post} /api/v2/secret/submit Submit a new secret
+ * @apiVersion 2.0.0
  * @apiName SubmitSecret
  * @apiGroup Secret
  *
  * @apiBody {String} body Secret string.
  * @apiBody {String} passphrase Key to protect the secret.
- * @apiBody {String} method="aes" Encryption method to use. Available options: aes des tripledes rabbit rc4 rc4drop
- * @apiBody {Integer} expiry="86400" Number of seconds that the secret will automatically expire after. Maximum 7 days (604800).
+ * @apiBody {String} [method="aes"] Encryption method to use. Available options: aes des tripledes rabbit rc4 rc4drop
+ * @apiBody {Integer} [expiry="86400"] Number of seconds that the secret will automatically expire after. Maximum 7 days (604800).
  * @apiExample Example usage:
  *  endpoint: http://localhost/api/v2/secret/submit
  *
@@ -42,8 +43,9 @@ var router = express.Router()
 router.post('/submit', secretSubmit)
 
 /**
- * @api {post} /api/v2/secret/:id
- * @apiName SubmitSecret
+ * @api {post} /api/v2/secret/:id Unlock a secret
+ * @apiVersion 2.0.0
+ * @apiName GetSecret
  * @apiGroup Secret
  *
  * @apiParam {String} id Unique secret ID.
@@ -65,7 +67,8 @@ router.post('/submit', secretSubmit)
 router.post('/:id', secretGet)
 
 /**
- * @api {delete} /api/v2/secret/:id
+ * @api {delete} /api/v2/secret/:id Destroy a secret
+ * @apiVersion 2.0.0
  * @apiName DestroySecret
  * @apiGroup Secret
  * @apiIgnore Not Implemented

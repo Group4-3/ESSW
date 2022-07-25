@@ -7,7 +7,7 @@
 */
 
 import bcrypt from 'bcrypt'
-import * as db from '../../modules/group43_database.js'
+import * as db from '../../modules/db.js'
 import * as cipher from '../../helpers/cipher.js'
 import * as textUtils from '../../helpers/text.js'
 

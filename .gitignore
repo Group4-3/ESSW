@@ -18,6 +18,7 @@ jspm_packages/
 .env
 .env.test
 dist
+server/*/apidoc
 
 # Gatsby files
 .cache/

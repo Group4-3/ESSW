@@ -31,9 +31,10 @@ import { router as v2 } from './src/v2/routes/index.js'
 app.use('/api/v1', v1)
 app.use('/api/v2', v2)
 
+app.use(express.static('public'))
+
 app.use((err, req, res, next) => {
   res.status(err.status || 400).json({
-    success: false,
     message: err.message || 'An unexpected error occurred.',
     errors: err.error || []
   })
@@ -41,7 +42,6 @@ app.use((err, req, res, next) => {
 
 app.use((req, res) => {
   res.status(404).json({
-    success: false,
     message: 'The requested resource could not be found.'
   })
 })
