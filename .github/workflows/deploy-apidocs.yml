@@ -1,0 +1,39 @@
+name: deploy-apidocs
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - server/**
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    concurrency: ci-${{ github.ref }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+
+      - name: setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - name: install npm dependencies
+        run: |
+          npm install
+
+      - name: generate api-doc page
+        run: |
+          apidoc -d -e "(node_modules|build)" -o build/apidoc --single
+
+      - name: deploy to github pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: build
+          branch: gh-pages
+          clean: true
