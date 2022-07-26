@@ -7,11 +7,29 @@
 */
 
 import express from 'express'
+import { methods } from '../../helpers/cipher.js'
 import { secretSubmit } from './submit.js'
 import { secretGet } from './get.js'
 import { secretDestroy } from './destroy.js'
 
 var router = express.Router()
+
+/**
+ * @api {get} /api/v2/secret/methods Return a list of available encryption methods
+ * @apiVersion 2.0.0
+ * @apiName EncryptionMethods
+ * @apiGroup Secret
+ *
+ * @apiSuccess {Array} methods Array of available encryption methods.
+ * @apiSuccessExample {json} Success-Response:
+ *  HTTP/1.1 200 OK
+ *  {
+ *    "methods": ["aes", "tripledes", "rc4drop"]
+ *  }
+ */
+router.get('/methods', function(req, res, next) {
+  return res.status(200).send({methods: methods})
+})
 
 /**
  * @api {post} /api/v2/secret/submit Submit a new secret
@@ -57,6 +75,7 @@ router.post('/submit', secretSubmit)
  *  {
  *    "passphrase": "#SuperS3cr3tP@ssw0rd"
  *  }
+ *
  * @apiSuccess {String} id Decrypted secret string.
  * @apiSuccessExample {json} Success-Response:
  *  HTTP/1.1 200 OK
