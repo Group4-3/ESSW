@@ -9,7 +9,6 @@
 import bcrypt from 'bcrypt'
 import * as db from '../../modules/db.js'
 import * as cipher from '../../helpers/cipher.js'
-import * as textUtils from '../../helpers/text.js'
 
 export async function secretGet(req, res, next) {
   try {
@@ -23,13 +22,17 @@ export async function secretGet(req, res, next) {
 
     var row = await db.db_retrieveSecret(id)
     if (!row.data)
-      return next({message: 'Secret with that ID does not exist or has been deleted.'})
+      return next({status: 404, message: 'Secret with that ID does not exist or has been deleted.'})
     row = row.data
+
+    if (row.access_failed_attempts >= 6)
+      return next({status: 429, message: 'Too many unsuccessful access attempts; the requested secret is locked.'})
 
     if(bcrypt.compareSync(passphrase, row.passphrase)) {
       var decrypted_body = cipher.decrypt(row.secret_text, passphrase, row.method)
       return res.status(200).send({body: decrypted_body})
     } else {
+      db.db_incrementSecretFailedAccess(id)
       return next({status: 401, message: 'Unauthorized.'})
     }
   } catch (err) {
