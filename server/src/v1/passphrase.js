@@ -1,7 +1,8 @@
-var router = require('express').Router()
-var bodyParser = require('body-parser')
-var jsonParser = bodyParser.json()
-var { pwnedPassphrase } = require('./utilities/pwned')
+import express from 'express'
+import * as db from './services/db.js'
+import { pwnedPassphrase } from './helpers/pwned.js'
+
+var router = express.Router()
 
 /**
  * @bodyParam {integer} length optional The length of the passphrase to generate.
@@ -9,7 +10,7 @@ var { pwnedPassphrase } = require('./utilities/pwned')
  *
  * @returnParam {string} passphrase The generated passphrase.
  */
-router.get('/', jsonParser, (req, res) => {
+router.get('/', (req, res) => {
   const MIN_LENGTH = 1
   const MAX_LENGTH = 256
   const DEFAULT_LENGTH = 32
@@ -52,7 +53,7 @@ router.get('/', jsonParser, (req, res) => {
  *
  * @returnParam {boolean} pwned True or false whether the passphrase has been exposed.
  */
-router.get('/pwned/:passphrase', jsonParser, async (req, res) => {
+router.get('/pwned/:passphrase', async (req, res) => {
   try {
     res.status(200).send({
       'pwned': await pwnedPassphrase(req.params.passphrase)
@@ -62,4 +63,4 @@ router.get('/pwned/:passphrase', jsonParser, async (req, res) => {
   }
 })
 
-module.exports = router
+export { router }

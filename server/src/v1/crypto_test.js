@@ -1,15 +1,15 @@
-var router = require('express').Router()
-var bodyParser = require('body-parser')
-var jsonParser = bodyParser.json()
+import express from 'express'
+import bcrypt from 'bcrypt'
+import Crypto from 'crypto-js'
+import * as db from './services/db.js'
 
-const Crypto = require('crypto-js')
-const db = require('../../services/db')
+var router = express.Router()
 
 /**
  * @bodyParam {string} secret required The secret to encrypt.
  * @bodyParam {string} passphrase required The key to encrypt the secret.
  */
-router.post('/encrypt', jsonParser, (req, res) => {
+router.post('/encrypt', (req, res) => {
   console.log(req.body)
   var secret = req.body.secret.toString()
   var password = req.body.passphrase.toString()
@@ -24,7 +24,7 @@ router.post('/encrypt', jsonParser, (req, res) => {
  * @bodyParam {string} encrypted_secret required The secret to encrypt.
  * @bodyParam {string} passphrase required The key to encrypt the secret.
  */
-router.post('/decrypt', jsonParser, (req, res) => {
+router.post('/decrypt', (req, res) => {
   var secret = req.body.encrypted_secret.toString()
   var password = req.body.passphrase.toString()
 
@@ -38,7 +38,7 @@ router.post('/decrypt', jsonParser, (req, res) => {
  * @bodyParam {string} secret required The secret to encrypt.
  * @bodyParam {string} passphrase required The key to encrypt the secret.
  */
-router.post('/secret/submit', jsonParser, (req, res) => {
+router.post('/secret/submit', (req, res) => {
   var errs = []
 
   var params = {
@@ -104,4 +104,4 @@ function decryptAes(body, pass) {
   return decrypted.toString(Crypto.enc.Utf8)
 }
 
-module.exports = router
+export { router }
