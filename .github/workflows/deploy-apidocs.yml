@@ -23,12 +23,10 @@ jobs:
         with:
           node-version: 16
 
-      - name: install npm dependencies
+      - name: generate api-doc page
+        working-directory: ./server
         run: |
           npm install
-
-      - name: generate api-doc page
-        run: |
           apidoc -d -e "(node_modules|build)" -o build/apidoc --single
 
       - name: deploy to github pages
