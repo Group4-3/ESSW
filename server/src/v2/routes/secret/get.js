@@ -21,7 +21,7 @@ export async function secretGet(req, res, next) {
       return next({message: 'Missing required body param: `passphrase`.'})
     var passphrase = req.body.passphrase.toString()
 
-    var row = await db.db_retrieveSecret(id)
+    var row = await db.retrieveSecret(id)
     if (!row.data)
       return next({message: 'Secret with that ID does not exist or has been deleted.'})
     row = row.data

@@ -116,7 +116,7 @@ function initialise() {
 
 initialise();
 
-export function db_addSecret(secretObject) {
+export function addSecret(secretObject) {
   try {
     databaseFile.prepare(INSERT_SECRET_QUERY).run(secretObject.secret_id,secretObject.secret_text, secretObject.passphrase, secretObject.expiry_date, secretObject.method);
   }
@@ -126,10 +126,10 @@ export function db_addSecret(secretObject) {
   return { data: null, code: 200, human_readable_code: "Success" };
 }
 
-export function db_retrieveSecret(secretID) {
+function secretAccess(preparedStatement, secretID) {
   let row;
-  try{
-    row = databaseFile.prepare(GET_SECRET_QUERY).get(secretID);
+  try {
+    row = databaseFile.prepare(preparedStatement).get(secretID);
   }
   catch (err) {
     return { data: null, code: 500, human_code: `failure, ${err}` };
@@ -137,38 +137,23 @@ export function db_retrieveSecret(secretID) {
   return { data: row, code: 200, human_readable_code: "Success" };
 }
 
-export function db_retrievePassphrase(secretID) {
-  let row;
-  try{
-    row = databaseFile.prepare(GET_PASSPHRASE_QUERY).get(secretID);
-  }
-  catch (err) {
-    return { data: null, code: 500, human_code: `failure, ${err}` };
-  }
-  return { data: row, code: 200, human_readable_code: "Success" };
+export function retrieveSecret(secretID) {
+  return secretAccess(GET_SECRET_QUERY, secretID);
 }
 
-export function db_deleteSecret(secretID) {
-  try {
-    databaseFile.prepare(DELETE_SECRET_QUERY).run(secretID);
-  }
-  catch (err) {
-    return { data: null, code: 500, human_code: `failure, ${err}` };
-  }
-  return { data: null, code: 200, human_readable_code: "Success" };
+export function retrievePassphrase(secretID) {
+  return secretAccess(GET_PASSPHRASE_QUERY, secretID);
 }
 
-export function db_incrementSecretFailedAccess(secretID) {
-  try {
-    databaseFile.prepare(INCREMENT_SECRET_FAILED_ACCESS_QUERY).run(secretID);
-  }
-  catch (err) {
-    return { data: null, code: 500, human_code: `failure, ${err}` };
-  }
-  return { data: null, code: 200, human_readable_code: "Success" };
+export function deleteSecret(secretID) {
+  return secretAccess(DELETE_SECRET_QUERY, secretID);
 }
 
-export function db_purgeExpiredSecrets() {
+export function incrementSecretFailedAccess(secretID) {
+  return secretAccess(INCREMENT_SECRET_FAILED_ACCESS_QUERY, secretID);
+}
+
+export function purgeExpiredSecrets() {
   try {
     databaseFile.exec(PRUNE_SECRETS_QUERY);
   }
