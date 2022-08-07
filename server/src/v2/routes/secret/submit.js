@@ -50,9 +50,7 @@ export async function secretSubmit(req, res, next) {
       return result
     })
 
-    var id = cipher.generateIdentifier()
-
-    var transaction = db.db_addSecret({
+    var transaction = db.addSecret({
       secret_id: id,
       secret_text: encrypted_body,
       passphrase: hashed_passphrase,
