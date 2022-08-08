@@ -116,20 +116,11 @@ function initialise() {
 
 initialise();
 
-export function addSecret(secretObject) {
-  try {
-    databaseFile.prepare(INSERT_SECRET_QUERY).run(secretObject.secret_id,secretObject.secret_text, secretObject.passphrase, secretObject.expiry_date, secretObject.method);
-  }
-  catch (err) {
-    return { data: null, code: 500, human_code: `failure, ${err}` };
-  }
-  return { data: null, code: 200, human_readable_code: "Success" };
-}
-
-function secretAccess(preparedStatement, secretID) {
+function getStatement(preparedStatement, statementParams) {
+  //Returns data
   let row;
   try {
-    row = databaseFile.prepare(preparedStatement).get(secretID);
+    row = databaseFile.prepare(preparedStatement).get(statementParams);
   }
   catch (err) {
     return { data: null, code: 500, human_code: `failure, ${err}` };
@@ -137,20 +128,36 @@ function secretAccess(preparedStatement, secretID) {
   return { data: row, code: 200, human_readable_code: "Success" };
 }
 
+function runStatement(preparedStatement, statementParams) {
+  //Does not return data
+  try {
+    databaseFile.prepare(preparedStatement).run(statementParams);
+  }
+  catch (err) {
+    return { data: null, code: 500, human_code: `failure, ${err}` };
+  }
+  return { data: null, code: 200, human_readable_code: "Success" };
+}
+
+export function addSecret(secretObject) {
+  return runStatement(INSERT_SECRET_QUERY, secretObject.secret_id, secretObject.secret_text, secretObject.passphrase, secretObject.expiry_date, secretObject.method);
+}
+
+
 export function retrieveSecret(secretID) {
-  return secretAccess(GET_SECRET_QUERY, secretID);
+  return getStatement(GET_SECRET_QUERY, secretID);
 }
 
 export function retrievePassphrase(secretID) {
-  return secretAccess(GET_PASSPHRASE_QUERY, secretID);
+  return getStatement(GET_PASSPHRASE_QUERY, secretID);
 }
 
 export function deleteSecret(secretID) {
-  return secretAccess(DELETE_SECRET_QUERY, secretID);
+  return runStatement(DELETE_SECRET_QUERY, secretID);
 }
 
 export function incrementSecretFailedAccess(secretID) {
-  return secretAccess(INCREMENT_SECRET_FAILED_ACCESS_QUERY, secretID);
+  return  runStatement(INCREMENT_SECRET_FAILED_ACCESS_QUERY, secretID);
 }
 
 export function purgeExpiredSecrets() {
