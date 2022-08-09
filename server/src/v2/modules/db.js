@@ -141,7 +141,7 @@ function runStatement(preparedStatement, statementParams) {
 }
 
 export function addSecret(secretObject) {
-  return runStatement(INSERT_SECRET_QUERY, secretObject.secret_id, secretObject.secret_text, secretObject.passphrase, secretObject.expiry_date, secretObject.method);
+  return runStatement(INSERT_SECRET_QUERY, [secretObject.secret_id, secretObject.secret_text, secretObject.passphrase, secretObject.expiry_date, secretObject.method]);
 }
 
 
