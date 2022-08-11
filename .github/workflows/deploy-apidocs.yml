@@ -26,8 +26,8 @@ jobs:
       - name: generate api-doc page
         working-directory: ./server
         run: |
-          npm install
-          apidoc -d -e "(node_modules|build)" -o build/apidoc --single
+          npm install -g apidoc@0.52.0
+          npm run apidoc
 
       - name: deploy to github pages
         uses: JamesIves/github-pages-deploy-action@v4
