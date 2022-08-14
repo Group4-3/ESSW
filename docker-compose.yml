@@ -3,25 +3,25 @@ services:
         essw_node_client:
                 user: node
                 build:
-                        context: docker_node_client
+                        context: client
                         dockerfile: Dockerfile
                 ports:
-                        - 80:8081
+                        - 8081:8081
                 environment:
                         - NODE_ENV=production
-                        - NODE_PORT=80
+                        - NODE_PORT=8081
                 networks:
                         - backend
         essw_node_server:
                 user: node
                 build:
-                        context: docker_node_server
+                        context: server
                         dockerfile: Dockerfile
                 ports:
-                        - 80:8082
+                        - 8082:8082
                 environment:
                         - NODE_ENV=production
-                        - NODE_PORT=80
+                        - NODE_PORT=8082
                 networks:
                         - backend
         essw_nginx:
@@ -30,11 +30,11 @@ services:
                 volumes:
                         - ./certbot/www:/var/www/certbot/:ro
                 ports:
-                        - 80:80
-                        - 443:433
+                        - 80:8080
+                        - 443:4443
                 environment:
                         - NGINX_HOST=localhost.com
-                        - NGINX_PORT=80
+                        - NGINX_PORT=8080
                 networks:
                         - backend
                         - default
