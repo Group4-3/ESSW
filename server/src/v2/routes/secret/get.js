@@ -27,7 +27,7 @@ export async function secretGet(req, res, next) {
     row = row.data
 
     if(bcrypt.compareSync(passphrase, row.passphrase)) {
-      var decrypted_body = cipher.decryptAesDemo(row.secret_text, passphrase)
+      var decrypted_body = cipher.decrypt(row.secret_text, passphrase, row.method)
       return res.status(200).send({body: decrypted_body})
     } else {
       return next({status: 401, message: 'Unauthorized.'})

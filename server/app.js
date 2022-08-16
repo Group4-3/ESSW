@@ -36,7 +36,7 @@ app.use(express.static('public'))
 app.use((err, req, res, next) => {
   res.status(err.status || 400).json({
     message: err.message || 'An unexpected error occurred.',
-    errors: err.error || []
+    errors: err.error
   })
 })
 

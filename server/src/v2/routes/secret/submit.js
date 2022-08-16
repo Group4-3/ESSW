@@ -13,17 +13,10 @@ import * as textUtils from '../../helpers/text.js'
 import { pwnedPassphrase } from '../../helpers/pwned.js'
 
 export async function secretSubmit(req, res, next) {
-  const METHODS = {
-    'aes': 0,
-    'des': 1,
-    'tripledes': 2,
-    'rabbit': 3,
-    'rc4': 4,
-    'rc4drop': 5
-  }
+  const METHODS = cipher.methods
   const DEFAULT_METHOD = 'aes'
   const DEFAULT_EXPIRY = 86400 // 1 day
-  const MAX_EXPIRY = 604800 // 7 days
+  const MAX_EXPIRY = 604800    // 7 days
 
   try {
     if (!req.body.body)
@@ -34,9 +27,9 @@ export async function secretSubmit(req, res, next) {
       return next({message: 'Missing required body param: `passphrase`.'})
     var passphrase = req.body.passphrase.toString()
 
-    if (req.body.method && !METHODS.hasOwnProperty(req.body.method))
-      return next({message: 'Param `method` must be one of: ' + Object.keys(METHODS).join(', ')})
-    var method = req.body.method ? req.body.method : DEFAULT_METHOD
+    if (req.body.method && !METHODS.includes(req.body.method))
+      return next({message: 'Param `method` must be one of: ' + METHODS.join(', ')})
+    var method = req.body.method ? req.body.method.toLowerCase() : DEFAULT_METHOD
 
     if (req.body.expiry && !Number.isInteger(parseInt(req.body.expiry))
         || parseInt(req.body.expiry) < 0
@@ -49,14 +42,16 @@ export async function secretSubmit(req, res, next) {
     if (pwned)
       return next({message: 'Passphrase has been pwned (leaked online); please use something else.'})
 
-    var id = cipher.generateIdentifier()
-    //var encrypted_body = cipher.encrypt(body, passphrase, method)
-    var encrypted_body = cipher.encryptAesDemo(body, passphrase)
+    var encrypted_body = cipher.encrypt(body, passphrase, method)
+    if (!encrypted_body)
+      return next({message: 'Your message could not be encrypted; please try again checking your parameters are correct.'})
+
     var hashed_passphrase = await bcrypt.hash(passphrase, 10).then(result => {
       return result
     })
 
     var transaction = db.addSecret({
+    var id = cipher.generateIdentifier()
       secret_id: id,
       secret_text: encrypted_body,
       passphrase: hashed_passphrase,
