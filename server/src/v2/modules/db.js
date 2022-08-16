@@ -64,7 +64,7 @@ var databaseFile;
 function initialise() {
   //databaseFile = new Database("secrets.db");
   databaseFile = new Database("secrets.db", { verbose: console.log });
-  const dropStatement = db.prepare('DROP TABLE IF EXISTS ?');
+  const dropStatement = databaseFile.prepare('DROP TABLE IF EXISTS ?');
   dropStatement.run(TABLE_NAME);
   console.log("Cleared Table ${TABLE_NAME} (if exists).")
   /*
@@ -77,7 +77,7 @@ function initialise() {
       method: A code to indicate which method was used for encryption
       access_failed_attempts: The current number of failed attempts accesssing the secret
   */
-  const createStatement = db.prepare(`
+  const createStatement = databaseFile.prepare(`
 CREATE TABLE
 '?'(
     id TEXT PRIMARY KEY NOT NULL,
@@ -118,7 +118,7 @@ function runStatement(statementParams) {
   return { data: null, code: 200, human_readable_code: "Success" };
 }
 
-const INSERT_SECRET_QUERY = db.prepare(`
+const INSERT_SECRET_QUERY = databaseFile.prepare(`
 INSERT INTO
 secret
 (
