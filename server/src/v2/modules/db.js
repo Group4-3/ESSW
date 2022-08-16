@@ -77,7 +77,7 @@ function runStatement(preparedStatement, statementParams) {
 
 const INSERT_SECRET_QUERY = databaseFile.prepare(`
 INSERT INTO
-secret
+@table_name
 (
     id,
     secret_text,
@@ -96,51 +96,52 @@ VALUES
 `);
 
 export function addSecret(secretObject) {
+  secretObject['table_name'] = TABLE_NAME; //Append table name to object
   return runStatement(INSERT_SECRET_QUERY, secretObject);
 }
 
 //---
 
-const GET_SECRET_QUERY = databaseFile.prepare(`SELECT * FROM secret WHERE id = ?`);
+const GET_SECRET_QUERY = databaseFile.prepare(`SELECT * FROM @table_name WHERE id = @secret_id`);
 
 export function retrieveSecret(secretID) {
-  return getStatement(GET_SECRET_QUERY, secretID);
+  return getStatement(GET_SECRET_QUERY, {"table_name":TABLE_NAME, "secret_id":secretID});
 }
 
 //---
 
-const GET_PASSPHRASE_QUERY = databaseFile.prepare(`SELECT passphrase FROM secret WHERE id = ?`);
+const GET_PASSPHRASE_QUERY = databaseFile.prepare(`SELECT passphrase FROM @table_name WHERE id = @secret_id`);
 
 export function retrievePassphrase(secretID) {
-  return getStatement(GET_PASSPHRASE_QUERY, secretID);
+  return getStatement(GET_PASSPHRASE_QUERY, { "table_name": TABLE_NAME, "secret_id": secretID });
 }
 
 //---
-const DELETE_SECRET_QUERY = databaseFile.prepare(`DELETE FROM secret WHERE id = ?`);
+const DELETE_SECRET_QUERY = databaseFile.prepare(`DELETE FROM @table_name WHERE id = @secret_id`);
 
 export function deleteSecret(secretID) {
-  return runStatement(DELETE_SECRET_QUERY, secretID);
+  return runStatement(DELETE_SECRET_QUERY, { "table_name": TABLE_NAME, "secret_id": secretID });
 }
 
 //---
 const INCREMENT_SECRET_FAILED_ACCESS_QUERY = databaseFile.prepare(`
 UPDATE
-secret
+@table_name
 SET
 access_failed_attempts = access_failed_attempts + 1
 WHERE
-id = ?`);
+id = @secret_id`);
 
 export function incrementSecretFailedAccess(secretID) {
-  return runStatement(INCREMENT_SECRET_FAILED_ACCESS_QUERY, secretID);
+  return runStatement(INCREMENT_SECRET_FAILED_ACCESS_QUERY, { "table_name": TABLE_NAME, "secret_id": secretID });
 }
 
 //---
-const PRUNE_SECRETS_QUERY = databaseFile.prepare(`DELETE FROM secret WHERE expiry_date < CURRENT_TIMESTAMP`);
+const PRUNE_SECRETS_QUERY = databaseFile.prepare(`DELETE FROM ? WHERE expiry_date < CURRENT_TIMESTAMP`);
 
 export function purgeExpiredSecrets() {
   try {
-    const purgeInfo = PRUNE_SECRETS_QUERY.run();
+    var purgeInfo = PRUNE_SECRETS_QUERY.run(TABLE_NAME);
   }
   catch (err) {
     return { data: null, code: 500, human_code: `failure, ${err}` };
