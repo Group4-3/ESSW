@@ -11,26 +11,6 @@ import Database from 'better-sqlite3';
 
 const TABLE_NAME = "Secret";
 
-const INSERT_SECRET_QUERY = `
-INSERT INTO
-secret
-(
-    id,
-    secret_text,
-    passphrase,
-    expiry_date,
-    method
-)
-VALUES
-(
-    ?,
-    ?,
-    ?,
-    ?,
-    ?
-)
-;
-`;
 const GET_SECRET_QUERY = `
 SELECT
 *
@@ -115,11 +95,11 @@ CREATE TABLE
 
 initialise();
 
-function getStatement(preparedStatement, statementParams) {
+function getStatement(statementParams) {
   //Returns data
   let row;
   try {
-    row = databaseFile.prepare(preparedStatement).get(statementParams);
+    row = databaseFile.get(statementParams);
   }
   catch (err) {
     return { data: null, code: 500, human_code: `failure, ${err}` };
@@ -127,10 +107,10 @@ function getStatement(preparedStatement, statementParams) {
   return { data: row, code: 200, human_readable_code: "Success" };
 }
 
-function runStatement(preparedStatement, statementParams) {
+function runStatement(statementParams) {
   //Does not return data
   try {
-    databaseFile.prepare(preparedStatement).run(statementParams);
+    databaseFile.run(statementParams);
   }
   catch (err) {
     return { data: null, code: 500, human_code: `failure, ${err}` };
@@ -138,8 +118,28 @@ function runStatement(preparedStatement, statementParams) {
   return { data: null, code: 200, human_readable_code: "Success" };
 }
 
+const INSERT_SECRET_QUERY = db.prepare(`
+INSERT INTO
+secret
+(
+    id,
+    secret_text,
+    passphrase,
+    expiry_date,
+    method
+)
+VALUES
+(
+    @secret_id,
+    @secret_text,
+    @passphrase,
+    @expiry_date,
+    @method
+)
+`);
+
 export function addSecret(secretObject) {
-  return runStatement(INSERT_SECRET_QUERY, [secretObject.secret_id, secretObject.secret_text, secretObject.passphrase, secretObject.expiry_date, secretObject.method]);
+  return runStatement(INSERT_SECRET_QUERY, secretObject);
 }
 
 
