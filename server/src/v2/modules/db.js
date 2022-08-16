@@ -9,33 +9,8 @@
 
 import Database from 'better-sqlite3';
 
-const DROP_SECRET_TABLE_QUERY = `
-DROP TABLE IF EXISTS
-secret;
-`;
+const TABLE_NAME = "Secret";
 
-/*
-  Create Table Query
-  Table name: secret
-    id: The primary key id for each secret
-    secret_text: The string of the secret
-    passphrase: The string of the hashed password
-    expiryDate: The date and time of when the secret should expire
-    method: A code to indicate which method was used for encryption
-    access_failed_attempts: The current number of failed attempts accesssing the secret
-*/
-const CREATE_TABLE_QUERY = `
-CREATE TABLE
-'secret'(
-    id TEXT PRIMARY KEY NOT NULL,
-    secret_text TEXT NOT NULL,
-    passphrase TEXT NOT NULL,
-    expiry_date DATE NOT NULL,
-    method TEXT NOT NULL,
-    access_failed_attempts INT NOT NULL DEFAULT 0
-    )
-;
-`;
 const INSERT_SECRET_QUERY = `
 INSERT INTO
 secret
@@ -110,9 +85,33 @@ function initialise() {
   databaseFile = new Database("secrets.db", {
     verbose: (["development"].includes(process.env.NODE_ENV) ? console.log : null)
   });
-  databaseFile.exec(DROP_SECRET_TABLE_QUERY);
-  databaseFile.exec(CREATE_TABLE_QUERY);
-  console.log("Started Database");
+  const dropStatement = db.prepare('DROP TABLE IF EXISTS ?');
+  dropStatement.run(TABLE_NAME);
+  console.log("Cleared Table ${TABLE_NAME} (if exists).")
+  /*
+    Create Table Query
+    Table name: secret
+      id: The primary key id for each secret
+      secret_text: The string of the secret
+      passphrase: The string of the hashed password
+      expiryDate: The date and time of when the secret should expire
+      method: A code to indicate which method was used for encryption
+      access_failed_attempts: The current number of failed attempts accesssing the secret
+  */
+  const createStatement = db.prepare(`
+CREATE TABLE
+'?'(
+    id TEXT PRIMARY KEY NOT NULL,
+    secret_text TEXT NOT NULL,
+    passphrase TEXT NOT NULL,
+    expiry_date DATE NOT NULL,
+    method TEXT NOT NULL,
+    access_failed_attempts INT NOT NULL DEFAULT 0
+    )
+`);
+  createStatement.run(TABLE_NAME);
+  console.log("Created New Table ${TABLE_NAME}.")
+  console.log("Database initialised successfully.");
 }
 
 initialise();
