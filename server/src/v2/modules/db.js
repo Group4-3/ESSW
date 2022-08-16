@@ -11,32 +11,7 @@ import Database from 'better-sqlite3';
 
 const TABLE_NAME = "Secret";
 
-const GET_SECRET_QUERY = `
-SELECT
-*
-FROM
-secret
-WHERE
-id = ?
-;
-`;
-const GET_PASSPHRASE_QUERY = `
-SELECT
-passphrase
-FROM
-secret
-WHERE
-id = ?
-;
-`
-const PRUNE_SECRETS_QUERY = `
-DELETE
-FROM
-secret
-WHERE
-expiry_date < CURRENT_TIMESTAMP
-;
-`;
+
 const DELETE_SECRET_QUERY = `
 DELETE
 FROM
@@ -95,11 +70,11 @@ CREATE TABLE
 
 initialise();
 
-function getStatement(statementParams) {
+function getStatement(preparedStatement, statementParams) {
   //Returns data
   let row;
   try {
-    row = databaseFile.get(statementParams);
+    row = preparedStatement.get(statementParams);
   }
   catch (err) {
     return { data: null, code: 500, human_code: `failure, ${err}` };
@@ -107,16 +82,18 @@ function getStatement(statementParams) {
   return { data: row, code: 200, human_readable_code: "Success" };
 }
 
-function runStatement(statementParams) {
+function runStatement(preparedStatement, statementParams) {
   //Does not return data
   try {
-    databaseFile.run(statementParams);
+    preparedStatement.run(statementParams);
   }
   catch (err) {
     return { data: null, code: 500, human_code: `failure, ${err}` };
   }
   return { data: null, code: 200, human_readable_code: "Success" };
 }
+
+//---
 
 const INSERT_SECRET_QUERY = databaseFile.prepare(`
 INSERT INTO
@@ -142,29 +119,58 @@ export function addSecret(secretObject) {
   return runStatement(INSERT_SECRET_QUERY, secretObject);
 }
 
+//---
+
+const GET_SECRET_QUERY = databaseFile.prepare(`
+SELECT
+*
+FROM
+secret
+WHERE
+id = ?
+`);
 
 export function retrieveSecret(secretID) {
   return getStatement(GET_SECRET_QUERY, secretID);
 }
 
+//---
+
+const GET_PASSPHRASE_QUERY = databaseFile.prepare(`
+SELECT
+passphrase
+FROM
+secret
+WHERE
+id = ?
+`);
+
 export function retrievePassphrase(secretID) {
   return getStatement(GET_PASSPHRASE_QUERY, secretID);
 }
+
+//---
+
 
 export function deleteSecret(secretID) {
   return runStatement(DELETE_SECRET_QUERY, secretID);
 }
 
+//---
+
 export function incrementSecretFailedAccess(secretID) {
-  return  runStatement(INCREMENT_SECRET_FAILED_ACCESS_QUERY, secretID);
+  return runStatement(INCREMENT_SECRET_FAILED_ACCESS_QUERY, secretID);
 }
 
+//---
+const PRUNE_SECRETS_QUERY = databaseFile.prepare(`
+DELETE
+FROM
+secret
+WHERE
+expiry_date < CURRENT_TIMESTAMP
+`);
+
 export function purgeExpiredSecrets() {
-  try {
-    databaseFile.exec(PRUNE_SECRETS_QUERY);
-  }
-  catch (err) {
-    return { data: null, code: 500, human_code: `failure, ${err}` };
-  }
-  return { code: 200, human_readable_code: "Success" };
+  return runStatement(PRUNE_SECRETS_QUERY);
 }
