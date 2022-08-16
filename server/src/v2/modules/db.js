@@ -9,7 +9,6 @@
 
 import Database from 'better-sqlite3';
 
-
 /*
 Global variable for the database file
 */
@@ -140,5 +139,11 @@ export function incrementSecretFailedAccess(secretID) {
 const PRUNE_SECRETS_QUERY = databaseFile.prepare(`DELETE FROM secret WHERE expiry_date < CURRENT_TIMESTAMP`);
 
 export function purgeExpiredSecrets() {
-  return runStatement(PRUNE_SECRETS_QUERY);
+  try {
+    const purgeInfo = PRUNE_SECRETS_QUERY.run();
+  }
+  catch (err) {
+    return { data: null, code: 500, human_code: `failure, ${err}` };
+  }
+  return { data: purgeInfo.changes, code: 200, human_readable_code: "Success" }; //Return the number of rows affected by purge
 }
