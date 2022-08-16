@@ -9,12 +9,12 @@
 
 import Database from 'better-sqlite3';
 
-const TABLE_NAME = "Secret";
-
 
 /*
-  Global variable for the database file
+Global variable for the database file
 */
+
+var TABLE_NAME = "Secret";
 var databaseFile;
 
 function initialise() {
@@ -102,14 +102,7 @@ export function addSecret(secretObject) {
 
 //---
 
-const GET_SECRET_QUERY = databaseFile.prepare(`
-SELECT
-*
-FROM
-secret
-WHERE
-id = ?
-`);
+const GET_SECRET_QUERY = databaseFile.prepare(`SELECT * FROM secret WHERE id = ?`);
 
 export function retrieveSecret(secretID) {
   return getStatement(GET_SECRET_QUERY, secretID);
@@ -117,14 +110,7 @@ export function retrieveSecret(secretID) {
 
 //---
 
-const GET_PASSPHRASE_QUERY = databaseFile.prepare(`
-SELECT
-passphrase
-FROM
-secret
-WHERE
-id = ?
-`);
+const GET_PASSPHRASE_QUERY = databaseFile.prepare(`SELECT passphrase FROM secret WHERE id = ?`);
 
 export function retrievePassphrase(secretID) {
   return getStatement(GET_PASSPHRASE_QUERY, secretID);
@@ -144,22 +130,14 @@ secret
 SET
 access_failed_attempts = access_failed_attempts + 1
 WHERE
-id = ?
-;
-`);
+id = ?`);
 
 export function incrementSecretFailedAccess(secretID) {
   return runStatement(INCREMENT_SECRET_FAILED_ACCESS_QUERY, secretID);
 }
 
 //---
-const PRUNE_SECRETS_QUERY = databaseFile.prepare(`
-DELETE
-FROM
-secret
-WHERE
-expiry_date < CURRENT_TIMESTAMP
-`);
+const PRUNE_SECRETS_QUERY = databaseFile.prepare(`DELETE FROM secret WHERE expiry_date < CURRENT_TIMESTAMP`);
 
 export function purgeExpiredSecrets() {
   return runStatement(PRUNE_SECRETS_QUERY);
