@@ -12,14 +12,6 @@ import Database from 'better-sqlite3';
 const TABLE_NAME = "Secret";
 
 
-const DELETE_SECRET_QUERY = `
-DELETE
-FROM
-secret
-WHERE
-id = ?
-;
-`;
 
 const INCREMENT_SECRET_FAILED_ACCESS_QUERY = `
 UPDATE
@@ -151,7 +143,7 @@ export function retrievePassphrase(secretID) {
 }
 
 //---
-
+const DELETE_SECRET_QUERY = databaseFile.prepare(`DELETE FROM secret WHERE id = ?`);
 
 export function deleteSecret(secretID) {
   return runStatement(DELETE_SECRET_QUERY, secretID);
