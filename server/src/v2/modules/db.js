@@ -12,17 +12,6 @@ import Database from 'better-sqlite3';
 const TABLE_NAME = "Secret";
 
 
-
-const INCREMENT_SECRET_FAILED_ACCESS_QUERY = `
-UPDATE
-secret
-SET
-access_failed_attempts = access_failed_attempts + 1
-WHERE
-id = ?
-;
-`
-
 /*
   Global variable for the database file
 */
@@ -150,6 +139,15 @@ export function deleteSecret(secretID) {
 }
 
 //---
+const INCREMENT_SECRET_FAILED_ACCESS_QUERY = databaseFile.prepare(`
+UPDATE
+secret
+SET
+access_failed_attempts = access_failed_attempts + 1
+WHERE
+id = ?
+;
+`);
 
 export function incrementSecretFailedAccess(secretID) {
   return runStatement(INCREMENT_SECRET_FAILED_ACCESS_QUERY, secretID);
