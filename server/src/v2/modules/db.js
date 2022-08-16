@@ -14,26 +14,29 @@ Global variable for the database file
 */
 
 var TABLE_NAME = "Secret";
+var databasePath = "./secrets.db"
 var databaseFile;
 
 function initialise() {
   databaseFile = new Database("secrets.db", {
     verbose: (["development"].includes(process.env.NODE_ENV) ? console.log : null)
   });
-  const dropStatement = db.prepare('DROP TABLE IF EXISTS ?');
-  dropStatement.run(TABLE_NAME);
-  console.log("Cleared Table ${TABLE_NAME} (if exists).")
-  /*
-    Create Table Query
-    Table name: secret
-      id: The primary key id for each secret
-      secret_text: The string of the secret
-      passphrase: The string of the hashed password
-      expiryDate: The date and time of when the secret should expire
-      method: A code to indicate which method was used for encryption
-      access_failed_attempts: The current number of failed attempts accesssing the secret
-  */
-  const createStatement = databaseFile.prepare(`
+  const initialisationFail = TRUE;
+  databaseFile.transaction.exclusive(() => { //Lock out all database functions when initialising, and put into transaction
+    const dropStatement = databaseFile.prepare('DROP TABLE IF EXISTS ?');
+    dropStatement.run(TABLE_NAME);
+    console.log("Cleared Table ${TABLE_NAME} (if exists).");
+    /*
+      Create Table Query
+      Table name: secret
+        id: The primary key id for each secret
+        secret_text: The string of the secret
+        passphrase: The string of the hashed password
+        expiryDate: The date and time of when the secret should expire
+        method: A code to indicate which method was used for encryption
+        access_failed_attempts: The current number of failed attempts accesssing the secret
+    */
+    const createStatement = databaseFile.prepare(`
 CREATE TABLE
 '?'(
     id TEXT PRIMARY KEY NOT NULL,
@@ -44,9 +47,16 @@ CREATE TABLE
     access_failed_attempts INT NOT NULL DEFAULT 0
     )
 `);
-  createStatement.run(TABLE_NAME);
-  console.log("Created New Table ${TABLE_NAME}.")
-  console.log("Database initialised successfully.");
+    createStatement.run(TABLE_NAME);
+    console.log("Created New Table ${TABLE_NAME}.")
+    initialisationFail = FALSE;
+  });
+  if (initialisationFail){
+    console.log("Database initialised successfully.");
+  }
+  else {
+    console.error("Could not initialise database! If you do not know why this error occurred, try deleting the database file, located at '${databasePath}' and trying again later.");
+  }
 }
 
 initialise();
