@@ -17,7 +17,7 @@ var TABLE_NAME = "Secret";
 var databasePath = "./secrets.db"
 var databaseFile;
 
-function initialise() {
+function initialiseSecret() {
   databaseFile = new Database("secrets.db", {
     verbose: (["development"].includes(process.env.NODE_ENV) ? console.log : null)
   });
@@ -59,7 +59,7 @@ CREATE TABLE
   }
 }
 
-initialise();
+initialiseSecret();
 
 function getStatement(preparedStatement, statementParams) {
   //Returns data
