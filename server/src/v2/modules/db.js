@@ -17,7 +17,7 @@ var TABLE_NAME = "Secret";
 var databasePath = "./secrets.db"
 var databaseFile;
 
-function initialise() {
+function initialiseSecret() {
   //databaseFile = new Database("secrets.db");
   databaseFile = new Database(databasePath, { verbose: console.log });
   const initialisationFail = TRUE;
@@ -58,7 +58,7 @@ CREATE TABLE
   }
 }
 
-initialise();
+initialiseSecret();
 
 function getStatement(preparedStatement, statementParams) {
   //Returns data
