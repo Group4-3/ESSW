@@ -1,11 +1,11 @@
-import supertest from 'supertest'
+import request from 'supertest'
 import should from 'should'
 import { app } from '../app.js'
 
 describe("Test /passphrase", () => {
   describe("GET /generate", () => {
     it("should return a random passphrase", (done) => {
-      supertest(app)
+      request(app)
         .get('/api/v2/passphrase/generate')
         .expect(200)
         .expect((res) => {
@@ -18,7 +18,7 @@ describe("Test /passphrase", () => {
     })
 
     it("should return a passphrase 12 characters long", (done) => {
-      supertest(app)
+      request(app)
         .get('/api/v2/passphrase/generate')
         .send({
           "length": 12
