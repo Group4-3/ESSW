@@ -7,9 +7,6 @@
 
 */
 
-/*
-  Modules
-*/
 import express from 'express'
 import cors from 'cors'
 import helmet from 'helmet'
@@ -49,3 +46,5 @@ app.use((req, res) => {
 const server = app.listen(process.env.PORT || 3001, () => {
   console.log('listening on port ' + server.address().port)
 })
+
+export { app }
