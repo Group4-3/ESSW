@@ -44,7 +44,7 @@ app.use((req, res) => {
 })
 
 const server = app.listen(process.env.PORT || 3001, () => {
-  console.log('listening on port ' + server.address().port)
+  console.log('Listening on port ' + server.address().port + ' in ' + process.env.NODE_ENV + ' mode')
 })
 
 export { app }
