@@ -67,9 +67,9 @@ function getStatement(preparedStatement, statementParams) {
     row = preparedStatement.get(statementParams);
   }
   catch (err) {
-    return { data: null, code: 500, human_code: `failure, ${err}` };
+    return { data: null, code: 500, error: `${err}`, success: false };
   }
-  return { data: row, code: 200, human_readable_code: "Success" };
+  return { data: row, code: 200, success: true };
 }
 
 function runStatement(preparedStatement, statementParams) {
@@ -78,9 +78,9 @@ function runStatement(preparedStatement, statementParams) {
     preparedStatement.run(statementParams);
   }
   catch (err) {
-    return { data: null, code: 500, human_code: `failure, ${err}` };
+    return { data: null, code: 500, error: `${err}`, success: false };
   }
-  return { data: null, code: 200, human_readable_code: "Success" };
+  return { data: null, code: 200, success: true };
 }
 
 //---
@@ -154,7 +154,7 @@ export function purgeExpiredSecrets() {
     var purgeInfo = PRUNE_SECRETS_QUERY.run(TABLE_NAME);
   }
   catch (err) {
-    return { data: null, code: 500, human_code: `failure, ${err}` };
+    return { data: null, code: 500, error: `${err}`, success: false };
   }
-  return { data: purgeInfo.changes, code: 200, human_readable_code: "Success" }; //Return the number of rows affected by purge
+  return { data: purgeInfo.changes, code: 200, success: true }; //Return the number of rows affected by purge
 }
