@@ -24,7 +24,9 @@ jobs:
           node-version: 16
 
       - name: install dependencies
+        working-directory: ./server
         run: npm install
 
       - name: run tests
+        working-directory: ./server
         run: npm run test
