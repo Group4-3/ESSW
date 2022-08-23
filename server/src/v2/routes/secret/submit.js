@@ -12,6 +12,14 @@ import * as cipher from '../../helpers/cipher.js'
 import * as textUtils from '../../helpers/text.js'
 import { pwnedPassphrase } from '../../helpers/pwned.js'
 import fs from 'fs';
+import createHash from 'crypto-js';  
+
+async function generateChecksum(algorithm, content) { //Returns a checksum of the content, using the supplied algorithm
+  // return createHash.update(content).digest("hex")
+  return createHash(algorithm)
+    .update(content)
+    .digest('hex');
+}
 
 function writeSecret(secret_id, secret_content) {
 
