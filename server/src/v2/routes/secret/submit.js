@@ -75,9 +75,9 @@ export async function secretSubmit(req, res, next) {
       return result
     })
     
-    var filestore = writeSecret(id, encrypted_body);
-
+    
     var id = cipher.generateIdentifier();
+    var filestore = writeSecret(id, encrypted_body);
     var transaction = db.addSecret({
       secret_id: id,
       secret_text: encrypted_body, //TODO:Alter 'secret text' to be appropriate file metadata
@@ -86,10 +86,7 @@ export async function secretSubmit(req, res, next) {
       method: method
     })
 
-    //TODO: Create file name from checksum?
-
     
-
     if (transaction.success && filestore.success) {
       return res.status(200).send({id: id})
     } 
