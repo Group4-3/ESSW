@@ -14,15 +14,27 @@ import { pwnedPassphrase } from '../../helpers/pwned.js'
 import fs from 'fs';
 import createHash from 'crypto-js';  
 
-async function generateChecksum(algorithm, content) { //Returns a checksum of the content, using the supplied algorithm
-  // return createHash.update(content).digest("hex")
+const SECRET_STORAGE_DIRECTORY = '.';
+
+async function generateChecksum(content, algorithm = 'sha256') { //Returns a checksum of the content, using the supplied algorithm (defaults to sha256)
+  // return createHash.update(content).digest("hex") 
   return createHash(algorithm)
     .update(content)
-    .digest('hex');
+    .digest('base64'); //Return base64 filename, for compactness
 }
 
 function writeSecret(secret_id, secret_content) {
-
+  var secret_hash = generateChecksum('secret_content');//, 'sha256'); //Use default sha256
+  var secret_path = `${ SECRET_STORAGE_DIRECTORY }/${secret_id}/${ secret_hash }`;
+  try {
+    fs.promises.writeFile(secret_path, secret_content);
+  }
+  catch (err) {
+    return next({success:false, error: err, error_messsage:`Unable to write file '${secret_path}': ${err}.`});
+  }
+  finally {
+    return next({ success: true });
+  }
 }
 
 export async function secretSubmit(req, res, next) {
@@ -63,6 +75,8 @@ export async function secretSubmit(req, res, next) {
       return result
     })
     
+    var filestore = writeSecret(id, encrypted_body);
+
     var id = cipher.generateIdentifier();
     var transaction = db.addSecret({
       secret_id: id,
@@ -74,12 +88,19 @@ export async function secretSubmit(req, res, next) {
 
     //TODO: Create file name from checksum?
 
-    var writeFile = fs.writeFile('${id}/${checksum}');
+    
 
-    if (transaction.success) {
+    if (transaction.success && filestore.success) {
       return res.status(200).send({id: id})
-    } else {
-      return next({message: 'An SQL intertation error has occurred.'})
+    } 
+    else if (transaction.success && !filestore.success) {
+      return next({message: `Unable to write secret to file: ${filestore.err}`});
+    }
+    else if (!transaction.success && filestore.success) {
+      return next({message: `Unable to write secret to database: ${err}`});
+    }
+    else {
+      return next({message: 'Secret Storage Failure.'})
     }
   } catch (err) {
     return next({status: 500, error: err})
