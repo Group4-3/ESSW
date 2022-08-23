@@ -47,14 +47,14 @@ CREATE TABLE
     )
 `);
     createStatement.run(TABLE_NAME);
-    console.log("Created New Table ${TABLE_NAME}.")
+    console.log(`Created New Table ${TABLE_NAME}.`)
     initialisationFail = FALSE;
   });
   if (initialisationFail){
     console.log("Database initialised successfully.");
   }
   else {
-    console.error("Could not initialise database! If you do not know why this error occurred, try deleting the database file, located at '${databasePath}' and trying again later.");
+    console.error(`Could not initialise database! If you do not know why this error occurred, try deleting the database file, located at '${databasePath}' and trying again later.`);
   }
 }
 
