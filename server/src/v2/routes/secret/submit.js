@@ -63,7 +63,7 @@ export async function secretSubmit(req, res, next) {
     if (transaction.code === 200) {
       return res.status(200).send({id: id})
     } else {
-      return next({message: 'An SQL intertation error has occurred.'})
+      return next({message: 'An SQL intertation error has occurred. :)'})
     }
   } catch (err) {
     return next({status: 500, error: err})
