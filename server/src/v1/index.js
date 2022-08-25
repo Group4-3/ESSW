@@ -1,6 +1,6 @@
 import express from 'express'
 import * as db from './services/db.js'
-import { import_test } from './helpers/test.js'
+import { import_test } from './helpers/text.js'
 import { router as secret } from './secret.js'
 import { router as passphrase } from './passphrase.js'
 import { router as test } from './crypto_test.js'

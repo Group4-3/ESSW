@@ -23,11 +23,12 @@ export async function secretGet(req, res, next) {
 
     var row = await db.db_retrieveSecret(id)
     if (!row.data)
-      return next({message: 'Secret with that ID does not exist or has been deleted.'})
+      return next({status: 404, message: 'Secret with that ID does not exist or has been deleted.'})
     row = row.data
 
     if(bcrypt.compareSync(passphrase, row.passphrase)) {
-      var decrypted_body = cipher.decryptAesDemo(row.secret_text, passphrase)
+      var decrypted_body = cipher.decrypt(row.secret_text, passphrase, row.method)
+      db.db_deleteSecret(id)
       return res.status(200).send({body: decrypted_body})
     } else {
       return next({status: 401, message: 'Unauthorized.'})
