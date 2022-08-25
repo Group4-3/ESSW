@@ -26,7 +26,9 @@ services:
                         - backend
         essw_nginx:
                 user: nginx
-                image: nginx
+                build:
+                        context: nginx
+                        dockerfile: Dockerfile
                 volumes:
                         - ./certbot/www:/var/www/certbot/:ro
                 ports:
