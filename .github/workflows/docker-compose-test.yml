@@ -1,0 +1,19 @@
+name: docker-compose-test
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - docker-compose.yml
+      - server/Dockerfile
+      - client/Dockerfile
+      - nginx/Dockerfile
+  pull_request:
+    paths:
+      - server/**
+
+jobs:
+  test:
+    concurrency: ci-${{ github.ref }}
+    runs-on: ubuntu-latest
