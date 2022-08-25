@@ -17,7 +17,7 @@ Ephemeral Secrets Sharing Website
 			- Command line tool to test for AMD users: grep svm /proc/cpuinfo
 ## How to Use
 
-1. Open two command line interfaces and navigate one to the server directory and the other to the client directory.
-2. Then type (`npm start`) in both directories to start up the client and server applications.
-3. Open up a web client like Chrome or Internet Explorer and naviage to <http://localhost:8080/first.html> for the submitting of a secret.
-4. Once a secret has been submitted then navigate to <http://localhost:8080/viewsecret.html> to view the submitted secret
+1. Open the command line interfaces and navigate one to the cloned repository.
+2. Then type (`docker compose up`) start up the docker services.
+3. Open up a web client like Chrome or Internet Explorer and naviage to <http://localhost:8080/first.html> (To be changed) for the submitting of a secret.
+4. Once a secret has been submitted then navigate to <http://localhost:8080/viewsecret.html> (To be changed) to view the submitted secret
