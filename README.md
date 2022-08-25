@@ -5,7 +5,16 @@ Ephemeral Secrets Sharing Website
 
 1. Clone from github (`git clone https://github.com/Group4-3/ESSW.git`).
 2. Visit <https://nodejs.org/en/download/> and download the latest version of the node runtime environment.
-
+2. Visit <https://docs.docker.com/get-started/#download-and-install-docker> and follow the install guide specific to your environment.
+	- Note that docker will require virtualisation technology on your computer.
+	- Ways to check if your system supports virutalisation:
+		- Windows:
+			1. Open task manager and navigate to the Performace tab.
+			2. Select CPU and then look for the virtualisation field and the value should either say Enabled or Disabled.
+		- Mac (TODO)
+		- Linux:
+			- Command line tool to test for Intel users: grep vmx /proc/cpuinfo
+			- Command line tool to test for AMD users: grep svm /proc/cpuinfo
 ## How to Use
 
 1. Open two command line interfaces and navigate one to the server directory and the other to the client directory.
