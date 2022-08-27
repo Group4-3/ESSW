@@ -155,7 +155,7 @@ export function purgeExpiredSecrets() {
     var purgeInfo = PRUNE_SECRETS_QUERY.run(TABLE_NAME);
   }
   catch (err) {
-    return { data: null, code: 500, error: `${err}`, success: false };
+    return { data: null, error: err, success: false };
   }
   return { data: purgeInfo.changes, success: true }; //Return the number of rows affected by purge
 }
