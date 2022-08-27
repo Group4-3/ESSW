@@ -21,14 +21,14 @@ export async function secretGet(req, res, next) {
       return next({message: 'Missing required body param: `passphrase`.'})
     var passphrase = req.body.passphrase.toString()
 
-    var row = await db.db_retrieveSecret(id)
+    var row = await db.retrieveSecret(id)
     if (!row.data)
       return next({status: 404, message: 'Secret with that ID does not exist or has been deleted.'})
     row = row.data
 
     if(bcrypt.compareSync(passphrase, row.passphrase)) {
       var decrypted_body = cipher.decrypt(row.secret_text, passphrase, row.method)
-      db.db_deleteSecret(id)
+      db.deleteSecret(id)
       return res.status(200).send({body: decrypted_body})
     } else {
       return next({status: 401, message: 'Unauthorized.'})

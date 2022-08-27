@@ -11,6 +11,11 @@ import * as db from '../../modules/db.js'
 import * as cipher from '../../helpers/cipher.js'
 import * as textUtils from '../../helpers/text.js'
 import { pwnedPassphrase } from '../../helpers/pwned.js'
+import fs from 'fs';
+
+function writeSecret(secret_id, secret_content) {
+
+}
 
 export async function secretSubmit(req, res, next) {
   const METHODS = cipher.methods
@@ -49,18 +54,21 @@ export async function secretSubmit(req, res, next) {
     var hashed_passphrase = await bcrypt.hash(passphrase, 10).then(result => {
       return result
     })
-
-    var id = cipher.generateIdentifier()
-
-    var transaction = db.db_addSecret({
+    
+    var id = cipher.generateIdentifier();
+    var transaction = db.addSecret({
       secret_id: id,
-      secret_text: encrypted_body,
+      secret_text: encrypted_body, //TODO:Alter 'secret text' to be appropriate file metadata
       passphrase: hashed_passphrase,
       expiry_date: expiry_date,
       method: method
     })
 
-    if (transaction.code === 200) {
+    //TODO: Create file name from checksum?
+
+    //var writeFile = fs.writeFile('${id}/${checksum}');
+
+    if (transaction.success) {
       return res.status(200).send({id: id})
     } else {
       return next({message: 'An SQL intertation error has occurred.'})
