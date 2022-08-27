@@ -79,9 +79,9 @@ function runStatement(preparedStatement, statementParams) {
     preparedStatement.run(statementParams);
   }
   catch (err) {
-    return { data: null, code: 500, error: `${err}`, success: false };
+    return { data: null, error: err, success: false };
   }
-  return { data: null, code: 200, success: true };
+  return { data: {}, success: true };
 }
 
 //---
