@@ -23,7 +23,7 @@ function initialiseSecret() {
   });
   const initialisationFail = true;
   const recreateTable = databaseFile.transaction(() => { //Lock out all database functions when initialising, and put into transaction
-    const dropStatement = databaseFile.prepare('DROP TABLE IF EXISTS ?');
+    const dropStatement = databaseFile.prepare(`DROP TABLE IF EXISTS '?'`);
     dropStatement.run(TABLE_NAME);
     console.log(`Cleared Table ${TABLE_NAME} (if exists).`);
     /*
