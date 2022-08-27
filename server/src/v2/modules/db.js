@@ -18,9 +18,10 @@ var databasePath = "./secrets.db"
 var databaseFile;
 
 function initialiseSecret() {
-  //databaseFile = new Database("secrets.db");
-  databaseFile = new Database(databasePath, { verbose: console.log });
-  const initialisationFail = TRUE;
+  databaseFile = new Database("secrets.db", {
+    verbose: (["development"].includes(process.env.NODE_ENV) ? console.log : null)
+  });
+  const initialisationFail = true;
   databaseFile.transaction.exclusive(() => { //Lock out all database functions when initialising, and put into transaction
     const dropStatement = databaseFile.prepare('DROP TABLE IF EXISTS ?');
     dropStatement.run(TABLE_NAME);
@@ -67,9 +68,9 @@ function getStatement(preparedStatement, statementParams) {
     row = preparedStatement.get(statementParams);
   }
   catch (err) {
-    return { data: null, code: 500, error: `${err}`, success: false };
+    return { data: null, error: err, success: false };
   }
-  return { data: row, code: 200, success: true };
+  return { data: row, success: true };
 }
 
 function runStatement(preparedStatement, statementParams) {
@@ -78,9 +79,9 @@ function runStatement(preparedStatement, statementParams) {
     preparedStatement.run(statementParams);
   }
   catch (err) {
-    return { data: null, code: 500, error: `${err}`, success: false };
+    return { data: null, error: err, success: false };
   }
-  return { data: null, code: 200, success: true };
+  return { data: {}, success: true };
 }
 
 //---
@@ -154,7 +155,7 @@ export function purgeExpiredSecrets() {
     var purgeInfo = PRUNE_SECRETS_QUERY.run(TABLE_NAME);
   }
   catch (err) {
-    return { data: null, code: 500, error: `${err}`, success: false };
+    return { data: null, error: err, success: false };
   }
-  return { data: purgeInfo.changes, code: 200, success: true }; //Return the number of rows affected by purge
+  return { data: purgeInfo.changes, success: true }; //Return the number of rows affected by purge
 }

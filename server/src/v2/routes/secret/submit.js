@@ -66,7 +66,7 @@ export async function secretSubmit(req, res, next) {
 
     //TODO: Create file name from checksum?
 
-    var writeFile = fs.writeFile('${id}/${checksum}');
+    //var writeFile = fs.writeFile('${id}/${checksum}');
 
     if (transaction.success) {
       return res.status(200).send({id: id})
