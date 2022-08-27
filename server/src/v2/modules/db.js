@@ -38,7 +38,7 @@ function initialiseSecret() {
     */
     const createStatement = databaseFile.prepare(`
 CREATE TABLE
-'@table_name'(
+'?'(
     id TEXT PRIMARY KEY NOT NULL,
     secret_text TEXT NOT NULL,
     passphrase TEXT NOT NULL,
@@ -47,7 +47,7 @@ CREATE TABLE
     access_failed_attempts INT NOT NULL DEFAULT 0
     )
 `);
-    createStatement.run({table_name : TABLE_NAME});
+    createStatement.run(TABLE_NAME);
     console.log(`Created New Table ${TABLE_NAME}.`)
     initialisationFail = FALSE;
   });
