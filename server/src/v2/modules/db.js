@@ -22,7 +22,7 @@ function initialiseSecret() {
     verbose: (["development"].includes(process.env.NODE_ENV) ? console.log : null)
   });
   const initialisationFail = true;
-  databaseFile.transaction.exclusive(() => { //Lock out all database functions when initialising, and put into transaction
+  const recreateTable = databaseFile.transaction(() => { //Lock out all database functions when initialising, and put into transaction
     const dropStatement = databaseFile.prepare('DROP TABLE IF EXISTS ?');
     dropStatement.run(TABLE_NAME);
     console.log(`Cleared Table ${TABLE_NAME} (if exists).`);
@@ -51,6 +51,7 @@ CREATE TABLE
     console.log(`Created New Table ${TABLE_NAME}.`)
     initialisationFail = FALSE;
   });
+  recreateTable.exclusive();
   if (initialisationFail){
     console.log("Database initialised successfully.");
   }
