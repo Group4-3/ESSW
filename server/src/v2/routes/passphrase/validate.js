@@ -30,6 +30,6 @@ export async function validate(req, res, next) {
 
     return res.status(200).json(response)
   } catch (err) {
-    return next({status: 500, error: err})
+    return next({status: 500, error: err.message})
   }
 }
