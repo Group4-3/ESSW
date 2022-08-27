@@ -68,9 +68,9 @@ function getStatement(preparedStatement, statementParams) {
     row = preparedStatement.get(statementParams);
   }
   catch (err) {
-    return { data: null, code: 500, error: `${err}`, success: false };
+    return { data: null, error: err, success: false };
   }
-  return { data: row, code: 200, success: true };
+  return { data: row, success: true };
 }
 
 function runStatement(preparedStatement, statementParams) {
