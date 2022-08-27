@@ -44,8 +44,8 @@ export async function secretSubmit(req, res, next) {
     var expiryOffset = req.body.expiry ? parseInt(req.body.expiry) : DEFAULT_EXPIRY
     var expiryDate = new Date(Date.now() + expiryOffset*1000).toISOString()
 
-    if (req.body.hasOwnProperty('max_access_attempts') && !Number.isInteger(parseInt(req.body.max_access_attempts)))
-      return next({message: 'Param `max_access_attempts` must be an integer (use -1 for infinite).'})
+    if (req.body.hasOwnProperty('max_access_attempts') && !Number.isInteger(parseInt(req.body.max_access_attempts)) || parseInt(req.body.max_access_attempts) < -1)
+      return next({message: 'Param `max_access_attempts` must be a positive integer (or use -1 for infinite).'})
 
     if (req.body.hasOwnProperty('ip_based_access_attempts') && !(typeof req.body.ip_based_access_attempts === 'boolean'))
       return next({message: 'Param `ip_based_access_attempts` must be of type Boolean.'})
