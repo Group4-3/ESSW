@@ -21,7 +21,7 @@ function initialiseSecret() {
   databaseFile = new Database("secrets.db", {
     verbose: (["development"].includes(process.env.NODE_ENV) ? console.log : null)
   });
-  const initialisationFail = TRUE;
+  const initialisationFail = true;
   databaseFile.transaction.exclusive(() => { //Lock out all database functions when initialising, and put into transaction
     const dropStatement = databaseFile.prepare('DROP TABLE IF EXISTS ?');
     dropStatement.run(TABLE_NAME);
