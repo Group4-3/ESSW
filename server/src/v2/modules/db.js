@@ -157,5 +157,5 @@ export function purgeExpiredSecrets() {
   catch (err) {
     return { data: null, code: 500, error: `${err}`, success: false };
   }
-  return { data: purgeInfo.changes, code: 200, success: true }; //Return the number of rows affected by purge
+  return { data: purgeInfo.changes, success: true }; //Return the number of rows affected by purge
 }
