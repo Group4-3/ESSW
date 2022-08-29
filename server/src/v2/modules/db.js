@@ -13,17 +13,18 @@ import Database from 'better-sqlite3';
 Global variable for the database file
 */
 
-var TABLE_NAME = "Secret";
-var databasePath = "./secrets.db"
+const TABLE_NAME = "Secret";
+const databasePath = "./secrets.db"
 var databaseFile;
 
 function initialiseSecret() {
-  //databaseFile = new Database("secrets.db");
-  databaseFile = new Database(databasePath, { verbose: console.log });
-  const initialisationFail = TRUE;
-  databaseFile.transaction.exclusive(() => { //Lock out all database functions when initialising, and put into transaction
-    const dropStatement = databaseFile.prepare('DROP TABLE IF EXISTS ?');
-    dropStatement.run(TABLE_NAME);
+  databaseFile = new Database("secrets.db", {
+    verbose: (["development"].includes(process.env.NODE_ENV) ? console.log : null)
+  });
+  var initialisationFail = true;
+  const recreateTable = databaseFile.transaction(() => { //Lock out all database functions when initialising, and put into transaction
+    const dropStatement = databaseFile.prepare(`DROP TABLE IF EXISTS '${TABLE_NAME}'`);
+    dropStatement.run()
     console.log(`Cleared Table ${TABLE_NAME} (if exists).`);
     /*
       Create Table Query
@@ -37,7 +38,7 @@ function initialiseSecret() {
     */
     const createStatement = databaseFile.prepare(`
 CREATE TABLE
-'?'(
+'${TABLE_NAME}'(
     id TEXT PRIMARY KEY NOT NULL,
     secret_text TEXT NOT NULL,
     passphrase TEXT NOT NULL,
@@ -46,10 +47,11 @@ CREATE TABLE
     access_failed_attempts INT NOT NULL DEFAULT 0
     )
 `);
-    createStatement.run(TABLE_NAME);
+    createStatement.run();
     console.log(`Created New Table ${TABLE_NAME}.`)
-    initialisationFail = FALSE;
+    initialisationFail = false;
   });
+  recreateTable.exclusive();
   if (initialisationFail){
     console.log("Database initialised successfully.");
   }
@@ -67,9 +69,9 @@ function getStatement(preparedStatement, statementParams) {
     row = preparedStatement.get(statementParams);
   }
   catch (err) {
-    return { data: null, code: 500, error: `${err}`, success: false };
+    return { data: null, error: err, success: false };
   }
-  return { data: row, code: 200, success: true };
+  return { data: row, success: true };
 }
 
 function runStatement(preparedStatement, statementParams) {
@@ -78,16 +80,16 @@ function runStatement(preparedStatement, statementParams) {
     preparedStatement.run(statementParams);
   }
   catch (err) {
-    return { data: null, code: 500, error: `${err}`, success: false };
+    return { data: null, error: err, success: false };
   }
-  return { data: null, code: 200, success: true };
+  return { data: {}, success: true };
 }
 
 //---
 
 const INSERT_SECRET_QUERY = databaseFile.prepare(`
 INSERT INTO
-@table_name
+'${TABLE_NAME}'
 (
     id,
     secret_text,
@@ -106,55 +108,54 @@ VALUES
 `);
 
 export function addSecret(secretObject) {
-  secretObject['table_name'] = TABLE_NAME; //Append table name to object
   return runStatement(INSERT_SECRET_QUERY, secretObject);
 }
 
 //---
 
-const GET_SECRET_QUERY = databaseFile.prepare(`SELECT * FROM @table_name WHERE id = @secret_id`);
+const GET_SECRET_QUERY = databaseFile.prepare(`SELECT * FROM '${TABLE_NAME}' WHERE id = ?`);
 
 export function retrieveSecret(secretID) {
-  return getStatement(GET_SECRET_QUERY, {"table_name":TABLE_NAME, "secret_id":secretID});
+  return getStatement(GET_SECRET_QUERY, secretID);
 }
 
 //---
 
-const GET_PASSPHRASE_QUERY = databaseFile.prepare(`SELECT passphrase FROM @table_name WHERE id = @secret_id`);
+const GET_PASSPHRASE_QUERY = databaseFile.prepare(`SELECT passphrase FROM '${TABLE_NAME}' WHERE id = ?`);
 
 export function retrievePassphrase(secretID) {
-  return getStatement(GET_PASSPHRASE_QUERY, { "table_name": TABLE_NAME, "secret_id": secretID });
+  return getStatement(GET_PASSPHRASE_QUERY, secretID);
 }
 
 //---
-const DELETE_SECRET_QUERY = databaseFile.prepare(`DELETE FROM @table_name WHERE id = @secret_id`);
+const DELETE_SECRET_QUERY = databaseFile.prepare(`DELETE FROM '${TABLE_NAME}' WHERE id = ?`);
 
 export function deleteSecret(secretID) {
-  return runStatement(DELETE_SECRET_QUERY, { "table_name": TABLE_NAME, "secret_id": secretID });
+  return runStatement(DELETE_SECRET_QUERY, secretID);
 }
 
 //---
 const INCREMENT_SECRET_FAILED_ACCESS_QUERY = databaseFile.prepare(`
 UPDATE
-@table_name
+'${TABLE_NAME}'
 SET
 access_failed_attempts = access_failed_attempts + 1
 WHERE
-id = @secret_id`);
+id = ?`);
 
 export function incrementSecretFailedAccess(secretID) {
-  return runStatement(INCREMENT_SECRET_FAILED_ACCESS_QUERY, { "table_name": TABLE_NAME, "secret_id": secretID });
+  return runStatement(INCREMENT_SECRET_FAILED_ACCESS_QUERY, secretID);
 }
 
 //---
-const PRUNE_SECRETS_QUERY = databaseFile.prepare(`DELETE FROM ? WHERE expiry_date < CURRENT_TIMESTAMP`);
+const PRUNE_SECRETS_QUERY = databaseFile.prepare(`DELETE FROM '${TABLE_NAME}' WHERE expiry_date < CURRENT_TIMESTAMP`);
 
 export function purgeExpiredSecrets() {
   try {
-    var purgeInfo = PRUNE_SECRETS_QUERY.run(TABLE_NAME);
+    var purgeInfo = PRUNE_SECRETS_QUERY.run();
   }
   catch (err) {
-    return { data: null, code: 500, error: `${err}`, success: false };
+    return { data: null, error: err, success: false };
   }
-  return { data: purgeInfo.changes, code: 200, success: true }; //Return the number of rows affected by purge
+  return { data: purgeInfo.changes, success: true }; //Return the number of rows affected by purge
 }

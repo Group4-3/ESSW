@@ -7,9 +7,6 @@
 
 */
 
-/*
-  Modules
-*/
 import express from 'express'
 import cors from 'cors'
 import helmet from 'helmet'
@@ -21,7 +18,11 @@ const isProduction = process.env.NODE_ENV === 'production'
 const app = express()
 app.use(helmet())
 app.use(cors())
-app.use(morgan('combined'))
+app.use(morgan('combined', {
+  skip: (req, res) => {
+    return ['test'].includes(process.env.NODE_ENV)
+  }
+}))
 app.use(express.urlencoded({ extended: false }))
 app.use(express.json())
 
@@ -47,5 +48,7 @@ app.use((req, res) => {
 })
 
 const server = app.listen(process.env.PORT || 3001, () => {
-  console.log('listening on port ' + server.address().port)
+  console.log('Listening on port ' + server.address().port + ' in ' + process.env.NODE_ENV + ' mode')
 })
+
+export { app, server }
