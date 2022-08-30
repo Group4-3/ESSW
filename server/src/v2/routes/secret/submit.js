@@ -11,31 +11,8 @@ import * as db from '../../modules/db.js'
 import * as cipher from '../../helpers/cipher.js'
 import * as textUtils from '../../helpers/text.js'
 import { pwnedPassphrase } from '../../helpers/pwned.js'
-import fs from 'fs';
-import createHash from 'crypto-js';  
-
-const SECRET_STORAGE_DIRECTORY = '.';
-
-async function generateChecksum(content, algorithm = 'sha256') { //Returns a checksum of the content, using the supplied algorithm (defaults to sha256)
-  // return createHash.update(content).digest("hex") 
-  return createHash(algorithm)
-    .update(content)
-    .digest('base64'); //Return base64 filename, for compactness
-}
-
-function writeSecret(secret_id, secret_content) {
-  var secret_hash = generateChecksum('secret_content');//, 'sha256'); //Use default sha256
-  var secret_path = `${ SECRET_STORAGE_DIRECTORY }/${secret_id}/${ secret_hash }`;
-  try {
-    fs.promises.writeFile(secret_path, secret_content);
-  }
-  catch (err) {
-    return next({success:false, error: err, error_messsage:`Unable to write file '${secret_path}': ${err}.`});
-  }
-  finally {
-    return next({ success: true });
-  }
-}
+import * as file from '../../modules/file.js'
+  
 
 export async function secretSubmit(req, res, next) {
   const METHODS = cipher.methods
@@ -77,7 +54,7 @@ export async function secretSubmit(req, res, next) {
     
     
     var id = cipher.generateIdentifier();
-    var filestore = writeSecret(id, encrypted_body);
+    var filestore = file.writeSecret(id, encrypted_body);
     var transaction = db.addSecret({
       secret_id: id,
       secret_text: encrypted_body, //TODO:Alter 'secret text' to be appropriate file metadata
