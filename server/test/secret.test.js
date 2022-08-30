@@ -144,5 +144,31 @@ describe('Test /secret', () => {
           done()
         })
     })
+
+    it('should prevent further access attempts after expiration time has elapsed', (done) => {
+      const secret = {
+        'body': 'SEP Group43!',
+        'passphrase': '#SuperS3cr3tP@ssw0rd',
+        'expiry': .1
+      }
+
+      request(app)
+        .post('/api/v2/secret/submit')
+        .send(secret)
+        .then((res) => {
+          setTimeout(() => {
+            request(app)
+              .post('/api/v2/secret/' + res.body.id)
+              .send({
+                'passphrase': '#SuperS3cr3tP@ssw0rd'
+              })
+              .expect(404)
+              .end((err, res) => {
+                if (err) return done(err)
+                done()
+              })
+          }, "200")
+      })
+    })
   })
 })
