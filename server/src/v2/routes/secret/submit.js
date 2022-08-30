@@ -54,7 +54,7 @@ export async function secretSubmit(req, res, next) {
     var hashed_passphrase = await bcrypt.hash(passphrase, 10).then(result => {
       return result
     })
-    
+
     var id = cipher.generateIdentifier();
     var transaction = db.addSecret({
       secret_id: id,

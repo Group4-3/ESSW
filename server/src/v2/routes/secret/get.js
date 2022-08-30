@@ -22,7 +22,7 @@ export async function secretGet(req, res, next) {
     var passphrase = req.body.passphrase.toString()
 
     var row = await db.retrieveSecret(id)
-    if (!row.data)
+    if (!row.data || row.data && Date.parse(row.data.expiry_date) < Date.now())
       return next({status: 404, message: 'Secret with that ID does not exist or has been deleted.'})
     row = row.data
 
