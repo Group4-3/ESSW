@@ -29,7 +29,22 @@ export function writeSecret(secret_id, secret_content) {
         return next({ success: false, error: err, error_messsage: `Unable to write file '${secret_path}': ${err}.` });
     }
     finally {
-        return next({ success: true , error: null, path: secret_path, name: secret_hash, secret_name:secret_id, file_name:secret_hash});
+        return next({ success: true , path: secret_path, name: secret_hash, secret_name:secret_id, file_name:secret_hash});
     }
 }
 
+export function readSecret(secret_path) {
+    if (await fs.readdir(secret_path).isDirectory()) { //Make sure that it's not a directory. May happen if secret path was malformed, and no ID was given. It is not possible to read a directory as a file.
+        return next({success: false, error: `Secret Path ${secret_path} is directory!`}); //Stop if we're working from a directory.
+    }
+    var fileContent;
+    try {
+        fileContent = await fs.promises.readFile(secret_path);
+    }
+    catch (err) {
+        return next({success : false, error: err, error_message})
+    }
+    finally {
+        return next({success:true, file_content : fileContent})
+    }
+}
