@@ -20,16 +20,16 @@ async function generateChecksum(content, algorithm = 'sha256') { //Returns a che
 }
 
 export function writeSecret(secret_id, secret_content) {
-    var secret_hash = generateChecksum('secret_content');//, 'sha256'); //Use default sha256
+    var secret_hash = generateChecksum(secret_content);//, 'sha256'); //Use default sha256
     var secret_path = `${SECRET_STORAGE_DIRECTORY}/${secret_id}/${secret_hash}`;
     try {
-        fs.promises.writeFile(secret_path, secret_content);
+        await fs.promises.writeFile(secret_path, secret_content); //Promise-based method of writing to a file
     }
     catch (err) {
         return next({ success: false, error: err, error_messsage: `Unable to write file '${secret_path}': ${err}.` });
     }
     finally {
-        return next({ success: true });
+        return next({ success: true , error: null, path: secret_path, name: secret_hash, secret_name:secret_id, file_name:secret_hash});
     }
 }
 

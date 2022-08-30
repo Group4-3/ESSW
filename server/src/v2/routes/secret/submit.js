@@ -57,7 +57,7 @@ export async function secretSubmit(req, res, next) {
     var filestore = file.writeSecret(id, encrypted_body);
     var transaction = db.addSecret({
       secret_id: id,
-      secret_text: encrypted_body, //TODO:Alter 'secret text' to be appropriate file metadata
+      secret_metadata: filestore.secret_path,
       passphrase: hashed_passphrase,
       expiry_date: expiry_date,
       method: method
@@ -68,7 +68,8 @@ export async function secretSubmit(req, res, next) {
       return res.status(200).send({id: id})
     } 
     else if (transaction.success && !filestore.success) {
-      return next({message: `Unable to write secret to file: ${filestore.err}`});
+      // return next({message: `Unable to write secret to file: ${filestore.err}`});
+      return next(({message: filestore.error_message}));
     }
     else if (!transaction.success && filestore.success) {
       return next({message: `Unable to write secret to database: ${err}`});

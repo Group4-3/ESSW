@@ -40,7 +40,7 @@ function initialiseSecret() {
 CREATE TABLE
 '${TABLE_NAME}'(
     id TEXT PRIMARY KEY NOT NULL,
-    secret_text TEXT NOT NULL,
+    secret_metadata TEXT NOT NULL,
     passphrase TEXT NOT NULL,
     expiry_date DATE NOT NULL,
     method TEXT NOT NULL,
