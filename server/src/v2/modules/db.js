@@ -53,10 +53,10 @@ CREATE TABLE
   });
   recreateTable.exclusive();
   if (initialisationFail){
-    console.log("Database initialised successfully.");
+    console.error(`Could not initialise database! If you do not know why this error occurred, try deleting the database file, located at '${databasePath}' and trying again later.`);
   }
   else {
-    console.error(`Could not initialise database! If you do not know why this error occurred, try deleting the database file, located at '${databasePath}' and trying again later.`);
+    console.log("Database initialised successfully.");
   }
 }
 
