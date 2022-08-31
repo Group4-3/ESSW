@@ -26,10 +26,8 @@ app.use(morgan('combined', {
 app.use(express.urlencoded({ extended: false }))
 app.use(express.json())
 
-import { router as v1 } from './src/v1/index.js'
 import { router as v2 } from './src/v2/routes/index.js'
 
-app.use('/api/v1', v1)
 app.use('/api/v2', v2)
 
 app.use(express.static('public'))
