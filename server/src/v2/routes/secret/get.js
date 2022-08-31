@@ -10,6 +10,7 @@ import bcrypt from 'bcrypt'
 import * as db from '../../modules/db.js'
 import * as cipher from '../../helpers/cipher.js'
 import * as textUtils from '../../helpers/text.js'
+import * as file from '../../modules/file.js'
 
 export async function secretGet(req, res, next) {
   try {
@@ -25,9 +26,11 @@ export async function secretGet(req, res, next) {
     if (!row.data)
       return next({status: 404, message: 'Secret with that ID does not exist or has been deleted.'})
     row = row.data
+    fileContent = file.readSecret(row.data.secret_metadata); //Read file secret, from given filename
 
     if(bcrypt.compareSync(passphrase, row.passphrase)) {
-      var decrypted_body = cipher.decrypt(row.secret_text, passphrase, row.method)
+      // var decrypted_body = cipher.decrypt(row.secret_text, passphrase, row.method)
+      var decrypted_body = cipher.decrypt(fileContent, passphrase, row.method) //Decrypt using file content
       db.deleteSecret(id)
       return res.status(200).send({body: decrypted_body})
     } else {

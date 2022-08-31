@@ -58,13 +58,14 @@ export async function secretSubmit(req, res, next) {
     var transaction = db.addSecret({
       secret_id: id,
       secret_metadata: filestore.secret_path,
+      secret_text: encrypted_body,
       passphrase: hashed_passphrase,
       expiry_date: expiry_date,
       method: method
     })
 
     
-    if (transaction.success && filestore.success) {
+    if (transaction.success && filestore.success) { //TODO: Rewrite to vary error behaviour based on processing path (file, text, or both?)
       return res.status(200).send({id: id})
     } 
     else if (transaction.success && !filestore.success) {
