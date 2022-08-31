@@ -11,7 +11,7 @@ const Home = () => {
                 </div>
 
                 <div class="button2">
-                    <button class="btn-block2" type="submit" value="save" >Submit Secret*</button>
+                    <button class="btn btn-primary" type="submit" value="save" >Submit Secret</button>
                 </div>
             </form>
         </div>
