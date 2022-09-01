@@ -14,11 +14,11 @@ Global variable for the database file
 */
 
 const TABLE_NAME = "Secret";
-const databasePath = "./secrets.db"
+const DATABASE_PATH = "./secrets.db"
 var databaseFile;
 
 function initialiseSecret() {
-  databaseFile = new Database("secrets.db", {
+  databaseFile = new Database(DATABASE_PATH, {
     verbose: (["development"].includes(process.env.NODE_ENV) ? console.log : null)
   });
   var initialisationFail = true;
@@ -53,7 +53,7 @@ CREATE TABLE
   });
   recreateTable.exclusive();
   if (initialisationFail){
-    console.error(`Could not initialise database! If you do not know why this error occurred, try deleting the database file, located at '${databasePath}' and trying again later.`);
+    console.error(`Could not initialise database! If you do not know why this error occurred, try deleting the database file, located at '${DATABASE_PATH}' and trying again later.`);
   }
   else {
     console.log("Database initialised successfully.");
