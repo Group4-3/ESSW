@@ -55,9 +55,10 @@ export async function secretSubmit(req, res, next) {
     
     var id = cipher.generateIdentifier();
     var filestore = file.writeSecret(id, encrypted_body);
+
     var transaction = db.addSecret({
       secret_id: id,
-      secret_metadata: filestore.secret_path,
+      file_metadata: filestore.secret_path,
       secret_text: encrypted_body,
       passphrase: hashed_passphrase,
       expiry_date: expiry_date,
