@@ -34,7 +34,7 @@ services:
                         - 443:80
                 environment:
                         - NGINX_HOST=localhost.com
-                        - NGINX_PORT=80
+                        - NGINX_PORT=8080
                 networks:
                         backend_connection:
                                 ipv4_address: 172.60.0.2
