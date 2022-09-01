@@ -62,24 +62,24 @@ export async function secretSubmit(req, res, next) {
 
     var file_metadata = {files : []};
 
-    upload_multiple_files.files.forEach(upload_file => {
-      let file_name = upload_file.name;
-      let file_content = upload_file.content;
-
-      let encrypted_file_content = cipher.encrypt(file_content, passphrase, method);
-
-      if (!encrypted_file_content)
-        return next({status : 500, error: "File encryption error!"});
-
-      let file_write_result = file.writeSecret(id, encrypted_file_content);
-
-      if (file_write_result.success) { //If the file write succeeds
-        file_metadata.files.push({original_file_name : file_name, encrypted_file_name : file_write_result.name, encrypted_file_path : file_write_result.path}); //Add file metadata to array
-      } 
-      else {
-        return next({status: 500, error: file_write_result.err});
-      }
-    });
+    if (upload_multiple_files.files >= 1) { //Only run file code, if files are attached.
+      upload_multiple_files.files.forEach(upload_file => {
+        let file_name = upload_file.name;
+        let file_content = upload_file.content;
+  
+        let encrypted_file_content = cipher.encrypt(file_content, passphrase, method);
+  
+        if (!encrypted_file_content)
+          return next({status : 500, error: "File encryption error!"});
+  
+        let file_write_result = file.writeSecret(id, encrypted_file_content);
+  
+        if (file_write_result.success) //If the file write succeeds
+          file_metadata.files.push({original_file_name : file_name, encrypted_file_name : file_write_result.name, encrypted_file_path : file_write_result.path}); //Add file metadata to array
+        else 
+          return next({status: 500, error: file_write_result.err});
+      });
+    }
     
     // var filestore = file.writeSecret(id, encrypted_body);
     var transaction = db.addSecret({

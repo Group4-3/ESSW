@@ -26,13 +26,28 @@ export async function secretGet(req, res, next) {
     if (!row.data)
       return next({status: 404, message: 'Secret with that ID does not exist or has been deleted.'})
     row = row.data
-    fileContent = file.readSecret(row.data.secret_metadata); //Read file secret, from given filename
-
+    var encrypted_files = row.file_metadata;
+    
     if(bcrypt.compareSync(passphrase, row.passphrase)) {
-      // var decrypted_body = cipher.decrypt(row.secret_text, passphrase, row.method)
-      var decrypted_body = cipher.decrypt(fileContent, passphrase, row.method) //Decrypt using file content
+      var decrypted_body = cipher.decrypt(row.secret_text, passphrase, row.method)
+      var decrypted_files = [];
+      
+      //Read uploaded files
+      if (encrypted_files.files >= 1) { //Only decrypt if there are files to decrypt.
+        encrypted_files.files.forEach(stored_file => {
+          let file_name = stored_file.original_file_name;
+          let encrypted_file_content = file.readSecret(stored_file.path); //Read file secret, from given filename
+          
+          let file_content = cipher.decrypt(encrypted_file_content, passphrase, row.method); //Decrypt using file content
+          if (!file_content) //Error if file decryption fails for some reason
+            return next({status : 500, message: 'File decryption error.'});
+          
+          decrypted_files.files.push({name : file_name, content : file_content});
+        });
+      }
+
       db.deleteSecret(id)
-      return res.status(200).send({body: decrypted_body})
+      return res.status(200).send({body: decrypted_body, files : decrypted_files})
     } else {
       return next({status: 401, message: 'Unauthorized.'})
     }
