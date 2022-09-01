@@ -23,7 +23,7 @@ export function writeSecret(secret_id, secret_content) {
     var secret_hash = generateChecksum(secret_content);//, 'sha256'); //Use default sha256
     var secret_path = `${SECRET_STORAGE_DIRECTORY}/${secret_id}/${secret_hash}`;
     try {
-        await fs.promises.writeFile(secret_path, secret_content); //Promise-based method of writing to a file
+        fs.writeFile(secret_path, secret_content);
     }
     catch (err) {
         return next({ success: false, error: err, error_messsage: `Unable to write file '${secret_path}': ${err}.` });
@@ -34,12 +34,12 @@ export function writeSecret(secret_id, secret_content) {
 }
 
 export function readSecret(secret_path) {
-    if (await fs.readdir(secret_path).isDirectory()) { //Make sure that it's not a directory. May happen if secret path was malformed, and no ID was given. It is not possible to read a directory as a file.
+    if (fs.readdir(secret_path).isDirectory()) { //Make sure that it's not a directory. May happen if secret path was malformed, and no ID was given. It is not possible to read a directory as a file.
         return next({success: false, error: `Secret Path ${secret_path} is directory!`}); //Stop if we're working from a directory.
     }
     var fileContent;
     try {
-        fileContent = await fs.promises.readFile(secret_path);
+        fileContent = fs.readFile(secret_path);
     }
     catch (err) {
         return next({success : false, error: err, error_message})
