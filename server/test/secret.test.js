@@ -145,30 +145,29 @@ describe('Test /secret', () => {
         })
     })
 
-    it('should prevent further access attempts after expiration time has elapsed', (done) => {
+    it('should prevent further access attempts after specified max unauthorized attempts', (done) => {
       const secret = {
         'body': 'SEP Group43!',
         'passphrase': '#SuperS3cr3tP@ssw0rd',
-        'expiry': .1
+        'max_access_attempts': 0,
+        'ip_based_access_attempts': true
       }
 
       request(app)
         .post('/api/v2/secret/submit')
         .send(secret)
         .then((res) => {
-          setTimeout(() => {
-            request(app)
-              .post('/api/v2/secret/' + res.body.id)
-              .send({
-                'passphrase': '#SuperS3cr3tP@ssw0rd'
-              })
-              .expect(404)
-              .end((err, res) => {
-                if (err) return done(err)
-                done()
-              })
-          }, "200")
-      })
+          request(app)
+            .post('/api/v2/secret/' + res.body.id)
+            .send({
+              'passphrase': 'abc'
+            })
+            .expect(429)
+            .end((err, res) => {
+              if (err) return done(err)
+              done()
+            })
+        })
     })
   })
 })
