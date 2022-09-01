@@ -52,10 +52,36 @@ export async function secretSubmit(req, res, next) {
       return result
     })
     
-    
     var id = cipher.generateIdentifier();
-    var filestore = file.writeSecret(id, encrypted_body);
 
+    //TODO: File Upload functionality (multiple)
+    var upload_multiple_files = {files : []}; // {files : [{name : 'temp_name', content : 'This is a temp message. If this ends up in production, something has gone horribly, horribly wrong.'},
+  //{name : 'other_file', content : 'Rending skin from bones'}]}; //TempVar to allow for multiple file uploads. Should be in JSON array format. (Get file modification time?)
+    
+    //JSON structure requires file name (no path, just name), and content. Name should include extension.
+
+    var file_metadata = {files : []};
+
+    upload_multiple_files.files.forEach(upload_file => {
+      let file_name = upload_file.name;
+      let file_content = upload_file.content;
+
+      let encrypted_file_content = cipher.encrypt(file_content, passphrase, method);
+
+      if (!encrypted_file_content)
+        return next({status : 500, error: "File encryption error!"});
+
+      let file_write_result = file.writeSecret(id, encrypted_file_content);
+
+      if (file_write_result.success) { //If the file write succeeds
+        file_metadata.files.push({original_file_name : file_name, encrypted_file_name : file_write_result.name, encrypted_file_path : file_write_result.path}); //Add file metadata to array
+      } 
+      else {
+        return next({status: 500, error: file_write_result.err});
+      }
+    });
+    
+    // var filestore = file.writeSecret(id, encrypted_body);
     var transaction = db.addSecret({
       secret_id: id,
       file_metadata: filestore.secret_path,

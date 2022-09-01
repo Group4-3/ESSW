@@ -29,7 +29,7 @@ export function writeSecret(secret_id, secret_content) {
         return next({ success: false, error: err, error_messsage: `Unable to write file '${secret_path}': ${err}.` });
     }
     finally {
-        return next({ success: true , path: secret_path, name: secret_hash, secret_name:secret_id, file_name:secret_hash});
+        return next({ success: true , path: secret_path, name: secret_hash});
     }
 }
 
