@@ -144,5 +144,30 @@ describe('Test /secret', () => {
           done()
         })
     })
+
+    it('should prevent further access attempts after specified max unauthorized attempts', (done) => {
+      const secret = {
+        'body': 'SEP Group43!',
+        'passphrase': '#SuperS3cr3tP@ssw0rd',
+        'max_access_attempts': 0,
+        'ip_based_access_attempts': true
+      }
+
+      request(app)
+        .post('/api/v2/secret/submit')
+        .send(secret)
+        .then((res) => {
+          request(app)
+            .post('/api/v2/secret/' + res.body.id)
+            .send({
+              'passphrase': 'abc'
+            })
+            .expect(429)
+            .end((err, res) => {
+              if (err) return done(err)
+              done()
+            })
+        })
+    })
   })
 })
