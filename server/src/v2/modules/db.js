@@ -103,7 +103,7 @@ VALUES
 (
     @secret_id,
     @secret_text,
-    @file_metadata
+    @file_metadata,
     @passphrase,
     @expiry_date,
     @method
