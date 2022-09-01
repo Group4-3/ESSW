@@ -65,14 +65,10 @@ export async function secretSubmit(req, res, next) {
     })
 
     
-    if (transaction.success && filestore.success) { //TODO: Rewrite to vary error behaviour based on processing path (file, text, or both?)
+    if (transaction.success) { //TODO: Rewrite to vary error behaviour based on processing path (file, text, or both?)
       return res.status(200).send({id: id})
     } 
-    else if (transaction.success && !filestore.success) {
-      // return next({message: `Unable to write secret to file: ${filestore.err}`});
-      return next(({message: filestore.error_message}));
-    }
-    else if (!transaction.success && filestore.success) {
+    else if (!transaction.success) {
       return next({message: `Unable to write secret to database: ${err}`});
     }
     else {
