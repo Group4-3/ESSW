@@ -45,7 +45,7 @@ app.use((req, res) => {
   })
 })
 
-const server = app.listen(process.env.PORT || 3001, () => {
+const server = app.listen(process.env.NODE_PORT || 3001, () => {
   console.log('Listening on port ' + server.address().port + ' in ' + process.env.NODE_ENV + ' mode')
 })
 

@@ -5,25 +5,23 @@ services:
                 build:
                         context: client
                         dockerfile: Dockerfile
-                ports:
-                        - 8081:8081
                 environment:
                         - NODE_ENV=production
                         - NODE_PORT=8081
                 networks:
-                        - backend
+                        backend_connection:
+                                ipv4_address: 172.60.0.3
         essw_node_server:
                 user: node
                 build:
                         context: server
                         dockerfile: Dockerfile
-                ports:
-                        - 8082:8082
                 environment:
                         - NODE_ENV=production
                         - NODE_PORT=8082
                 networks:
-                        - backend
+                        backend_connection:
+                                ipv4_address: 172.60.0.4
         essw_nginx:
                 user: nginx
                 build:
@@ -32,19 +30,25 @@ services:
                 volumes:
                         - ./certbot/www:/var/www/certbot/:ro
                 ports:
-                        - 80:8080
-                        - 443:4443
+                        - 80:80
+                        - 443:80
                 environment:
                         - NGINX_HOST=localhost.com
                         - NGINX_PORT=8080
                 networks:
-                        - backend
-                        - default
+                        backend_connection:
+                                ipv4_address: 172.60.0.2
         certbot:
                 image: certbot/certbot:latest
                 volumes:
                         - ./certbot/www/:/var/www/certbot/:rw
 networks:
-        backend:
-                name: backend_connection
+        frontend_connection:
+                name: frontend_connection
                 driver: bridge
+        backend_connection:
+                ipam:
+                        driver: default
+                        config:
+                                - subnet: "172.60.0.0/24"
+                                  gateway: "172.60.0.1"

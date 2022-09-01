@@ -18,7 +18,7 @@ const databasePath = "./secrets.db"
 var databaseFile;
 
 function initialiseSecret() {
-  databaseFile = new Database("secrets.db", {
+  databaseFile = new Database("./secrets.db", {
     verbose: (["development"].includes(process.env.NODE_ENV) ? console.log : null)
   });
   var initialisationFail = true;
