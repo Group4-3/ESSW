@@ -68,7 +68,7 @@ export async function secretSubmit(req, res, next) {
       return result
     })
 
-    var id = cipher.generateIdentifier()
+    var id = cipher.generateIdentifier();
     var transaction = db.addSecret({
       secret_id: id,
       secret_text: encryptedText, //TODO:Alter 'secret text' to be appropriate file metadata
