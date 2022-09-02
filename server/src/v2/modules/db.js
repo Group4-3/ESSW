@@ -18,7 +18,7 @@ const databasePath = "./secrets.db"
 var databaseFile;
 
 function initialiseSecret() {
-  databaseFile = new Database("secrets.db", {
+  databaseFile = new Database("./secrets.db", {
     verbose: (["development"].includes(process.env.NODE_ENV) ? console.log : null)
   });
   var initialisationFail = true;
@@ -45,7 +45,7 @@ CREATE TABLE
     passphrase TEXT NOT NULL,
     expiry_date DATE NOT NULL,
     method TEXT NOT NULL,
-    access_failed_attempts INT NOT NULL DEFAULT 0
+    unauthorized_attempts TEXT NOT NULL
     )
 `);
     createStatement.run();
@@ -70,7 +70,7 @@ function getStatement(preparedStatement, statementParams) {
     row = preparedStatement.get(statementParams);
   }
   catch (err) {
-    return { data: null, error: err, success: false };
+    return { data: null, error: err.message, success: false };
   }
   return { data: row, success: true };
 }
@@ -81,7 +81,7 @@ function runStatement(preparedStatement, statementParams) {
     preparedStatement.run(statementParams);
   }
   catch (err) {
-    return { data: null, error: err, success: false };
+    return { data: null, error: err.message, success: false };
   }
   return { data: {}, success: true };
 }
@@ -97,7 +97,8 @@ INSERT INTO
     secret_file_metadata,
     passphrase,
     expiry_date,
-    method
+    method,
+    unauthorized_attempts
 )
 VALUES
 (
@@ -106,7 +107,8 @@ VALUES
     @file_metadata,
     @passphrase,
     @expiry_date,
-    @method
+    @method,
+    @unauthorized_attempts
 )
 `);
 
@@ -138,16 +140,16 @@ export function deleteSecret(secretID) {
 }
 
 //---
-const INCREMENT_SECRET_FAILED_ACCESS_QUERY = databaseFile.prepare(`
+const UPDATE_UNAUTHORIZED_ATTEMPS_QUERY = databaseFile.prepare(`
 UPDATE
 '${TABLE_NAME}'
 SET
-access_failed_attempts = access_failed_attempts + 1
+unauthorized_attempts = ?
 WHERE
 id = ?`);
 
-export function incrementSecretFailedAccess(secretID) {
-  return runStatement(INCREMENT_SECRET_FAILED_ACCESS_QUERY, secretID);
+export function updateUnauthorizedAttempts(secretID, jsonStr) {
+  return runStatement(UPDATE_UNAUTHORIZED_ATTEMPS_QUERY, [jsonStr, secretID]);
 }
 
 //---
@@ -158,7 +160,7 @@ export function purgeExpiredSecrets() {
     var purgeInfo = PRUNE_SECRETS_QUERY.run();
   }
   catch (err) {
-    return { data: null, error: err, success: false };
+    return { data: null, error: err.message, success: false };
   }
   return { data: purgeInfo.changes, success: true }; //Return the number of rows affected by purge
 }
