@@ -6,4 +6,6 @@ mkdir -p /etc/ssl/${NGINX_HOST}
 openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/${NGINX_HOST}/privkey.pem -keyform PEM -out /etc/ssl/${NGINX_HOST}/fullchain.pem -keyform PEM -passout pass:foobar -subj "/C=AU/ST=GLOBAL/L=GLOBAL/O=ESSW/CN=${nginx_server}"
 chown -R nginx:nginx /etc/ssl/${NGINX_HOST}/ 
 chmod -R 755 /etc/ssl/${NGINX_HOST}/
+else
+echo "Certbot certificates detected, not generating local certificates";
 fi
