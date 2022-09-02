@@ -18,7 +18,6 @@ services:
                         dockerfile: Dockerfile
                 environment:
                         - NODE_ENV=production
-                        - NODE_PORT=8082
                 networks:
                         backend_connection:
                                 ipv4_address: 172.60.0.4
@@ -31,10 +30,9 @@ services:
                         - ./certbot/www:/var/www/certbot/:ro
                 ports:
                         - 80:80
-                        - 443:80
+                        - 443:443
                 environment:
-                        - NGINX_HOST=localhost.com
-                        - NGINX_PORT=8080
+                        - NGINX_HOST=the-index.xyz
                 networks:
                         backend_connection:
                                 ipv4_address: 172.60.0.2
