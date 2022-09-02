@@ -40,10 +40,15 @@ describe('Test /passphrase', () => {
     })
   })
 
-  describe('GET /pwned/:passphrase', () => {
+  describe('POST /pwned', () => {
     it('should return true (pwned) when given a weak passphrase', (done) => {
+      const body = {
+        'passphrase': 'password'
+      }
+
       request(app)
-        .get('/api/v2/passphrase/pwned/password')
+        .post('/api/v2/passphrase/pwned')
+        .send(body)
         .expect(200)
         .expect((res) => {
           return res.body.should.have.property('pwned').be.equal(true)
@@ -55,8 +60,13 @@ describe('Test /passphrase', () => {
     })
 
     it('should return false (not pwned) when given a strong passphrase', (done) => {
+      const body = {
+        'passphrase': 'Z6bR#LWgwHrBOCnmBH%koB1GmKENBQH@'
+      }
+
       request(app)
-        .get('/api/v2/passphrase/pwned/Z6bR#LWgwHrBOCnmBH%koB1GmKENBQH@')
+        .post('/api/v2/passphrase/pwned')
+        .send(body)
         .expect(200)
         .expect((res) => {
           return res.body.should.have.property('pwned').be.equal(false)
