@@ -8,7 +8,7 @@
 
 import express from 'express'
 import { generate } from './generate.js'
-import { validate } from './validate.js'
+import { pwned } from './pwned.js'
 
 var router = express.Router()
 
@@ -58,6 +58,6 @@ router.get('/generate', generate)
  *    "suffix": "2c22a1160038ae259602dfe3d848ef028cc"
  *  }
  */
-router.post('/pwned', validate)
+router.post('/pwned', pwned)
 
 export { router }

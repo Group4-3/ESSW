@@ -1,6 +1,6 @@
 /*
     ----- GROUP 43 Header -----
-    Component Name: Passphrase/Validate
+    Component Name: Passphrase/Pwned
     Description: Check if a given passphrase has been leaked online
     Date of Creation: 02/06/2022
     Author(s): Mitchell Sundstrom
@@ -9,7 +9,7 @@
 import fetch from 'node-fetch'
 import crypto from 'crypto-js'
 
-export async function validate(req, res, next) {
+export async function pwned(req, res, next) {
   try {
     if (!req.body.hasOwnProperty('passphrase'))
       return next({message: 'Missing required body param: `passphrase`.'})
