@@ -55,10 +55,15 @@ export async function secretSubmit(req, res, next) {
     var id = cipher.generateIdentifier();
 
     //TODO: File Upload functionality (multiple)
+
     var upload_multiple_files = {files : []}; // {files : [{name : 'temp_name', content : 'This is a temp message. If this ends up in production, something has gone horribly, horribly wrong.'},
   //{name : 'other_file', content : 'Rending skin from bones'}]}; //TempVar to allow for multiple file uploads. Should be in JSON array format. (Get file modification time?)
     
     //JSON structure requires file name (no path, just name), and content. Name should include extension.
+
+    req.body.files.forEach(upload_file => {
+      upload_multiple_files.files.push({name : upload_file.filename, content : upload_file.filecontent});
+    });
 
     var file_metadata = {files : []};
 
