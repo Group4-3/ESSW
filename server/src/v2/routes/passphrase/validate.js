@@ -11,7 +11,11 @@ import crypto from 'crypto-js'
 
 export async function validate(req, res, next) {
   try {
-    var sha1 = crypto.SHA1(req.params.passphrase).toString()
+    if (!req.body.hasOwnProperty('passphrase'))
+      return next({message: 'Missing required body param: `passphrase`.'})
+    var pp = req.body.passphrase.toString()
+
+    var sha1 = crypto.SHA1(pp).toString()
     var prefix = sha1.substring(0, 5)
     var suffix = sha1.substring(5)
 
