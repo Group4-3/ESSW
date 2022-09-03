@@ -1,11 +1,13 @@
 #!/bin/bash
 
 if [ ! -f "/etc/ssl/${NGINX_HOST}/privkey.pem" ]; then
-echo "No cerbot certificates, generating local - WARNING: Certificates will not be signed by an authorised CA";
+echo "No Certificates, generating local - WARNING: Certificates will not be signed by an authorised CA";
 mkdir -p /etc/ssl/${NGINX_HOST}
-openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/${NGINX_HOST}/privkey.pem -keyform PEM -out /etc/ssl/${NGINX_HOST}/fullchain.pem -keyform PEM -passout pass:foobar -subj "/C=AU/ST=GLOBAL/L=GLOBAL/O=ESSW/CN=${nginx_server}"
+openssl ecparam -name prime256v1 -genkey -noout -out /etc/ssl/${NGINX_HOST}/privkey.pem
+openssl ec -in /etc/ssl/${NGINX_HOST}/privkey.pem -pubout -out /etc/ssl/${NGINX_HOST}/pubkey.pem
+openssl req -new -nodes -x509 -key /etc/ssl/${NGINX_HOST}/privkey.pem -in /etc/ssl/${NGINX_HOST}/pubkey.pem -out /etc/ssl/${NGINX_HOST}/certificate.pem -days 365 -subj "/C=AU/ST=GLOBAL/L=GLOBAL/O=ESSW/CN=GROUP4-3/OU=DEVOPS/"
 chown -R nginx:nginx /etc/ssl/${NGINX_HOST}/ 
-chmod -R 755 /etc/ssl/${NGINX_HOST}/
+chmod 600 /etc/ssl/${NGINX_HOST}/*
 else
-echo "Certbot certificates detected, not generating local certificates";
+echo "Certificates detected, not generating local certificates";
 fi

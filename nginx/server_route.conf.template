@@ -25,7 +25,7 @@ server {
     ##
     # CertBot Certificates
     ##
-    ssl_certificate /etc/ssl/${NGINX_HOST}/fullchain.pem;
+    ssl_certificate /etc/ssl/${NGINX_HOST}/certificate.pem;
     ssl_certificate_key /etc/ssl/${NGINX_HOST}/privkey.pem;
 
     location / {
