@@ -21,6 +21,7 @@ dist
 server/*/apidoc
 certbot/conf
 certbot/www
+certbot/ssl
 
 # Gatsby files
 .cache/

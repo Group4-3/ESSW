@@ -7,7 +7,6 @@ services:
                         dockerfile: Dockerfile
                 environment:
                         - NODE_ENV=production
-                        - NODE_PORT=8081
                 networks:
                         backend_connection:
                                 ipv4_address: 172.60.0.3
@@ -26,24 +25,23 @@ services:
                 build:
                         context: nginx
                         dockerfile: Dockerfile
-                volumes:
-                        - ./certbot/www:/var/www/certbot/:ro
-                        - ./certbot/conf:/etc/letsencrypt/:ro
                 ports:
                         - 80:80
                         - 443:443
                 environment:
-                        - NGINX_HOST=the-index.xyz
+                        - HOST_NAME=the-index.xyz
                 networks:
                         backend_connection:
                                 ipv4_address: 172.60.0.2
                 volumes:
-                        - ./certbot/www:/var/www/certbot
-                        - ./certbot/conf:/etc/letsencrypt
+                        - ./certbot/www:/var/www/certbot:ro
+                        - ./certbot/conf/live/:/var/ssl/:ro
         certbot: 
                 build:
                         context: certbot
                         dockerfile: Dockerfile
+                environment:
+                        - HOST_NAME=the-index.xyz
                 volumes:
                         - ./certbot/www:/var/www/certbot/:rw
                         - ./certbot/conf:/etc/letsencrypt/:rw
