@@ -28,6 +28,7 @@ services:
                         dockerfile: Dockerfile
                 volumes:
                         - ./certbot/www:/var/www/certbot/:ro
+                        - ./certbot/conf:/etc/letsencrypt/:ro
                 ports:
                         - 80:80
                         - 443:443
@@ -36,10 +37,16 @@ services:
                 networks:
                         backend_connection:
                                 ipv4_address: 172.60.0.2
+                volumes:
+                        - ./certbot/www:/var/www/certbot
+                        - ./certbot/conf:/etc/letsencrypt
         certbot:
                 image: certbot/certbot:latest
                 volumes:
-                        - ./certbot/www/:/var/www/certbot/:rw
+                        - ./certbot/www:/var/www/certbot/:rw
+                        - ./certbot/conf:/etc/letsencrypt/:rw
+                profiles:
+                        - donotstart
 networks:
         frontend_connection:
                 name: frontend_connection
