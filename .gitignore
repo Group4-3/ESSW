@@ -19,6 +19,8 @@ jspm_packages/
 .env.test
 dist
 server/*/apidoc
+certbot/conf
+certbot/www
 
 # Gatsby files
 .cache/

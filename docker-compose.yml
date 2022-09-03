@@ -40,13 +40,17 @@ services:
                 volumes:
                         - ./certbot/www:/var/www/certbot
                         - ./certbot/conf:/etc/letsencrypt
-        certbot:
-                image: certbot/certbot:latest
+        certbot: 
+                build:
+                        context: certbot
+                        dockerfile: Dockerfile
                 volumes:
                         - ./certbot/www:/var/www/certbot/:rw
                         - ./certbot/conf:/etc/letsencrypt/:rw
-                profiles:
-                        - donotstart
+                command: certonly -v --preferred-challenges http -d the-index.xyz --non-interactive --agree-tos -m petribayley@gmail.com --webroot -w /var/www/certbot/
+                #profiles:
+                        #- donotstart
+
 networks:
         frontend_connection:
                 name: frontend_connection
