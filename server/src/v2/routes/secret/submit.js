@@ -104,9 +104,9 @@ export async function secretSubmit(req, res, next) {
     var transaction = db.addSecret({
       secret_id: id,
       file_metadata: filestore.secret_path,
-      secret_text: encrypted_body,
-      passphrase: hashed_passphrase,
-      expiry_date: expiry_date,
+      secret_text: encryptedText,
+      passphrase: hashedPassphrase,
+      expiry_date: expiryDate,
       method: method,
       unauthorized_attempts: unauthorizedAttempts
     })
