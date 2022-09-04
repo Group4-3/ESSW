@@ -74,9 +74,10 @@ export async function secretSubmit(req, res, next) {
     
     //JSON structure requires file name (no path, just name), and content. Name should include extension.
 
-    req.body.files.forEach(upload_file => {
-      upload_multiple_files.files.push({name : upload_file.filename, content : upload_file.filecontent});
-    });
+    if (req.body.files >= 1)
+      req.body.files.forEach(upload_file => {
+        upload_multiple_files.files.push({name : upload_file.filename, content : upload_file.filecontent});
+      });
 
     var file_metadata = {files : []};
 
