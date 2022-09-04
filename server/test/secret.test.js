@@ -29,7 +29,8 @@ describe('Test /secret', () => {
     it('should return successfully with persisted secret id', (done) => {
       const secret = {
         'body': 'SEP Group43!',
-        'passphrase': '#SuperS3cr3tP@ssw0rd'
+        'passphrase': '#SuperS3cr3tP@ssw0rd',
+        'files' : []
       }
 
       request(app)
@@ -49,7 +50,8 @@ describe('Test /secret', () => {
     it('should return an error 400 when providing an insecure passphrase', (done) => {
       const secret = {
         'body': 'SEP Group43!',
-        'passphrase': 'password'
+        'passphrase': 'password',
+        'files': []
       }
 
       request(app)
@@ -66,7 +68,8 @@ describe('Test /secret', () => {
       const secret = {
         'body': 'SEP Group43!',
         'passphrase': '#SuperS3cr3tP@ssw0rd',
-        'method': 'tripledes'
+        'method': 'tripledes',
+        'files' : []
       }
 
       request(app)
@@ -86,7 +89,8 @@ describe('Test /secret', () => {
       const secret = {
         'body': 'SEP Group43!',
         'passphrase': '#SuperS3cr3tP@ssw0rd',
-        'method': 'very_real_cipher'
+        'method': 'very_real_cipher',
+        'files': []
       }
 
       request(app)
@@ -150,7 +154,8 @@ describe('Test /secret', () => {
         'body': 'SEP Group43!',
         'passphrase': '#SuperS3cr3tP@ssw0rd',
         'max_access_attempts': 0,
-        'ip_based_access_attempts': true
+        'ip_based_access_attempts': true,
+        'files': []
       }
 
       request(app)
