@@ -26,10 +26,10 @@ export function writeSecret(secret_id, secret_content) {
         fs.writeFile(secret_path, secret_content);
     }
     catch (err) {
-        return next({ success: false, error: err, error_messsage: `Unable to write file '${secret_path}': ${err}.` });
+        return { success: false, error: err, error_messsage: `Unable to write file '${secret_path}': ${err}.` };
     }
     finally {
-        return next({ success: true , path: secret_path, name: secret_hash});
+        return { success: true , path: secret_path, name: secret_hash};
     }
 }
 
@@ -42,9 +42,9 @@ export function readSecret(secret_path) {
         fileContent = fs.readFile(secret_path);
     }
     catch (err) {
-        return next({success : false, error: err, error_message})
+        return {success : false, error: err, error_message};
     }
     finally {
-        return next({success:true, file_content : fileContent})
+        return {success:true, file_content : fileContent};
     }
 }
