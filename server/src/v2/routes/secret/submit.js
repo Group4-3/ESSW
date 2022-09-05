@@ -74,14 +74,14 @@ export async function secretSubmit(req, res, next) {
     
     //JSON structure requires file name (no path, just name), and content. Name should include extension.
 
-    if (req.body.files >= 1)
+    // if (req.body.files.length >= 1)
       req.body.files.forEach(upload_file => {
         upload_multiple_files.files.push({name : upload_file.filename, content : upload_file.filecontent});
       });
 
     var file_metadata = {files : []};
 
-    if (upload_multiple_files.files >= 1) { //Only run file code, if files are attached.
+    // if (upload_multiple_files.files.length >= 1) { //Only run file code, if files are attached.
       upload_multiple_files.files.forEach(upload_file => {
         let file_name = upload_file.name;
         let file_content = upload_file.content;
@@ -98,7 +98,7 @@ export async function secretSubmit(req, res, next) {
         else 
           return next({status: 500, error: file_write_result.err});
       });
-    }
+    // }
     
     // var filestore = file.writeSecret(id, encrypted_body);
     var transaction = db.addSecret({
