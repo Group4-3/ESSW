@@ -41,7 +41,7 @@ CREATE TABLE
 '${TABLE_NAME}'(
     id TEXT PRIMARY KEY NOT NULL,
     secret_text TEXT,
-    secret_file_metadata TEXT,
+    file_metadata TEXT,
     passphrase TEXT NOT NULL,
     expiry_date DATE NOT NULL,
     method TEXT NOT NULL,
@@ -94,7 +94,7 @@ INSERT INTO
 (
     id,
     secret_text,
-    secret_file_metadata,
+    file_metadata,
     passphrase,
     expiry_date,
     method,

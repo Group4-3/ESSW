@@ -102,14 +102,15 @@ export async function secretSubmit(req, res, next) {
     
     // var filestore = file.writeSecret(id, encrypted_body);
     var transaction = db.addSecret({
-      secret_id: id,
-      file_metadata: filestore.secret_path,
+      secret_id: id.toString(),
       secret_text: encryptedText,
+      file_metadata: file_metadata.toString(),
       passphrase: hashedPassphrase,
       expiry_date: expiryDate,
       method: method,
       unauthorized_attempts: unauthorizedAttempts
     })
+    // console.log(transaction.success);
 
     
     if (transaction.success) { //TODO: Rewrite to vary error behaviour based on processing path (file, text, or both?)
@@ -118,9 +119,9 @@ export async function secretSubmit(req, res, next) {
     else if (!transaction.success) {
       return next({status : 500, message: `Unable to write secret to database: ${err}`});
     }
-    else {
-      return next({status : 500, message: 'Secret Storage Failure.'})
-    }
+    // else {
+    //   return next({status : 500, message: 'Secret Storage Failure.'})
+    // }
   } catch (err) {
     return next({status: 500, error: err.message})
   }
