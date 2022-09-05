@@ -33,7 +33,7 @@ export function writeSecret(secret_id, secret_content) {
     }
 }
 
-export function readSecret(secret_path) {
+export async function readSecret(secret_path) {
     if (fs.readdir(secret_path).isDirectory()) { //Make sure that it's not a directory. May happen if secret path was malformed, and no ID was given. It is not possible to read a directory as a file.
         return next({success: false, error: `Secret Path ${secret_path} is directory!`}); //Stop if we're working from a directory.
     }
