@@ -10,7 +10,20 @@
 import fs from 'fs';
 import createHash from 'crypto-js';
 
-const SECRET_STORAGE_DIRECTORY = '.';
+const SECRET_STORAGE_DIRECTORY = './secret_storage';
+
+
+async function createDirectory(directory) { //Safely create directory, by only creating directory if it exists
+    if (!fs.existsSync(directory)) {
+        fs.mkdir(directory, (err) => {
+            if (err.code != 'EEXIST') {
+                throw err; //Throw error if we have any IO issues.
+            }
+        });
+        return true; //Directory was created
+    }
+    return false; //Directory was not created
+}
 
 async function generateChecksum(content, algorithm = 'sha256') { //Returns a checksum of the content, using the supplied algorithm (defaults to sha256)
     // return createHash.update(content).digest("hex") 
@@ -19,10 +32,12 @@ async function generateChecksum(content, algorithm = 'sha256') { //Returns a che
         .digest('base64'); //Return base64 filename, for compactness
 }
 
-export function writeSecret(secret_id, secret_content) {
+export async function writeSecret(secret_id, secret_content) {
     var secret_hash = generateChecksum(secret_content);//, 'sha256'); //Use default sha256
-    var secret_path = `${SECRET_STORAGE_DIRECTORY}/${secret_id}/${secret_hash}`;
+    var secret_directory = `${SECRET_STORAGE_DIRECTORY}/${secret_id}`
+    var secret_path = `${secret_directory}/${secret_hash}`;
     try {
+        createDirectory(secret_directory)
         fs.writeFile(secret_path, secret_content);
     }
     catch (err) {
