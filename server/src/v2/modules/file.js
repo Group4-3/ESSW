@@ -9,9 +9,20 @@
 
 import fs from 'fs';
 import createHash from 'crypto-js';
+import process from process;
+
 
 const SECRET_STORAGE_DIRECTORY = './secret_storage';
 
+function intialiseFileStorage() {//Clear storage
+    if (!createDirectory(SECRET_STORAGE_DIRECTORY)) {
+        if (fs.readdirSync(SECRET_STORAGE_DIRECTORY).length === 0) { //Check if the directory contains files. Synchronous check used to block program, since we want to make sure that secret storage is empty before starting.
+            throw "SECRET_STORAGE_NOT_EMPTY";
+            process.exit(5); //Throw exit code 5 (FATAL_ERROR), and terminate. Code should not proceed if the server is empty.
+        }
+    }
+
+}
 
 async function createDirectory(directory) { //Safely create directory, by only creating directory if it exists
     if (!fs.existsSync(directory)) {

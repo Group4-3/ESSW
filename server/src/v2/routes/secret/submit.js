@@ -6,12 +6,12 @@
     Author(s): Petri Bayley, Mitchell Sundstrom
 */
 
+import * as file from '../../modules/file.js'
 import bcrypt from 'bcrypt'
 import * as db from '../../modules/db.js'
 import * as cipher from '../../helpers/cipher.js'
 import * as textUtils from '../../helpers/text.js'
 import { pwnedPassphrase } from '../../helpers/pwned.js'
-import * as file from '../../modules/file.js'
   
 
 export async function secretSubmit(req, res, next) {
