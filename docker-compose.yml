@@ -35,7 +35,7 @@ services:
                                 ipv4_address: 172.60.0.2
                 volumes:
                         - ./certbot/www:/var/www/certbot:ro
-                        - ./certbot/conf/live/:/var/ssl/:ro
+                        - ./certbot/conf/live/:/etc/letsencrypt/:rw
         certbot: 
                 build:
                         context: certbot
@@ -45,7 +45,7 @@ services:
                 volumes:
                         - ./certbot/www:/var/www/certbot/:rw
                         - ./certbot/conf:/etc/letsencrypt/:rw
-                command: certonly -v --preferred-challenges http -d the-index.xyz --non-interactive --agree-tos -m petribayley@gmail.com --webroot -w /var/www/certbot/
+                #command: certonly -v --preferred-challenges http -d the-index.xyz --non-interactive --agree-tos -m petribayley@gmail.com --webroot -w /var/www/certbot/
                 #profiles:
                         #- donotstart
 
