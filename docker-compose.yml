@@ -21,7 +21,7 @@ services:
                         backend_connection:
                                 ipv4_address: 172.60.0.4
         essw_nginx:
-                user: nginx
+                user: root
                 build:
                         context: nginx
                         dockerfile: Dockerfile
@@ -29,26 +29,12 @@ services:
                         - 80:80
                         - 443:443
                 environment:
-                        - HOST_NAME=the-index.xyz
+                        - HOST_NAME=localhost
                 networks:
                         backend_connection:
                                 ipv4_address: 172.60.0.2
                 volumes:
-                        - ./certbot/www:/var/www/certbot:ro
-                        - ./certbot/conf/live/:/etc/letsencrypt/:rw
-        certbot: 
-                build:
-                        context: certbot
-                        dockerfile: Dockerfile
-                environment:
-                        - HOST_NAME=the-index.xyz
-                volumes:
-                        - ./certbot/www:/var/www/certbot/:rw
-                        - ./certbot/conf:/etc/letsencrypt/:rw
-                #command: certonly -v --preferred-challenges http -d the-index.xyz --non-interactive --agree-tos -m petribayley@gmail.com --webroot -w /var/www/certbot/
-                #profiles:
-                        #- donotstart
-
+                        - ./user_certificates:/ssl_gen/user_nginx_certificates
 networks:
         frontend_connection:
                 name: frontend_connection

@@ -19,9 +19,11 @@ jspm_packages/
 .env.test
 dist
 server/*/apidoc
-certbot/conf
-certbot/www
-certbot/ssl
+
+# Certificate build directory
+setup/ca
+setup/nginx_certificates/
+
 
 # Gatsby files
 .cache/

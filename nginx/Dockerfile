@@ -3,7 +3,10 @@ FROM nginx:1.23.1
 EXPOSE 80
 EXPOSE 443
 
-RUN touch /run/nginx.pid && mkdir /etc/letsencrypt && chown -R nginx:nginx /var/cache/nginx /run/nginx.pid /etc/nginx /etc/ssl /etc/letsencrypt
+RUN touch /run/nginx.pid
+RUN mkdir /ssl_gen /ssl_gen/user_nginx_certificates
+RUN chown -R nginx:nginx /var/cache/nginx /run/nginx.pid /etc/nginx /ssl_gen /etc/ssl /ssl_gen/user_nginx_certificates
 COPY server_route.conf.template /etc/nginx/templates/server_route.conf.template
 COPY nginx.conf /etc/nginx/nginx.conf
-COPY nginx_noncertbot_gen.sh /docker-entrypoint.d/nginx_noncertbot_gen.sh
+COPY ssl_setup.sh /docker-entrypoint.d/ssl_setup.sh
+COPY v3.ext /ssl_gen/v3.ext
