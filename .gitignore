@@ -20,9 +20,8 @@ jspm_packages/
 dist
 server/*/apidoc
 
-# Certificate build directory
-setup/ca
-setup/nginx_certificates/
+# Certificate directory
+user_certificates/*
 
 
 # Gatsby files
