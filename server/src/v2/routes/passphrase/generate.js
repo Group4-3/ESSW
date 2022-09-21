@@ -12,8 +12,13 @@ export function generate(req, res, next) {
   const DEFAULT_LENGTH = 32
   const DEFAULT_CHAR_SETS = "lowercase,uppercase,numerical,special"
 
-  var length = req.body.length && parseInt(req.body.length) ? parseInt(req.body.length) : DEFAULT_LENGTH
-  var selectedSets = req.body.character_set ? req.body.character_set.toString().toLowerCase().split(',') : DEFAULT_CHAR_SETS.split(',')
+  if (req.body.hasOwnProperty('length') && !Number.isInteger(parseInt(req.body['length']))
+      || parseInt(req.body['length']) < MIN_LENGTH
+      || parseInt(req.body['length']) > MAX_LENGTH)
+    return next({message: 'Param `length` must be an integer between ' + MIN_LENGTH + ' and ' + MAX_LENGTH + '.'})
+  var length = req.body.hasOwnProperty('length') ? parseInt(req.body['length']) : DEFAULT_LENGTH
+
+  var selectedSets = req.body.hasOwnProperty('character_set') ? req.body.character_set.toString().toLowerCase().split(',') : DEFAULT_CHAR_SETS.split(',')
 
   var sets = {
     lowercase: 'abcdefghijklmnopqrstuvwxyz',
