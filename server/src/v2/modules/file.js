@@ -9,27 +9,31 @@
 
 import fs from 'fs';
 import createHash from 'crypto-js';
+import * as path from 'path'
 
-const SECRET_STORAGE_DIRECTORY = '.';
+const __dirname = path.resolve()
+const SECRET_STORAGE_DIRECTORY = './uploads/';
 
-async function generateChecksum(content, algorithm = 'sha256') { //Returns a checksum of the content, using the supplied algorithm (defaults to sha256)
-    // return createHash.update(content).digest("hex") 
-    return createHash(algorithm)
-        .update(content)
-        .digest('base64'); //Return base64 filename, for compactness
-}
+// async function generateChecksum(content, algorithm = 'sha256') { //Returns a checksum of the content, using the supplied algorithm (defaults to sha256)
+//     // return createHash.update(content).digest("hex")
+//     return createHash(algorithm)
+//         .update(content)
+//         .digest('base64'); //Return base64 filename, for compactness
+// }
 
-export function writeSecret(secret_id, secret_content) {
-    var secret_hash = generateChecksum(secret_content);//, 'sha256'); //Use default sha256
-    var secret_path = `${SECRET_STORAGE_DIRECTORY}/${secret_id}/${secret_hash}`;
+export async function writeSecret(content, path) {
+    var secret_path = `${SECRET_STORAGE_DIRECTORY}/${path}`;
+    // var secret_path = `E:/GitHub/Uni/SEP/ESSW/server/uploads/${path}`
     try {
-        fs.writeFile(secret_path, secret_content);
-    }
-    catch (err) {
-        return next({ success: false, error: err, error_messsage: `Unable to write file '${secret_path}': ${err}.` });
-    }
-    finally {
-        return next({ success: true , path: secret_path, name: secret_hash});
+      console.log(secret_path)
+      await fs.writeFile(secret_path, content, (err) => {
+        if (err)
+          console.log(err)
+      }).then(result => {
+        return result
+      })
+    } catch (err) {
+      return err.message
     }
 }
 

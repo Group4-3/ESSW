@@ -82,7 +82,7 @@ const Form = ({formResponse}) => {
         formResponse(json);
       } else {
         // error message should come from client validations
-        updateErrorMessage(json.message)
+        updateErrorMessage(JSON.stringify(json, null, 4))
       }
     } catch (err) {
       console.log(err)

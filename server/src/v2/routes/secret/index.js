@@ -8,7 +8,7 @@
 
 import express from 'express'
 import { methods } from '../../helpers/cipher.js'
-import { secretSubmit, secretFileUpload } from './submit.js'
+import { secretSubmit, fileAttacher } from './submit.js'
 import { secretGet } from './get.js'
 import { secretDestroy } from './destroy.js'
 
@@ -60,7 +60,7 @@ router.get('/methods', function(req, res, next) {
  *    "id": "e7dc39a0"
  *  }
  */
-router.post('/submit', secretFileUpload, secretSubmit)
+router.post('/submit', fileAttacher, secretSubmit)
 
 /**
  * @api {post} /api/v2/secret/:id Unlock a secret

@@ -10,7 +10,7 @@ export const getFileIcon = (mimetype) => {
     'video/mp4': 'bi-filetype-mp4'
   }
 
-  return icons[mimetype] != undefined ? icons[mimetype] : 'bi-file-earmark'
+  return icons[mimetype] !== undefined ? icons[mimetype] : 'bi-file-earmark'
 }
 
 export const humanReadableSize = (bytes) => {

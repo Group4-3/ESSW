@@ -18,18 +18,20 @@ function hasProperty(body, property) {
   return property in body && body[property]
 }
 
-const upload = multer({
-  storage: multer.diskStorage({
-    destination: function (req, file, cb) {
-      cb(null, 'uploads/')
-    },
-    filename: function (req, file, cb) {
-      cb(null, Date.now() + file.originalname)
-    }
-  })
-})
+// const upload = multer({
+//   storage: multer.diskStorage({
+//     destination: function (req, file, cb) {
+//       cb(null, 'uploads/')
+//     },
+//     filename: function (req, file, cb) {
+//       cb(null, Date.now() + file.originalname)
+//     }
+//   })
+// })
 
-export var secretFileUpload = upload.array('files', 8)
+export const fileAttacher = multer({
+  storage: multer.memoryStorage()
+}).array('files', 1)
 
 export async function secretSubmit(req, res, next) {
   const METHODS = cipher.methods
@@ -44,25 +46,15 @@ export async function secretSubmit(req, res, next) {
     var id = cipher.generateIdentifier()
 
     if (!hasProperty(req.body, 'text') && !(req.files && Object.keys(req.files).length))
-      return next({message: 'Missing required body param: `text` OR `files` (must use one).'})
-
-    var text = hasProperty(req.body, 'text')? textUtils.escape(req.body.text.toString()) : ''
-
-    var files = []
-    // if (req.body.hasOwnProperty('files')) {
-    //   var tmpFiles = Array.isArray(req.body.files) ? req.body.files : [req.body.files]
-    //   for (var i = 0; i < tmpFiles.length; i++) {
-    //     files.push({
-    //       file_name: tmpFiles[i].filename
-    //     })
-    //   }
-    // }
-
-    console.log(files)
+      return next({message: 'Missing required body param: `text` OR `file` (must use one).'})
 
     if (!hasProperty(req.body, 'passphrase'))
       return next({message: 'Missing required body param: `passphrase`.'})
     var passphrase = req.body.passphrase.toString()
+
+    var pwned = await pwnedPassphrase(passphrase)
+    if (pwned)
+      return next({message: 'Passphrase has been pwned (leaked online); please use something else.'})
 
     if (hasProperty(req.body, 'method') && !METHODS.includes(req.body.method))
       return next({message: 'Param `method` must be one of: ' + METHODS.join(', ')})
@@ -88,13 +80,40 @@ export async function secretSubmit(req, res, next) {
       attempts: hasProperty(req.body, 'ip_based_access_attempts') ? {} : 0
     })
 
-    var pwned = await pwnedPassphrase(passphrase)
-    if (pwned)
-      return next({message: 'Passphrase has been pwned (leaked online); please use something else.'})
-
+    var text = hasProperty(req.body, 'text') ? textUtils.escape(req.body.text.toString()) : ''
     var encryptedText = cipher.encrypt(text, passphrase, method)
     if (!encryptedText)
       return next({message: 'Your message could not be encrypted; please try again checking your parameters are correct.'})
+
+    var fileMetadata = []
+    if (req.files && Object.keys(req.files).length) {
+      var tmpFiles = req.files
+      for (var i = 0; i < tmpFiles.length; i++) {
+        var stream = tmpFiles[i].buffer
+        var hex = stream.toString('hex')
+        var checksum = cipher.generateChecksum(hex)
+        var originalName = tmpFiles[i].originalname
+        var encryptedFileName = cipher.encrypt(originalName, passphrase, method)
+        var encryptedFileContents =  cipher.encrypt(hex, passphrase, method)
+        var path = [id, checksum].join("-")
+
+        fileMetadata.push({
+          encrypted_file_name: encryptedFileName,
+          encoding: tmpFiles[i].encoding,
+          extension: originalName.substring(originalName.lastIndexOf('.')+1, originalName.length) || ".txt",
+          mimetype: tmpFiles[i].mimetype,
+          size: tmpFiles[i].size,
+          checksum: checksum,
+          location: path
+        })
+
+        var result = await file.writeSecret(encryptedFileContents, path)
+        console.log(result)
+      }
+    }
+    fileMetadata = JSON.stringify(fileMetadata)
+
+    console.log(fileMetadata)
 
     var hashedPassphrase = await bcrypt.hash(passphrase, 10).then(result => {
       return result
@@ -138,7 +157,7 @@ export async function secretSubmit(req, res, next) {
     var transaction = db.addSecret({
       secret_id: id,
       secret_text: encryptedText,
-      file_metadata: "",
+      file_metadata: fileMetadata,
       passphrase: hashedPassphrase,
       expiry_date: expiryDate,
       method: method,

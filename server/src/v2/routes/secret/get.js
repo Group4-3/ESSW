@@ -21,10 +21,6 @@ export async function secretGet(req, res, next) {
       return next({message: 'Missing required request param: `id`.'})
     var id = req.params.id
 
-    if (!req.body.hasOwnProperty('passphrase'))
-      return next({message: 'Missing required body param: `passphrase`.'})
-    var passphrase = req.body.passphrase.toString()
-
     var row = await db.retrieveSecret(id)
     if (!row.data || row.data && Date.parse(row.data.expiry_date) < Date.now())
       return next({status: 404, message: 'Secret with that ID does not exist or has been deleted.'})
@@ -33,6 +29,10 @@ export async function secretGet(req, res, next) {
 
     if (!secretHelper.canAttemptAccess(row, remoteIp))
       return next({status: 429, message: 'Too many unsuccessful access attempts; the requested secret is locked.'})
+
+    if (!req.body.hasOwnProperty('passphrase'))
+      return next({message: 'Missing required body param: `passphrase`.'})
+    var passphrase = req.body.passphrase.toString()
 
     if(bcrypt.compareSync(passphrase, row.passphrase)) {
       var decrypted_body = cipher.decrypt(row.secret_text, passphrase, row.method)
