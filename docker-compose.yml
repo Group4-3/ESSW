@@ -7,7 +7,6 @@ services:
                         dockerfile: Dockerfile
                 environment:
                         - NODE_ENV=production
-                        - NODE_PORT=8081
                 networks:
                         backend_connection:
                                 ipv4_address: 172.60.0.3
@@ -18,7 +17,6 @@ services:
                         dockerfile: Dockerfile
                 environment:
                         - NODE_ENV=production
-                        - NODE_PORT=8082
                 networks:
                         backend_connection:
                                 ipv4_address: 172.60.0.4
@@ -27,21 +25,16 @@ services:
                 build:
                         context: nginx
                         dockerfile: Dockerfile
-                volumes:
-                        - ./certbot/www:/var/www/certbot/:ro
                 ports:
                         - 80:80
-                        - 443:80
+                        - 443:443
                 environment:
-                        - NGINX_HOST=localhost.com
-                        - NGINX_PORT=8080
+                        - HOST_NAME=localhost
                 networks:
                         backend_connection:
                                 ipv4_address: 172.60.0.2
-        certbot:
-                image: certbot/certbot:latest
                 volumes:
-                        - ./certbot/www/:/var/www/certbot/:rw
+                        - ./user_certificates:/ssl_gen/user_nginx_certificates
 networks:
         frontend_connection:
                 name: frontend_connection

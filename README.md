@@ -18,6 +18,7 @@ Ephemeral Secrets Sharing Website
 ## How to Use
 
 1. Open the command line interfaces and navigate one to the cloned repository.
-2. Then type (`docker compose up`) start up the docker services.
-3. Open up a web client like Chrome or Internet Explorer and naviage to <http://localhost:8080/first.html> (To be changed) for the submitting of a secret.
-4. Once a secret has been submitted then navigate to <http://localhost:8080/viewsecret.html> (To be changed) to view the submitted secret
+2. (Optional) If you have generated your own certificates, place the private and public key in the user_certificates directory and name them nginx.crt.pem (Public), nginx.key.pem (Private).
+3. Then type (`docker compose up`) start up the docker services.
+4. Open up a web client like Chrome or Internet Explorer and naviage to <http://localhost:8080/first.html> (To be changed) for the submitting of a secret.
+5. Once a secret has been submitted then navigate to <http://localhost:8080/viewsecret.html> (To be changed) to view the submitted secret
