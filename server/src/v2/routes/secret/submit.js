@@ -14,7 +14,8 @@ import { pwnedPassphrase } from '../../helpers/pwned.js'
 import * as file from '../../modules/file.js'
 
 function hasProperty(body, property) {
-  return body.hasOwnProperty(property)
+  // need to reprocess otherwise [Object: null prototype]
+  return {...body}.hasOwnProperty(property)
 }
 
 export async function secretSubmit(req, res, next) {
@@ -56,8 +57,6 @@ export async function secretSubmit(req, res, next) {
     if (hasProperty(req.body, 'ip_based_access_attempts') && !(typeof req.body.ip_based_access_attempts === 'boolean'))
       return next({message: 'Param `ip_based_access_attempts` must be of type Boolean.'})
 
-    console.log("attempts " + hasProperty(req.body, 'max_access_attempts'))
-
     var unauthorizedAttempts = JSON.stringify({
       max_attempts: hasProperty(req.body, 'max_access_attempts') ? parseInt(req.body.max_access_attempts) : DEFAULT_ACCESS_ATTEMPTS,
       ip_based: hasProperty(req.body, 'ip_based_access_attempts') ? req.body.ip_based_access_attempts : false,
@@ -71,23 +70,25 @@ export async function secretSubmit(req, res, next) {
 
     var fileMetadata = []
     if (req.files && Object.keys(req.files).length) {
-      var tmpFiles = req.files
-      for (var i = 0; i < tmpFiles.length; i++) {
-        var originalName = tmpFiles[i].originalname
+      if (typeof req.files !== 'object')
+        return next({message: 'Files must be a multer object.'})
+
+      for (var i = 0; i < req.files.length; i++) {
+        var f = req.files[i]
+        var originalName = f.originalname
         var encryptedFileName = cipher.encrypt(originalName, passphrase, method)
 
-        var savedFile = await file.writeSecretFile(tmpFiles[i].buffer, passphrase, method, secretId)
-
+        var savedFile = await file.writeSecretFile(f.buffer, passphrase, method, secretId)
         if (!savedFile.success) {
           return next({status: 500, message: 'Unable to save encrypted file to disk.', error: savedFile.error})
         }
 
         fileMetadata.push({
           encrypted_file_name: encryptedFileName,
-          encoding: tmpFiles[i].encoding,
+          encoding: f.encoding,
           extension: originalName.substring(originalName.lastIndexOf('.')+1, originalName.length) || ".txt",
-          mimetype: tmpFiles[i].mimetype,
-          size: tmpFiles[i].size,
+          mimetype: f.mimetype,
+          size: f.size,
           checksum: savedFile.checksum,
           location: savedFile.path
         })
