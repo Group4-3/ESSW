@@ -21,7 +21,7 @@ dist
 server/*/apidoc
 
 # Certificate directory
-user_certificates/*
+nginx/user_certificates/*
 
 
 # Gatsby files

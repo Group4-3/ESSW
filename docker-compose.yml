@@ -26,6 +26,8 @@ services:
                 build:
                         context: nginx
                         dockerfile: Dockerfile
+                        args:
+                                - HOST_NAME=${HOST_NAME}
                 ports:
                         - 80:80
                         - 443:443
@@ -34,8 +36,6 @@ services:
                 networks:
                         backend_connection:
                                 ipv4_address: 172.60.0.2
-                volumes:
-                        - ./user_certificates:/ssl_gen/user_nginx_certificates
 networks:
         frontend_connection:
                 name: frontend_connection
