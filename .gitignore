@@ -19,6 +19,7 @@ jspm_packages/
 .env.test
 dist
 server/*/apidoc
+server/uploads
 
 # Certificate directory
 nginx/user_certificates/*

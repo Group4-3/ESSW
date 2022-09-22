@@ -13,7 +13,8 @@ export function canAttemptAccess(secret, ip) {
   var attempts = data.attempts
 
   return (maxAttempts === -1
-          || ipBased && (!attempts.hasOwnProperty(ip) && maxAttempts > 0 || attempts.hasOwnProperty(ip) && attempts[ip] < maxAttempts)
+          || ipBased && (!attempts.hasOwnProperty(ip) && maxAttempts > 0
+          || attempts.hasOwnProperty(ip) && attempts[ip] < maxAttempts)
           || !ipBased && attempts < maxAttempts) ? true : false
 }
 
