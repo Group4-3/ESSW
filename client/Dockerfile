@@ -8,9 +8,9 @@ RUN npm install
 RUN npm install --global serve
 
 
-from client-base as client-base-prod
+FROM client-base as client-base-prod
 RUN npm run build
 CMD ["serve", "-s", "build"]
 
-from client-base as client-base-dev 
+FROM client-base as client-base-dev 
 CMD ["npm", "start"]
