@@ -14,7 +14,7 @@ import { pwnedPassphrase } from '../../helpers/pwned.js'
 import * as file from '../../modules/file.js'
 
 function hasProperty(body, property) {
-  return property in body && body[property]
+  return body.hasOwnProperty(property)
 }
 
 export async function secretSubmit(req, res, next) {
@@ -55,6 +55,8 @@ export async function secretSubmit(req, res, next) {
 
     if (hasProperty(req.body, 'ip_based_access_attempts') && !(typeof req.body.ip_based_access_attempts === 'boolean'))
       return next({message: 'Param `ip_based_access_attempts` must be of type Boolean.'})
+
+    console.log("attempts " + hasProperty(req.body, 'max_access_attempts'))
 
     var unauthorizedAttempts = JSON.stringify({
       max_attempts: hasProperty(req.body, 'max_access_attempts') ? parseInt(req.body.max_access_attempts) : DEFAULT_ACCESS_ATTEMPTS,

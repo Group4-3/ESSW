@@ -28,7 +28,7 @@ describe('Test /secret', () => {
   describe('POST /submit', () => {
     it('should return successfully with persisted secret id', (done) => {
       const secret = {
-        'body': 'SEP Group43!',
+        'text': 'SEP Group43!',
         'passphrase': '#SuperS3cr3tP@ssw0rd'
       }
 
@@ -48,7 +48,7 @@ describe('Test /secret', () => {
 
     it('should return an error 400 when providing an insecure passphrase', (done) => {
       const secret = {
-        'body': 'SEP Group43!',
+        'text': 'SEP Group43!',
         'passphrase': 'password'
       }
 
@@ -64,7 +64,7 @@ describe('Test /secret', () => {
 
     it('should return successfully with persisted secret id when using an alternative cipher method', (done) => {
       const secret = {
-        'body': 'SEP Group43!',
+        'text': 'SEP Group43!',
         'passphrase': '#SuperS3cr3tP@ssw0rd',
         'method': 'tripledes'
       }
@@ -84,7 +84,7 @@ describe('Test /secret', () => {
 
     it('should return an error 400 when providing an unsupported cipher method', (done) => {
       const secret = {
-        'body': 'SEP Group43!',
+        'text': 'SEP Group43!',
         'passphrase': '#SuperS3cr3tP@ssw0rd',
         'method': 'very_real_cipher'
       }
@@ -124,7 +124,7 @@ describe('Test /secret', () => {
         })
         .expect(200)
         .expect((res) => {
-          return res.body.should.have.property('body').be.equal('SEP Group43!')
+          return res.body.should.have.property('text').be.equal('SEP Group43!')
         })
         .end((err, res) => {
           if (err) return done(err)
@@ -147,7 +147,7 @@ describe('Test /secret', () => {
 
     it('should prevent further access attempts after specified max unauthorized attempts', (done) => {
       const secret = {
-        'body': 'SEP Group43!',
+        'text': 'SEP Group43!',
         'passphrase': '#SuperS3cr3tP@ssw0rd',
         'max_access_attempts': 0,
         'ip_based_access_attempts': true
@@ -160,7 +160,7 @@ describe('Test /secret', () => {
           request(app)
             .post('/api/v2/secret/' + res.body.id)
             .send({
-              'passphrase': 'abc'
+              'passphrase': '#SuperS3cr3tP@ssw0rd'
             })
             .expect(429)
             .end((err, res) => {
