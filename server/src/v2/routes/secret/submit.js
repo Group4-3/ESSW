@@ -86,7 +86,7 @@ export async function secretSubmit(req, res, next) {
         fileMetadata.push({
           encrypted_file_name: encryptedFileName,
           encoding: f.encoding,
-          extension: originalName.substring(originalName.lastIndexOf('.')+1, originalName.length) || "txt",
+          extension: originalName.substring(originalName.lastIndexOf('.')+1, originalName.length) || "",
           mimetype: f.mimetype,
           size: f.size,
           checksum: savedFile.checksum,
