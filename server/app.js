@@ -23,7 +23,7 @@ app.use(morgan('combined', {
     return ['test'].includes(process.env.NODE_ENV)
   }
 }))
-app.use(express.urlencoded({ extended: false }))
+app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
 
 import { router as v2 } from './src/v2/routes/index.js'

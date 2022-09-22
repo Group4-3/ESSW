@@ -8,6 +8,7 @@
 
 import express from 'express'
 import { methods } from '../../helpers/cipher.js'
+import { fileAttacher } from '../../modules/file.js'
 import { secretSubmit } from './submit.js'
 import { secretGet } from './get.js'
 import { secretDestroy } from './destroy.js'
@@ -37,7 +38,7 @@ router.get('/methods', function(req, res, next) {
  * @apiName SubmitSecret
  * @apiGroup Secret
  *
- * @apiBody {String} body Secret string.
+ * @apiBody {String} text Secret string.
  * @apiBody {String} passphrase Key to protect the secret.
  * @apiBody {String} [method="aes"] Encryption method to use. Available options: aes des tripledes rabbit rc4 rc4drop
  * @apiBody {Integer} [expiry="1800"] Number of seconds that the secret will automatically expire after. Default 30 minutes (1800). Maximum 7 days (604800).
@@ -48,7 +49,7 @@ router.get('/methods', function(req, res, next) {
  *
  *  body:
  *  {
- *    "body": "SEP Group43!",
+ *    "text": "SEP Group43!",
  *    "passphrase": "#SuperS3cr3tP@ssw0rd",
  *    "expiry": "21600"
  *  }
@@ -60,7 +61,7 @@ router.get('/methods', function(req, res, next) {
  *    "id": "e7dc39a0"
  *  }
  */
-router.post('/submit', secretSubmit)
+router.post('/submit', fileAttacher, secretSubmit)
 
 /**
  * @api {post} /api/v2/secret/:id Unlock a secret
@@ -82,7 +83,7 @@ router.post('/submit', secretSubmit)
  * @apiSuccessExample {json} Success-Response:
  *  HTTP/1.1 200 OK
  *  {
- *    "body": "SEP Group43!"
+ *    "text": "SEP Group43!"
  *  }
  */
 router.post('/:id', secretGet)
