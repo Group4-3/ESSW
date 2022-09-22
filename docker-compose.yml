@@ -21,7 +21,7 @@ services:
                         backend_connection:
                                 ipv4_address: 172.60.0.4
         essw_nginx:
-                user: root
+                user: nginx
                 build:
                         context: nginx
                         dockerfile: Dockerfile
