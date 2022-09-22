@@ -16,10 +16,6 @@ const iterations = 100
 
 export const methods = ['aes', 'des', 'tripledes', 'rabbit', 'rc4', 'rc4drop']
 
-export function generateChecksum(content) {
-  return crypto.SHA256(content).toString()
-}
-
 export function generateIdentifier() {
   return crypto.lib.WordArray.random(idLength).toString()
 }

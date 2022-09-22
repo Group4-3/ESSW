@@ -7,7 +7,6 @@
 */
 
 import bcrypt from 'bcrypt'
-import multer from 'multer'
 import * as db from '../../modules/db.js'
 import * as cipher from '../../helpers/cipher.js'
 import * as textUtils from '../../helpers/text.js'
@@ -18,32 +17,15 @@ function hasProperty(body, property) {
   return property in body && body[property]
 }
 
-// const upload = multer({
-//   storage: multer.diskStorage({
-//     destination: function (req, file, cb) {
-//       cb(null, 'uploads/')
-//     },
-//     filename: function (req, file, cb) {
-//       cb(null, Date.now() + file.originalname)
-//     }
-//   })
-// })
-
-export const fileAttacher = multer({
-  storage: multer.memoryStorage()
-}).array('files', 1)
-
 export async function secretSubmit(req, res, next) {
   const METHODS = cipher.methods
   const DEFAULT_METHOD = 'aes'
   const DEFAULT_EXPIRY = 1800 // 30 minutes
-  const MAX_EXPIRY = 604800 // 7 days
+  const MAX_EXPIRY = 604800   // 7 days
   const DEFAULT_ACCESS_ATTEMPTS = 5
 
   try {
-    console.log(req.body)
-    console.log(req.files)
-    var id = cipher.generateIdentifier()
+    var secretId = cipher.generateIdentifier()
 
     if (!hasProperty(req.body, 'text') && !(req.files && Object.keys(req.files).length))
       return next({message: 'Missing required body param: `text` OR `file` (must use one).'})
@@ -89,13 +71,14 @@ export async function secretSubmit(req, res, next) {
     if (req.files && Object.keys(req.files).length) {
       var tmpFiles = req.files
       for (var i = 0; i < tmpFiles.length; i++) {
-        var stream = tmpFiles[i].buffer
-        var hex = stream.toString('hex')
-        var checksum = cipher.generateChecksum(hex)
         var originalName = tmpFiles[i].originalname
         var encryptedFileName = cipher.encrypt(originalName, passphrase, method)
-        var encryptedFileContents =  cipher.encrypt(hex, passphrase, method)
-        var path = [id, checksum].join("-")
+
+        var savedFile = await file.writeSecretFile(tmpFiles[i].buffer, passphrase, method, secretId)
+
+        if (!savedFile.success) {
+          return next({status: 500, message: 'Unable to save encrypted file to disk.', error: savedFile.error})
+        }
 
         fileMetadata.push({
           encrypted_file_name: encryptedFileName,
@@ -103,59 +86,19 @@ export async function secretSubmit(req, res, next) {
           extension: originalName.substring(originalName.lastIndexOf('.')+1, originalName.length) || ".txt",
           mimetype: tmpFiles[i].mimetype,
           size: tmpFiles[i].size,
-          checksum: checksum,
-          location: path
+          checksum: savedFile.checksum,
+          location: savedFile.path
         })
-
-        var result = await file.writeSecret(encryptedFileContents, path)
-        console.log(result)
       }
     }
     fileMetadata = JSON.stringify(fileMetadata)
-
-    console.log(fileMetadata)
 
     var hashedPassphrase = await bcrypt.hash(passphrase, 10).then(result => {
       return result
     })
 
-  //
-  //
-  //   //TODO: File Upload functionality (multiple)
-  //
-  //   var upload_multiple_files = {files : []}; // {files : [{name : 'temp_name', content : 'This is a temp message. If this ends up in production, something has gone horribly, horribly wrong.'},
-  // //{name : 'other_file', content : 'Rending skin from bones'}]}; //TempVar to allow for multiple file uploads. Should be in JSON array format. (Get file modification time?)
-  //
-  //   //JSON structure requires file name (no path, just name), and content. Name should include extension.
-  //
-  //   req.body.files.forEach(upload_file => {
-  //     upload_multiple_files.files.push({name : upload_file.filename, content : upload_file.filecontent});
-  //   });
-  //
-  //   var file_metadata = {files : []};
-  //
-  //   if (upload_multiple_files.files >= 1) { //Only run file code, if files are attached.
-  //     upload_multiple_files.files.forEach(upload_file => {
-  //       let file_name = upload_file.name;
-  //       let file_content = upload_file.content;
-  //
-  //       let encrypted_file_content = cipher.encrypt(file_content, passphrase, method);
-  //
-  //       if (!encrypted_file_content)
-  //         return next({status : 500, error: "File encryption error!"});
-  //
-  //       let file_write_result = file.writeSecret(id, encrypted_file_content);
-  //
-  //       if (file_write_result.success) //If the file write succeeds
-  //         file_metadata.files.push({original_file_name : file_name, encrypted_file_name : file_write_result.name, encrypted_file_path : file_write_result.path}); //Add file metadata to array
-  //       else
-  //         return next({status: 500, error: file_write_result.err});
-  //     });
-  //   }
-
-    // var filestore = file.writeSecret(id, encrypted_body);
     var transaction = db.addSecret({
-      secret_id: id,
+      secret_id: secretId,
       secret_text: encryptedText,
       file_metadata: fileMetadata,
       passphrase: hashedPassphrase,
@@ -166,7 +109,7 @@ export async function secretSubmit(req, res, next) {
 
     if (transaction.success) {
       return res.status(200).send({
-        id: id,
+        id: secretId,
         expires_at: expiryDate
       })
     } else {

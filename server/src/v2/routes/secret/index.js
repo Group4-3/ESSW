@@ -8,7 +8,8 @@
 
 import express from 'express'
 import { methods } from '../../helpers/cipher.js'
-import { secretSubmit, fileAttacher } from './submit.js'
+import { fileAttacher } from '../../modules/file.js'
+import { secretSubmit } from './submit.js'
 import { secretGet } from './get.js'
 import { secretDestroy } from './destroy.js'
 

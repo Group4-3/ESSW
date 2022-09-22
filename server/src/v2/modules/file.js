@@ -4,37 +4,48 @@
     Description: Driver to interface with the filesystem
     Date of Creation: 31/08/2022
     Author(s): Kevin Lew
-
 */
 
-import fs from 'fs';
-import createHash from 'crypto-js';
+import fs from 'fs'
+import multer from 'multer'
+import crypto from 'crypto-js'
 import * as path from 'path'
+import * as cipher from '../helpers/cipher.js'
 
-const __dirname = path.resolve()
-const SECRET_STORAGE_DIRECTORY = './uploads/';
+const SECRET_STORAGE_DIRECTORY = './uploads'
 
-// async function generateChecksum(content, algorithm = 'sha256') { //Returns a checksum of the content, using the supplied algorithm (defaults to sha256)
-//     // return createHash.update(content).digest("hex")
-//     return createHash(algorithm)
-//         .update(content)
-//         .digest('base64'); //Return base64 filename, for compactness
-// }
+export const fileAttacher = multer({
+  storage: multer.memoryStorage()
+}).array('files', 1)
 
-export async function writeSecret(content, path) {
-    var secret_path = `${SECRET_STORAGE_DIRECTORY}/${path}`;
-    // var secret_path = `E:/GitHub/Uni/SEP/ESSW/server/uploads/${path}`
-    try {
-      console.log(secret_path)
-      await fs.writeFile(secret_path, content, (err) => {
-        if (err)
-          console.log(err)
-      }).then(result => {
-        return result
-      })
-    } catch (err) {
-      return err.message
+export function generateChecksum(content) {
+  return crypto.SHA256(content).toString()
+}
+
+export async function writeSecretFile(buffer, passphrase, method, id = undefined) {
+  try {
+    var content = buffer.toString()
+    var checksum = generateChecksum(content)
+    var encryptedFileContents = cipher.encrypt(content, passphrase, method)
+
+    var saveDirectory = id !== undefined ? [SECRET_STORAGE_DIRECTORY, id].join('/') : SECRET_STORAGE_DIRECTORY
+    var fileName = [checksum, cipher.generateIdentifier()].join('_')
+    var filePath = [saveDirectory, fileName].join('/')
+
+    if (!fs.existsSync(saveDirectory)) {
+      await fs.mkdirSync(saveDirectory)
     }
+
+    await fs.writeFile(filePath, encryptedFileContents, (err) => {
+      if (err) {
+        return { success: false, error: err.message }
+      }
+    })
+
+    return { success: true, path: filePath, checksum: checksum }
+  } catch (err) {
+    return { success: false, error: err.message }
+  }
 }
 
 export function readSecret(secret_path) {
