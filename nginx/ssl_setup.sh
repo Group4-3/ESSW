@@ -33,7 +33,5 @@ else
 	# Copy key and fullchain to NGINX certificate directory
 	cp ${CERT_SERVER_DIR}/nginx.key.pem ${NGINX_CERT_LOC}/nginx.key.pem
     cp ${CERT_SERVER_DIR}/nginx_fullchain.crt.pem ${NGINX_CERT_LOC}/nginx.crt.pem
-
+    chmod 600 ${CERT_SERVER_DIR}/*.pem ${CA_DIR}/*.pem ${CA_DIR}/*.srl
 fi
-
-chmod 600 ${CERT_SERVER_DIR}/*.pem ${CA_DIR}/*.pem ${CA_DIR}/*.srl
