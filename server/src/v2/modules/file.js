@@ -58,7 +58,7 @@ export async function readSecret(secret_path) {
         fileContent = fs.readFile(secret_path);
     }
     catch (err) {
-        return {success : false, error: err, error_message}
+        return {success : false, error: err, error_message : error_message}
     }
     finally {
         return {success:true, file_content : fileContent}
