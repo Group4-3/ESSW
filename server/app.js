@@ -4,7 +4,7 @@
     Date of Creation: 27/04/2022
     Description: Main server application for the API
     Author(s): Petri Bayley & Mitchell Sundstrom
-
+    p
 */
 
 import express from 'express'
@@ -23,13 +23,11 @@ app.use(morgan('combined', {
     return ['test'].includes(process.env.NODE_ENV)
   }
 }))
-app.use(express.urlencoded({ extended: false }))
+app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
 
-import { router as v1 } from './src/v1/index.js'
 import { router as v2 } from './src/v2/routes/index.js'
 
-app.use('/api/v1', v1)
 app.use('/api/v2', v2)
 
 app.use(express.static('public'))
@@ -47,7 +45,7 @@ app.use((req, res) => {
   })
 })
 
-const server = app.listen(process.env.PORT || 3001, () => {
+const server = app.listen(process.env.NODE_PORT || 3001, () => {
   console.log('Listening on port ' + server.address().port + ' in ' + process.env.NODE_ENV + ' mode')
 })
 
