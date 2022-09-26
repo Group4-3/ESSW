@@ -49,18 +49,20 @@ export async function writeSecretFile(buffer, passphrase, method, id = undefined
   }
 }
 
-export async function readSecret(secret_path) {
+export async function readSecret(secret_path, passphrase, method) {
     if (fs.readdir(secret_path).isDirectory()) { //Make sure that it's not a directory. May happen if secret path was malformed, and no ID was given. It is not possible to read a directory as a file.
         return {success: false, error: `Secret Path ${secret_path} is directory!`}; //Stop if we're working from a directory.
     }
-    var fileContent;
+    var file;
     try {
-        fileContent = fs.readFile(secret_path);
+      let encrypted_file_content = fs.readFile(secret_path);
+      let decrypted_file_content = cipher.decrypt(encrypted_file_content, passphrase, method); //We can assume that passphrase is correct, as validation has already occurred
+      file = Buffer.from(decrypted_file_content);
     }
     catch (err) {
-        return {success : false, error: err, error_message : error_message}
+        return {success : false, error: err}
     }
     finally {
-        return {success:true, file_content : fileContent}
+        return {success:true, file_content : file}
     }
 }

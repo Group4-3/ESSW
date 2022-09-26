@@ -54,27 +54,31 @@ export async function secretGet(req, res, next) {
       // }
 
       //Read Encrypted files
-      file_metadata.forEach(file_data => {
-        let file_name = cipher.decrypt(file_data.encrypted_file_name, passphrase, row.method); //Decrypt the file name, using the text method
-        let encrypted_file_content = await file.readSecret(file_data.location); 
-        let decrypted_file_content = cipher.decrypt(encrypted_file_content, passphrase, row.method); //We can assume that passphrase is correct, as validation has already occurred
+        for (let i = 0, i_length = file_metadata.length; i < i_length; ++i) {
+          let file_data = file_metadata[i];
+          let file_name = cipher.decrypt(file_data.encrypted_file_name, passphrase, row.method); //Decrypt the file name, using the text method
+          let decrypted_file_content = await file.readSecret(file_data.location); 
 
-        if (file_data.checksum != crypto.SHA256(decrypted_file_content).toString()) { //Ensure that the file matches saved checksum. If not, fail out
-          throw {message: "File checksum mismatch!"};
-        }
+          if (!decrypted_file_content.success) {
+            throw error;
+          }
 
-        decrypted_files.push({ //Push file data into object, and add to array
-          name : file_name,
-          encoding: file_data.encoding,
-          file: decrypted_file_content,
-          extension: file_data.extension,
-          mimetype: file_data.mimetype,
-          size : file_data.size,
-          checksum : file_data.checksum
-        });
-        //TODO: Delete secret, and move to file module
-
-      });
+          if (file_data.checksum != crypto.SHA256(decrypted_file_content).toString()) { //Ensure that the file matches saved checksum. If not, fail out
+            throw {message: "File checksum mismatch!"};
+          }
+  
+          decrypted_files.push({ //Push file data into object, and add to array
+            name : file_name,
+            encoding: file_data.encoding,
+            file: decrypted_file_content,
+            extension: file_data.extension,
+            mimetype: file_data.mimetype,
+            size : file_data.size,
+            checksum : file_data.checksum
+          });
+          
+  
+        };
 
 
 
