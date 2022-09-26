@@ -21,6 +21,21 @@ const encryptionoptions = [
   {label: 'rc4drop', value: 'rc4drop'}
 ];
 
+const maxattemptsoptions = [
+  {label: '1', value: 1*1},
+  {label: '2', value: 2*1},
+  {label: '3', value: 3*1},
+  {label: '4', value: 4*1},
+  {label: '5', value: 5*1},
+  {label: 'Infinite', value: -1*1}
+];
+
+const ipbasedattemptsoptions = [
+  {label: 'True', value: 'True'},
+  {label: 'False', value: 'False'}
+];
+
+
 const Form = ({formResponse}) => {
   const [errorMessage, updateErrorMessage] = React.useState('');
   const [formData, updateFormData] = React.useState(Object.freeze({
@@ -136,6 +151,22 @@ const Form = ({formResponse}) => {
                 <div className="col-sm-10">
                   <select id="method" name="method" onChange={handleInputChange} className="form-select">
                     {encryptionoptions.map((option) => <option value={option.value}>{option.label}</option>)}
+                  </select>
+                </div>
+              </div>
+              <div className="mb-5 row">
+                <label for="max_access_attempts" className="col-sm-2 col-form-label">Access Attempts</label>
+                <div className="col-sm-10">
+                  <select id="max_access_attempts" name="max_access_attempts" onChange={handleInputChange} className="form-select">
+                    {maxattemptsoptions.map((option) => <option value={option.value}>{option.label}</option>)}
+                  </select>
+                </div>
+              </div>
+              <div className="mb-6 row">
+                <label for="ip_based_access_attempts" className="col-sm-2 col-form-label">Ip Based Attempts</label>
+                <div className="col-sm-10">
+                  <select id="ip_based_access_attempts" name="ip_based_access_attempts" onChange={handleInputChange} className="form-select">
+                    {ipbasedattemptsoptions.map((option) => <option value={option.value}>{option.label}</option>)}
                   </select>
                 </div>
               </div>
