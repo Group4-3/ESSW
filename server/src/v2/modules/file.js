@@ -37,10 +37,10 @@ export async function writeSecretFile(buffer, passphrase, method, id = undefined
     var filePath = [saveDirectory, fileName].join('/')
 
     if (!fs.existsSync(saveDirectory)) {
-      await fs.mkdirSync(saveDirectory)
+      fs.mkdirSync(saveDirectory)
     }
 
-    await fs.writeFile(filePath, encryptedFileContents, (err) => {
+    fs.writeFile(filePath, encryptedFileContents, (err) => {
       if (err) {
         // return { success: false, error: err.message }
         throw err.message; //Error will be caught by catch statement below
