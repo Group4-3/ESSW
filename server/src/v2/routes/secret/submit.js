@@ -94,7 +94,7 @@ export async function secretSubmit(req, res, next) {
         })
       }
     }
-    fileMetadata = JSON.stringify(fileMetadata)
+    // fileMetadata = JSON.stringify(fileMetadata)
 
     var hashedPassphrase = await bcrypt.hash(passphrase, 10).then(result => {
       return result
@@ -103,7 +103,7 @@ export async function secretSubmit(req, res, next) {
     var transaction = db.addSecret({
       secret_id: secretId,
       secret_text: encryptedText,
-      file_metadata: fileMetadata,
+      file_metadata: JSON.stringify(fileMetadata),
       passphrase: hashedPassphrase,
       expiry_date: expiryDate,
       method: method,
