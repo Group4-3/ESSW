@@ -14,6 +14,10 @@ import * as cipher from '../helpers/cipher.js'
 
 const SECRET_STORAGE_DIRECTORY = './uploads'
 
+function isDirectory(path) {//Make sure that it's not a directory. May happen if secret path was malformed, and no ID was given. It is not possible to read a directory as a file.
+  return fs.readdir(path).isDirectory();
+}
+
 export const fileAttacher = multer({
   storage: multer.memoryStorage()
 }).array('files', 1)
@@ -50,9 +54,10 @@ export async function writeSecretFile(buffer, passphrase, method, id = undefined
 }
 
 export async function readSecret(secret_path, passphrase, method) {
-    if (fs.readdir(secret_path).isDirectory()) { //Make sure that it's not a directory. May happen if secret path was malformed, and no ID was given. It is not possible to read a directory as a file.
-        return {success: false, error: `Secret Path ${secret_path} is directory!`}; //Stop if we're working from a directory.
-    }
+  if (isDirectory(secret_path)){
+    return {success:false, error : `Secret path ${secret_path} is a directory!`}
+  }
+
     var file;
     try {
       let encrypted_file_content = fs.readFile(secret_path);
@@ -65,4 +70,24 @@ export async function readSecret(secret_path, passphrase, method) {
     finally {
         return {success:true, file_content : file}
     }
+}
+
+async function deleteFile(filePath) {
+    fs.unlink(filePath);
+}
+
+export async function deleteSecret(secret_path) { //Code to delete given secret directory, and contents.
+  try {
+    fs.rmdir(secret_path, {recursive:true}, err => {
+      if (err){
+        throw err;
+      }
+    });
+  }
+  catch (err) {
+    return {success : false, error:err};
+  }
+  finally {
+    return {success:true};
+  }
 }
