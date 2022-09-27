@@ -153,6 +153,19 @@ export function updateUnauthorizedAttempts(secretID, jsonStr) {
 }
 
 //---
+const SHOW_EXPIRED_SECRETS = databaseFile.prepare(`SELECT id FROM '${TABLE_NAME}' WHERE expiry_date < CURRENT_TIMESTAMP`);
+
+export function showExpiredSecrets() {
+  let secretIterator;
+  try {
+    secretIterator = SHOW_EXPIRED_SECRETS.iterate(); //Provide iterator containing list of secrets. Iterator used, in case of large numbers of secrets
+  }
+  catch (err) {
+    return { data: null, error: err.message, success: false };
+  }
+  return { data: secretIterator, success: true };
+}
+
 const PRUNE_SECRETS_QUERY = databaseFile.prepare(`DELETE FROM '${TABLE_NAME}' WHERE expiry_date < CURRENT_TIMESTAMP`);
 
 export function purgeExpiredSecrets() {
