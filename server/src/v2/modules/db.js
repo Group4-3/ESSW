@@ -140,7 +140,7 @@ export function deleteSecret(secretID) {
 }
 
 //---
-const UPDATE_UNAUTHORIZED_ATTEMPS_QUERY = databaseFile.prepare(`
+const UPDATE_UNAUTHORIZED_ATTEMPTS_QUERY = databaseFile.prepare(`
 UPDATE
 '${TABLE_NAME}'
 SET
@@ -149,7 +149,7 @@ WHERE
 id = ?`);
 
 export function updateUnauthorizedAttempts(secretID, jsonStr) {
-  return runStatement(UPDATE_UNAUTHORIZED_ATTEMPS_QUERY, [jsonStr, secretID]);
+  return runStatement(UPDATE_UNAUTHORIZED_ATTEMPTS_QUERY, [jsonStr, secretID]);
 }
 
 //---
