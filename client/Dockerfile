@@ -1,9 +1,18 @@
 FROM node:18
 
 WORKDIR /home/node/app
-COPY . /home/node/app/.
 
+ARG HOST_NAME
+RUN mkdir -p /home/node/app/build_final
+RUN chown 1001 /home/node/app/build_final
+RUN chown node /home/node/app/
+RUN npm i -g envsub
+USER node
+COPY --chown=node:node . /home/node/app/.
 RUN npm install
-RUN mkdir /home/node/app/node_modules/.cache && chown -R node:node /home/node/app/node_modules/.cache
+ENV API_HOST_NAME=$HOST_NAME
+RUN envsub /home/node/app/src/helpers/constants.js /home/node/app/src/helpers/constants.js
+RUN cat /home/node/app/src/helpers/constants.js
 
-CMD ["npm", "start"]
+RUN npm run build
+CMD ["cp", "-r", "/home/node/app/build", "/home/node/app/build_final"]

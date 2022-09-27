@@ -24,6 +24,9 @@ server/uploads
 # Certificate directory
 user_certificates/*
 
+# Client build files
+client_build/
+
 
 # Gatsby files
 .cache/
