@@ -63,7 +63,7 @@ CREATE TABLE
 
 initialiseSecret();
 
-function getStatement(preparedStatement, statementParams) {
+function getStatement(preparedStatement, statementParams = null) {
   //Returns data
   let row;
   try {
