@@ -8,7 +8,7 @@
 
 import express from 'express'
 import { generate } from './generate.js'
-import { validate } from './validate.js'
+import { pwned } from './pwned.js'
 
 var router = express.Router()
 
@@ -31,12 +31,19 @@ var router = express.Router()
 router.get('/generate', generate)
 
 /**
- * @api {get} /api/v2/passphrase/pwned/:passphrase Validate if passphrase has been exposed
+ * @api {post} /api/v2/passphrase/pwned Validate if passphrase has been exposed
  * @apiVersion 2.0.0
  * @apiName ValidatePassphrase
  * @apiGroup Passphrase
  *
- * @apiParam {String} passphrase Passphrase to test to see if it has been leaked online aka pwned.
+ * @apiBody {String} passphrase Passphrase to test to see if it has been leaked online aka pwned.
+ * @apiExample Example usage:
+ *  endpoint: http://localhost/api/v2/passphrase/pwned
+ *
+ *  body:
+ *  {
+ *    "passphrase": "#SuperS3cr3tP@ssw0rd"
+ *  }
  *
  * @apiSuccess {Boolean} pwned Passphrase has been leaked online.
  * @apiSuccess {String} sha1 SHA1 hash of the passphrase.
@@ -46,11 +53,11 @@ router.get('/generate', generate)
  *  HTTP/1.1 200 OK
  *  {
  *    "pwned": false,
- *    "sha1": "f808cd712bcccc76376abcd38f40f57fe73948a4",
- *    "prefix": "f808c",
- *    "suffix": "d712bcccc76376abcd38f40f57fe73948a4"
+ *    "sha1": "bab002c22a1160038ae259602dfe3d848ef028cc",
+ *    "prefix": "bab00",
+ *    "suffix": "2c22a1160038ae259602dfe3d848ef028cc"
  *  }
  */
-router.get('/pwned/:passphrase', validate)
+router.post('/pwned', pwned)
 
 export { router }

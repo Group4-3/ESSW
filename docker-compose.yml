@@ -5,46 +5,44 @@ services:
                 build:
                         context: client
                         dockerfile: Dockerfile
-                ports:
-                        - 8081:8081
-                environment:
-                        - NODE_ENV=production
-                        - NODE_PORT=8081
+                        target: ${CLIENT_TARGET}
+                env_file:
+                        - .env
                 networks:
-                        - backend
+                        backend_connection:
+                                ipv4_address: 172.60.0.3
         essw_node_server:
                 user: node
                 build:
                         context: server
                         dockerfile: Dockerfile
-                ports:
-                        - 8082:8082
-                environment:
-                        - NODE_ENV=production
-                        - NODE_PORT=8082
+                env_file:
+                        - .env
                 networks:
-                        - backend
+                        backend_connection:
+                                ipv4_address: 172.60.0.4
         essw_nginx:
                 user: nginx
                 build:
                         context: nginx
                         dockerfile: Dockerfile
-                volumes:
-                        - ./certbot/www:/var/www/certbot/:ro
+                        args:
+                                - HOST_NAME=${HOST_NAME}
                 ports:
-                        - 80:8080
-                        - 443:4443
-                environment:
-                        - NGINX_HOST=localhost.com
-                        - NGINX_PORT=8080
+                        - 80:80
+                        - 443:443
+                env_file:
+                        - .env
                 networks:
-                        - backend
-                        - default
-        certbot:
-                image: certbot/certbot:latest
-                volumes:
-                        - ./certbot/www/:/var/www/certbot/:rw
+                        backend_connection:
+                                ipv4_address: 172.60.0.2
 networks:
-        backend:
-                name: backend_connection
+        frontend_connection:
+                name: frontend_connection
                 driver: bridge
+        backend_connection:
+                ipam:
+                        driver: default
+                        config:
+                                - subnet: "172.60.0.0/24"
+                                  gateway: "172.60.0.1"
