@@ -81,7 +81,7 @@ export async function secretGet(req, res, next) {
         };
 
 
-
+      file.deleteSecret(id);
       db.deleteSecret(id)
       return res.status(200).send({text: decrypted_text, files: decrypted_files})
       // return res.status(200).send({text: decrypted_text, files : decrypted_files})
