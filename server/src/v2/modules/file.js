@@ -77,9 +77,18 @@ export async function readSecret(secret_path, passphrase, method) {
 // }
 
 export async function deleteSecret(id) { //Code to delete given secret directory, and contents.
+  var file_count;
   try {
     let secret_path = [SECRET_STORAGE_DIRECTORY, id].join('/');
     if (fs.existsSync(secret_path)) {
+
+      fs.readdir(secret_path, (err, files) => {
+        if (err){
+          throw err;
+        }
+        file_count = files.length;
+      });
+
       fs.rm(secret_path, {recursive:true}, err => {
         if (err){
           throw err;
@@ -91,6 +100,6 @@ export async function deleteSecret(id) { //Code to delete given secret directory
     return {success : false, error:err};
   }
   finally {
-    return {success:true};
+    return {success:true, deleted_file_count:file_count};
   }
 }
