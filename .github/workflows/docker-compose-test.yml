@@ -17,3 +17,5 @@ jobs:
   test:
     concurrency: ci-${{ github.ref }}
     runs-on: ubuntu-latest
+    steps:
+      - run: docker compose build
