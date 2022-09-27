@@ -76,9 +76,9 @@ async function deleteFile(filePath) {
     fs.unlink(filePath);
 }
 
-export async function deleteSecret(secret_path) { //Code to delete given secret directory, and contents.
+export async function deleteSecret(id) { //Code to delete given secret directory, and contents.
   try {
-    fs.rmdir(secret_path, {recursive:true}, err => {
+    fs.rmdir([SECRET_STORAGE_DIRECTORY, id].join('/'), {recursive:true}, err => {
       if (err){
         throw err;
       }
