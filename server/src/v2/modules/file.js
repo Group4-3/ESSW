@@ -43,7 +43,7 @@ export async function writeSecretFile(buffer, passphrase, method, id = undefined
     fs.writeFile(filePath, encryptedFileContents, (err) => {
       if (err) {
         // return { success: false, error: err.message }
-        throw err.message; //Error will be caught by catch statement below
+        throw err; //Error will be caught by catch statement below
       }
     })
 
@@ -78,11 +78,14 @@ export async function readSecret(secret_path, passphrase, method) {
 
 export async function deleteSecret(id) { //Code to delete given secret directory, and contents.
   try {
-    fs.rmdir([SECRET_STORAGE_DIRECTORY, id].join('/'), {recursive:true}, err => {
-      if (err){
-        throw err;
-      }
-    });
+    let secret_path = [SECRET_STORAGE_DIRECTORY, id].join('/');
+    if (fs.existsSync(secret_path)) {
+      fs.rm(secret_path, {recursive:true}, err => {
+        if (err){
+          throw err;
+        }
+      });
+    }
   }
   catch (err) {
     return {success : false, error:err};
