@@ -72,9 +72,9 @@ export async function readSecret(secret_path, passphrase, method) {
     }
 }
 
-async function deleteFile(filePath) {
-    fs.unlink(filePath);
-}
+// async function deleteFile(filePath) {
+//     fs.unlink(filePath);
+// }
 
 export async function deleteSecret(id) { //Code to delete given secret directory, and contents.
   try {
