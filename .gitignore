@@ -22,7 +22,7 @@ server/*/apidoc
 server/uploads
 
 # Certificate directory
-nginx/user_certificates/*
+nginx/user_certificates/*.pem
 
 # Client build files
 client_build/
