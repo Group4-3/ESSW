@@ -1,16 +1,18 @@
 FROM node:18 as client-base
 
 WORKDIR /home/node/app
-COPY . /home/node/app/.
 
-RUN mkdir -p /home/node/app/node_modules/.cache && chown -R node:node /home/node/app
+ARG HOST_NAME
+RUN mkdir -p /home/node/app/build_final
+RUN chown 1001 /home/node/app/build_final
+RUN chown node /home/node/app/
+RUN npm i -g envsub
+USER node
+COPY --chown=node:node . /home/node/app/.
 RUN npm install
-RUN npm install --global serve
+ENV API_HOST_NAME=$HOST_NAME
+RUN envsub /home/node/app/src/helpers/constants.js /home/node/app/src/helpers/constants.js
+RUN cat /home/node/app/src/helpers/constants.js
 
-
-FROM client-base as client-base-prod
 RUN npm run build
-CMD ["serve", "-s", "build"]
-
-FROM client-base as client-base-dev 
-CMD ["npm", "start"]
+CMD ["cp", "-r", "/home/node/app/build", "/home/node/app/build_final"]
