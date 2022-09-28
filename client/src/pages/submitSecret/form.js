@@ -31,8 +31,18 @@ const maxattemptsoptions = [
 ];
 
 const ipbasedattemptsoptions = [
-  {label: 'True', value: 'true'},
-  {label: 'False', value: 'false'}
+  {label: 'False', value: 'false'},
+  {label: 'True', value: 'true'}
+];
+
+const allowinsecurepasswordoptions = [
+  {label: 'No', value: 'false'},
+  {label: 'Yes', value: 'true'}
+];
+
+const noencryptionoptions = [
+  {label: 'No', value: 'false'},
+  {label: 'Yes', value: 'true'}
 ];
 
 
@@ -174,6 +184,22 @@ const Form = ({formResponse}) => {
                 <div className="col-sm-10">
                   <select id="ip_based_access_attempts" name="ip_based_access_attempts" onChange={handleInputChange} className="form-select">
                     {ipbasedattemptsoptions.map((option) => <option value={option.value}>{option.label}</option>)}
+                  </select>
+                </div>
+              </div>
+              <div className="mb-7 row">
+                <label for="allow_insecure_password" className="col-sm-2 col-form-label">Allow Insecure Password</label>
+                <div className="col-sm-10">
+                  <select id="allow_insecure_password" name="allow_insecure_password" onChange={handleInputChange} className="form-select">
+                    {allowinsecurepasswordoptions.map((option) => <option value={option.value}>{option.label}</option>)}
+                  </select>
+                </div>
+              </div>
+              <div className="mb-8 row">
+                <label for="no_encryption" className="col-sm-2 col-form-label">Encryption</label>
+                <div className="col-sm-10">
+                  <select id="no_encryption" name="no_encryption" onChange={handleInputChange} className="form-select">
+                    {noencryptionoptions.map((option) => <option value={option.value}>{option.label}</option>)}
                   </select>
                 </div>
               </div>
