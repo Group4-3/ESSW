@@ -1,0 +1,1 @@
+export const API_HOST_NAME = "${API_HOST_NAME}"

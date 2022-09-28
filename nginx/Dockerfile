@@ -14,5 +14,5 @@ COPY nginx.conf /etc/nginx/nginx.conf
 COPY ssl_setup.sh /etc/nginx/ssl_gen/ssl_setup.sh
 COPY v3.ext /etc/nginx/ssl_gen/v3.ext
 COPY user_certificates /etc/nginx/ssl_gen/user_nginx_certificates
-RUN /etc/nginx/ssl_gen/ssl_setup.sh
+RUN chmod a+x /etc/nginx/ssl_gen/ssl_setup.sh && /etc/nginx/ssl_gen/ssl_setup.sh
 RUN chown -R nginx:nginx /var/cache/nginx /run/nginx.pid /etc/nginx /etc/ssl
