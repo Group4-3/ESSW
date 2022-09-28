@@ -205,7 +205,7 @@ const Form = ({formResponse}) => {
               </div>
               <div className="mb-8 row">
                 <label for="no_encryption" className="col-sm-2 col-form-label">Public Key Encryption</label>
-                <textarea id="text" name="text" placeholder="Enter public key..." onChange={handleInputChange} className="form-control" rows="3"></textarea>
+                <textarea id="public_key_input" name="public_key_input" placeholder="Enter public key..." onChange={handleInputChange} className="form-control" rows="3"></textarea>
               </div>
             </div>
           </div>
