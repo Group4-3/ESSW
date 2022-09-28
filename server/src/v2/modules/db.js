@@ -133,14 +133,15 @@ export function retrievePassphrase(secretID) {
 }
 
 //---
-const DELETE_SECRET_QUERY = databaseFile.prepare(`DELETE FROM '${TABLE_NAME}' WHERE id = ?`);
+// const DELETE_SECRET_QUERY = databaseFile.prepare(`DELETE FROM '${TABLE_NAME}' WHERE id = ?`);
+const DELETE_SECRET_QUERY = databaseFile.prepare(`UPDATE '${TABLE_NAME}' SET expiry_date = CURRENT_TIMESTAMP WHERE ID = ?`);
 
 export function deleteSecret(secretID) {
   return runStatement(DELETE_SECRET_QUERY, secretID);
 }
 
 //---
-const UPDATE_UNAUTHORIZED_ATTEMPS_QUERY = databaseFile.prepare(`
+const UPDATE_UNAUTHORIZED_ATTEMPTS_QUERY = databaseFile.prepare(`
 UPDATE
 '${TABLE_NAME}'
 SET
@@ -149,7 +150,7 @@ WHERE
 id = ?`);
 
 export function updateUnauthorizedAttempts(secretID, jsonStr) {
-  return runStatement(UPDATE_UNAUTHORIZED_ATTEMPS_QUERY, [jsonStr, secretID]);
+  return runStatement(UPDATE_UNAUTHORIZED_ATTEMPTS_QUERY, [jsonStr, secretID]);
 }
 
 //---

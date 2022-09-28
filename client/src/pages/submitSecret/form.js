@@ -1,5 +1,6 @@
 import React from 'react';
 import { getFileIcon, humanReadableSize } from '../../helpers/file';
+import { API_HOST_NAME } from "../../helpers/constants.js";
 
 const expiryOptions = [
   {label: '5 minutes', value: 5*60},
@@ -115,8 +116,7 @@ const Form = ({formResponse}) => {
         }
         body.append(key, value);
       };
-
-      let res = await fetch('http://localhost:3001/api/v2/secret/submit', {
+      let res = await fetch((API_HOST_NAME == '${HOST_NAME}' ? 'http://localhost:3001' : 'https://' + API_HOST_NAME) + '/api/v2/secret/submit', {
         method: 'POST',
         body: body
       });

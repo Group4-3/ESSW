@@ -5,9 +5,14 @@ services:
                 build:
                         context: client
                         dockerfile: Dockerfile
-                        target: ${CLIENT_TARGET}
+                        args:
+                                - HOST_NAME=${HOST_NAME}
+                environment:
+                        - NODE_ENV=production
                 env_file:
                         - .env
+                volumes:
+                        - ./client_build:/home/node/app/build_final
                 networks:
                         backend_connection:
                                 ipv4_address: 172.60.0.3
@@ -36,6 +41,9 @@ services:
                 networks:
                         backend_connection:
                                 ipv4_address: 172.60.0.2
+                volumes:
+                        - ./user_certificates:/ssl_gen/user_nginx_certificates
+                        - ./client_build/build:/usr/share/nginx/html/react
 networks:
         frontend_connection:
                 name: frontend_connection

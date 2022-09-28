@@ -68,7 +68,7 @@ export async function secretSubmit(req, res, next) {
     if (!encryptedText)
       return next({message: 'Your message could not be encrypted; please try again checking your parameters are correct.'})
 
-    var fileMetadata = []
+    var fileMetadata = [];
     if (req.files && Object.keys(req.files).length) {
       if (typeof req.files !== 'object')
         return next({message: 'Files must be a multer object.'})
@@ -94,7 +94,7 @@ export async function secretSubmit(req, res, next) {
         })
       }
     }
-    fileMetadata = JSON.stringify(fileMetadata)
+    fileMetadata = fileMetadata.length > 0 ? JSON.stringify(fileMetadata) : "";
 
     var hashedPassphrase = await bcrypt.hash(passphrase, 10).then(result => {
       return result
