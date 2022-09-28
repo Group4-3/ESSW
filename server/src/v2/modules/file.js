@@ -28,7 +28,7 @@ function isDirectory(path) {//Make sure that it's not a directory. May happen if
 function initialiseSecretStorage() { //Initialise, and ensure that the secret storage directory is valid
   if (!fs.existsSync(SECRET_STORAGE_DIRECTORY)) { //Create directory if the secret storage directory doesn't exist
     console.warn('Secret storage directory %s does not exist, creating.', SECRET_STORAGE_DIRECTORY);
-    fs.mkdir(SECRET_STORAGE_DIRECTORY);
+    fs.mkdirSync(SECRET_STORAGE_DIRECTORY);
   }
 }
 
@@ -53,7 +53,7 @@ export async function writeSecretFile(buffer, passphrase, method, id = undefined
     var filePath = [saveDirectory, fileName].join('/')
 
     if (!fs.existsSync(saveDirectory)) {
-      fs.mkdir(saveDirectory);
+      fs.mkdirSync(saveDirectory);
     }
 
     fs.writeFileSync(filePath, encryptedFileContents);
