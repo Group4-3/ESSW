@@ -72,7 +72,7 @@ const Form = ({formResponse}) => {
         }
         body.append(key, value);
       };
-      let res = await fetch((API_HOST_NAME == '${HOST_NAME}' ? 'http://localhost:3001' : 'https://' + API_HOST_NAME) + '/api/v2/secret/submit', {
+      let res = await fetch((API_HOST_NAME == '${API_HOST_NAME}' ? 'http://localhost:3001' : 'https://' + API_HOST_NAME) + '/api/v2/secret/submit', {
         method: 'POST',
         body: body
       });
