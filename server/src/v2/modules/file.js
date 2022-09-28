@@ -71,7 +71,7 @@ export async function readSecret(secret_path, passphrase, method) {
 
     var file;
     try {
-      let encrypted_file_content = fs.readFile(secret_path);
+      let encrypted_file_content = fs.readFileSync(secret_path);
       let decrypted_file_content = cipher.decrypt(encrypted_file_content, passphrase, method); //We can assume that passphrase is correct, as validation has already occurred
       file = Buffer.from(decrypted_file_content);
     }
