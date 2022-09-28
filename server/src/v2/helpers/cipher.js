@@ -20,6 +20,14 @@ export function generateIdentifier() {
   return crypto.lib.WordArray.random(idLength).toString()
 }
 
+export function encryptWithPublicKey(body, publicKey) {
+  return crypto.publicEncrypt(publicKey, body);
+}
+
+export function decryptWithPrivateKey(body, privateKey) {
+  return crypto.privateDecrypt(privateKey, body);
+}
+
 export function encrypt(body, passphrase, method = 'aes') {
   if (!methods.includes(method))
     return false
