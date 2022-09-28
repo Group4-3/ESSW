@@ -43,7 +43,9 @@ const Form = ({formResponse}) => {
     files: [],
     passphrase: '',
     expiry: 5*60,
-    method: ''
+    method: '',
+    max_access_attempts: 5*1,
+    ip_based_access_attempts: ''
   }));
 
 
