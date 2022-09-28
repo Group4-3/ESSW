@@ -56,12 +56,7 @@ export async function writeSecretFile(buffer, passphrase, method, id = undefined
       fs.mkdirSync(saveDirectory);
     }
 
-    fs.writeFile(filePath, encryptedFileContents, (err) => {
-      if (err) {
-        // return { success: false, error: err.message }
-        throw err; //Error will be caught by catch statement below
-      }
-    })
+    fs.writeFileSync(filePath, encryptedFileContents);
 
     return { success: true, path: filePath, checksum: checksum }
   } catch (err) {
