@@ -23,9 +23,10 @@ export async function secretGet(req, res, next) {
 
     var row = await db.retrieveSecret(id)
     if (!row.data || row.data && Date.parse(row.data.expiry_date) < Date.now())
-      return next({status: 404, message: 'Secret with that ID does not exist or has been deleted.'})
+      return next({status: 404, message: 'Secret with that ID does not exist or has been deleted.'});
+
     row = row.data
-    // var encrypted_files = row.file_metadata;
+    var file_metadata = row.secret_file_metadata;
 
     if (!secretHelper.canAttemptAccess(row, remoteIp))
       return next({status: 429, message: 'Too many unsuccessful access attempts; the requested secret is locked.'})
@@ -36,7 +37,7 @@ export async function secretGet(req, res, next) {
 
     if(bcrypt.compareSync(passphrase, row.passphrase)) {
       var decrypted_text = cipher.decrypt(row.secret_text, passphrase, row.method)
-      // var decrypted_files = [];
+      var decrypted_files = [];
 
       // //Read uploaded files
       // if (encrypted_files.files >= 1) { //Only decrypt if there are files to decrypt.
@@ -52,8 +53,37 @@ export async function secretGet(req, res, next) {
       //   });
       // }
 
+      //Read Encrypted files
+        for (let i = 0, i_length = file_metadata.length; i < i_length; ++i) {
+          let file_data = file_metadata[i];
+          let file_name = cipher.decrypt(file_data.encrypted_file_name, passphrase, row.method); //Decrypt the file name, using the text method
+          let decrypted_file_content = await file.readSecret(file_data.location); 
+
+          if (!decrypted_file_content.success) {
+            throw error;
+          }
+
+          if (file_data.checksum != crypto.SHA256(decrypted_file_content).toString()) { //Ensure that the file matches saved checksum. If not, fail out
+            throw {message: "File checksum mismatch!"};
+          }
+  
+          decrypted_files.push({ //Push file data into object, and add to array
+            name : file_name,
+            encoding: file_data.encoding,
+            file: decrypted_file_content,
+            extension: file_data.extension,
+            mimetype: file_data.mimetype,
+            size : file_data.size,
+            checksum : file_data.checksum
+          });
+          
+  
+        };
+
+
+      file.deleteSecret(id);
       db.deleteSecret(id)
-      return res.status(200).send({text: decrypted_text})
+      return res.status(200).send({text: decrypted_text, files: decrypted_files})
       // return res.status(200).send({text: decrypted_text, files : decrypted_files})
     } else {
       db.updateUnauthorizedAttempts(row.id, secretHelper.incrementUnauthorizedAttempt(row, remoteIp))
