@@ -99,6 +99,10 @@ const Form = ({formResponse}) => {
           }
           continue;
         }
+        if (key === 'ip_based_access_attempts') {
+          body.append('files', Boolean(value));
+          continue;
+        }
         body.append(key, value);
       };
 
