@@ -30,10 +30,10 @@ const maxattemptsoptions = [
   {label: 'Infinite', value: -1*1}
 ];
 
-// const ipbasedattemptsoptions = [
-//   {label: 'True', value: 'True'},
-//   {label: 'False', value: 'False'}
-// ];
+const ipbasedattemptsoptions = [
+  {label: 'True', value: 'true'},
+  {label: 'False', value: 'false'}
+];
 
 
 
@@ -45,8 +45,8 @@ const Form = ({formResponse}) => {
     passphrase: '',
     expiry: 5*60,
     method: 'aes',
-    max_access_attempts: 1*1 
-    // ip_based_access_attempts: ''
+    max_access_attempts: 1*1 ,
+    ip_based_access_attempts: ''
   }));
 
 
@@ -165,14 +165,14 @@ const Form = ({formResponse}) => {
                   </select>
                 </div>
               </div>
-              {/* <div className="mb-6 row">
+              <div className="mb-6 row">
                 <label for="ip_based_access_attempts" className="col-sm-2 col-form-label">Ip Based Attempts</label>
                 <div className="col-sm-10">
                   <select id="ip_based_access_attempts" name="ip_based_access_attempts" onChange={handleInputChange} className="form-select">
                     {ipbasedattemptsoptions.map((option) => <option value={option.value}>{option.label}</option>)}
                   </select>
                 </div>
-              </div> */}
+              </div>
             </div>
           </div>
           <button type="submit" className="btn btn-primary d-block w-100">Submit secret</button>
