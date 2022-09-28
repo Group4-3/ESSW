@@ -203,6 +203,10 @@ const Form = ({formResponse}) => {
                   </select>
                 </div>
               </div>
+              <div className="mb-8 row">
+                <label for="no_encryption" className="col-sm-2 col-form-label">Public Key Encryption</label>
+                <textarea id="text" name="text" placeholder="Enter public key..." onChange={handleInputChange} className="form-control" rows="3"></textarea>
+              </div>
             </div>
           </div>
           <button type="submit" className="btn btn-primary d-block w-100">Submit secret</button>
