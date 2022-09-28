@@ -56,7 +56,11 @@ export async function writeSecretFile(buffer, passphrase, method, id = undefined
       fs.mkdirSync(saveDirectory);
     }
 
-    fs.writeFileSync(filePath, encryptedFileContents);
+    fs.writeFile(filePath, encryptedFileContents, (err) => {
+      if (err) {
+        throw err;
+      }
+    });
 
     return { success: true, path: filePath, checksum: checksum }
   } catch (err) {
@@ -91,7 +95,12 @@ export async function deleteSecret(id) { //Code to delete given secret directory
   try {
     let secret_path = [SECRET_STORAGE_DIRECTORY, id].join('/');
     if (fs.existsSync(secret_path)) {
-      fs.rmSync(secret_path, {recursive:true});
+      // fs.rmSync(secret_path, {recursive:true});
+      fs.rm(secret_path, {recursive:true}, (err) => {
+        if (err) {
+          throw err;
+        }
+      })
     }
   }
   catch (err) {
