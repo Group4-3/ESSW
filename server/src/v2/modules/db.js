@@ -133,7 +133,8 @@ export function retrievePassphrase(secretID) {
 }
 
 //---
-const DELETE_SECRET_QUERY = databaseFile.prepare(`DELETE FROM '${TABLE_NAME}' WHERE id = ?`);
+// const DELETE_SECRET_QUERY = databaseFile.prepare(`DELETE FROM '${TABLE_NAME}' WHERE id = ?`);
+const DELETE_SECRET_QUERY = databaseFile.prepare(`UPDATE '${TABLE_NAME}' SET expiry_date = CURRENT_TIMESTAMP WHERE ID = ?`);
 
 export function deleteSecret(secretID) {
   return runStatement(DELETE_SECRET_QUERY, secretID);
