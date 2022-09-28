@@ -12,11 +12,27 @@ import crypto from 'crypto-js'
 import * as path from 'path'
 import * as cipher from '../helpers/cipher.js'
 
-const SECRET_STORAGE_DIRECTORY = './uploads'
+function stripTrail(path) { //Remove trailing slashes
+  if (path.substr(-1) === '/') {
+    return path.substr(0, path.length - 1);
+  }
+  return path;
+}
+
+const SECRET_STORAGE_DIRECTORY = stripTrail('./uploads')
 
 function isDirectory(path) {//Make sure that it's not a directory. May happen if secret path was malformed, and no ID was given. It is not possible to read a directory as a file.
   return fs.readdir(path).isDirectory();
 }
+
+function initialiseSecretStorage() { //Initialise, and ensure that the secret storage directory is valid
+  if (!fs.existsSync(SECRET_STORAGE_DIRECTORY)) { //Create directory if the secret storage directory doesn't exist
+    console.warn('Secret storage directory %s does not exist, creating.', SECRET_STORAGE_DIRECTORY);
+    fs.mkdirSync(SECRET_STORAGE_DIRECTORY);
+  }
+}
+
+initialiseSecretStorage();
 
 export const fileAttacher = multer({
   storage: multer.memoryStorage()
@@ -37,7 +53,7 @@ export async function writeSecretFile(buffer, passphrase, method, id = undefined
     var filePath = [saveDirectory, fileName].join('/')
 
     if (!fs.existsSync(saveDirectory)) {
-      fs.mkdirSync(saveDirectory)
+      fs.mkdirSync(saveDirectory);
     }
 
     fs.writeFile(filePath, encryptedFileContents, (err) => {
