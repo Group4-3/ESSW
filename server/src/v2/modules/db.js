@@ -19,7 +19,8 @@ const DATABASE_PATH = process.env.DATABASE_PATH ? process.env.DATABASE_PATH : ".
 var databaseFile;
 
 function initialiseSecret() {
-  if (!fs.existsSync(DATABASE_PATH) || fs.lstatSync(DATABASE_PATH).isDirectory()){
+  console.printlo
+  if (fs.existsSync(DATABASE_PATH) && fs.lstatSync(DATABASE_PATH).isDirectory()){
     console.error("Database path '%s' is a directory, not a file. Halting.", DATABASE_PATH);
     throw "Database path is directory!";
   }
