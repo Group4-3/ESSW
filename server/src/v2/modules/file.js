@@ -19,7 +19,7 @@ function stripTrail(path) { //Remove trailing slashes
   return path;
 }
 
-const SECRET_STORAGE_DIRECTORY = stripTrail('./uploads')
+const SECRET_STORAGE_DIRECTORY = stripTrail(process.env.FILE_STORAGE_PATH ? process.env.FILE_STORAGE_PATH : './uploads')
 
 function isDirectory(path) {//Make sure that it's not a directory. May happen if secret path was malformed, and no ID was given. It is not possible to read a directory as a file.
   return fs.readdir(path).isDirectory();
