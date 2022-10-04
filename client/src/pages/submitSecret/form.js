@@ -24,25 +24,6 @@ const encryptionOptions = [
   {label: 'none', value: 'none'}
 ];
 
-const maxAttemptsOptions = [
-  {label: '1', value: 1},
-  {label: '2', value: 2},
-  {label: '3', value: 3},
-  {label: '4', value: 4},
-  {label: '5', value: 5},
-  {label: 'Infinite', value: -1}
-];
-
-const ipBasedAttemptsOptions = [
-  {label: 'False', value: false},
-  {label: 'True', value: true}
-];
-
-const allowInsecurePasswordOptions = [
-  {label: 'No', value: false},
-  {label: 'Yes', value: true}
-];
-
 const Form = ({formResponse}) => {
   const [errorMessage, updateErrorMessage] = React.useState('');
   const [formData, updateFormData] = React.useState(Object.freeze({
