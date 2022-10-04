@@ -1,4 +1,5 @@
 import React from 'react';
+import Collapse from 'bootstrap/js/dist/collapse';
 import { getFileIcon, humanReadableSize } from '../../helpers/file';
 import { API_HOST_NAME } from "../../helpers/constants.js";
 
@@ -13,40 +14,34 @@ const expiryOptions = [
   {label: '7 days', value: 7*24*60*60}
 ];
 
-const encryptionoptions = [
+const encryptionOptions = [
   {label: 'aes', value: 'aes'},
   {label: 'des', value: 'des'},
   {label: 'tripledes', value: 'tripledes'},
   {label: 'rabbit', value: 'rabbit'},
   {label: 'rc4', value: 'rc4'},
-  {label: 'rc4drop', value: 'rc4drop'}
+  {label: 'rc4drop', value: 'rc4drop'},
+  {label: 'none', value: 'none'}
 ];
 
-const maxattemptsoptions = [
-  {label: '1', value: 1*1},
-  {label: '2', value: 2*1},
-  {label: '3', value: 3*1},
-  {label: '4', value: 4*1},
-  {label: '5', value: 5*1},
-  {label: 'Infinite', value: -1*1}
+const maxAttemptsOptions = [
+  {label: '1', value: 1},
+  {label: '2', value: 2},
+  {label: '3', value: 3},
+  {label: '4', value: 4},
+  {label: '5', value: 5},
+  {label: 'Infinite', value: -1}
 ];
 
-const ipbasedattemptsoptions = [
-  {label: 'False', value: 'false'},
-  {label: 'True', value: 'true'}
+const ipBasedAttemptsOptions = [
+  {label: 'False', value: false},
+  {label: 'True', value: true}
 ];
 
-const allowinsecurepasswordoptions = [
-  {label: 'No', value: 'false'},
-  {label: 'Yes', value: 'true'}
+const allowInsecurePasswordOptions = [
+  {label: 'No', value: false},
+  {label: 'Yes', value: true}
 ];
-
-const noencryptionoptions = [
-  {label: 'No', value: 'false'},
-  {label: 'Yes', value: 'true'}
-];
-
-
 
 const Form = ({formResponse}) => {
   const [errorMessage, updateErrorMessage] = React.useState('');
@@ -56,16 +51,22 @@ const Form = ({formResponse}) => {
     passphrase: '',
     expiry: 5*60,
     method: 'aes',
-    max_access_attempts: 1*1 ,
-    ip_based_access_attempts: ''
+    max_access_attempts: -1,
+    ip_based_access_attempts: false,
+    allow_insecure_passphrase: false
   }));
-
-
 
   const handleInputChange = (e) => {
     updateFormData({
       ...formData,
       [e.target.name]: e.target.value.trim()
+    });
+  };
+
+  const handleSwitchChange = (e) => {
+    updateFormData({
+      ...formData,
+      [e.target.name]: e.target.checked
     });
   };
 
@@ -104,16 +105,14 @@ const Form = ({formResponse}) => {
     try {
       let body = new FormData();
       for (const [key, value] of Object.entries(formData)) {
+        console.log([key, value])
         if (key === 'files') {
           for (const file of formData.files) {
             body.append('files', file);
           }
           continue;
         }
-        if (key === 'ip_based_access_attempts') {
-          body.append('files', Boolean(value));
-          continue;
-        }
+
         body.append(key, value);
       };
       let res = await fetch((API_HOST_NAME == '${HOST_NAME}' ? 'http://localhost:3001' : 'https://' + API_HOST_NAME) + '/api/v2/secret/submit', {
@@ -154,58 +153,63 @@ const Form = ({formResponse}) => {
           </div>
           <div className="card">
             <div className="card-body">
-              <h6>Advanced Options</h6>
-              <div className="mb-3 row">
-                <label for="expiry" className="col-sm-2 col-form-label">Expires in</label>
-                <div className="col-sm-10">
-                  <select id="expiry" name="expiry" onChange={handleInputChange} className="form-select">
-                    {expiryOptions.map((option) => <option value={option.value}>{option.label}</option>)}
-                  </select>
+              <div className="accordion">
+                <div className="accordion-item">
+                  <div className="accordion-header">
+                    <button className="accordion-button fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#advanced-options-menu" aria-expanded="false">
+                      Advanced Options
+                    </button>
+                  </div>
+                  <div id="advanced-options-menu" className="accordion-collapse collapse">
+                    <div className="accordion-body">
+                      <div className="my-3 row">
+                        <label for="expiry" className="col-sm-6 col-form-label">Expires in</label>
+                        <div className="col-sm-6">
+                          <select id="expiry" name="expiry" onChange={handleInputChange} className="form-select">
+                            {expiryOptions.map((option) => <option value={option.value}>{option.label}</option>)}
+                          </select>
+                        </div>
+                      </div>
+                      <div className="mb-3 row">
+                        <label for="method" className="col-sm-6 col-form-label">Encryption method</label>
+                        <div className="col-sm-6">
+                          <select id="method" name="method" onChange={handleInputChange} className="form-select">
+                            {encryptionOptions.map((option) => <option value={option.value}>{option.label}</option>)}
+                          </select>
+                        </div>
+                      </div>
+                      <div className="mb-3 row">
+                        <label for="max_access_attempts" className="col-sm-6 col-form-label">
+                          Max access attempts
+                          <small className="text-muted"> (-1 infinite)</small>
+                        </label>
+                        <div className="col-sm-6">
+                          <input id="max_access_attempts" name="max_access_attempts" type="number" min="-1" max="999" onChange={handleInputChange} className="form-control"/>
+                        </div>
+                      </div>
+                      <div className="mb-3 row">
+                        <label className="form-check-label col-sm-6" for="ip_based_access_attempts">Limit access attempts per IP</label>
+                        <div className="col-sm-6">
+                          <div className="form-check form-switch">
+                            <input className="form-check-input" type="checkbox" id="ip_based_access_attempts" name="ip_based_access_attempts" onChange={handleSwitchChange}/>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="mb-3 row">
+                        <label className="form-check-label col-sm-6" for="allow_insecure_passphrase">Allow insecure passphrase</label>
+                        <div className="col-sm-6">
+                          <div className="form-check form-switch">
+                            <input className="form-check-input" type="checkbox" id="allow_insecure_passphrase" name="allow_insecure_passphrase" onChange={handleSwitchChange}/>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="mb-3 row">
+                        <label for="no_encryption" className="col-sm-2 col-form-label">Public Key Encryption</label>
+                        <textarea id="public_key_input" name="public_key_input" placeholder="Enter public key..." onChange={handleInputChange} className="form-control" rows="3"></textarea>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </div>
-              <div className="mb-4 row">
-                <label for="method" className="col-sm-2 col-form-label">Encryption Method</label>
-                <div className="col-sm-10">
-                  <select id="method" name="method" onChange={handleInputChange} className="form-select">
-                    {encryptionoptions.map((option) => <option value={option.value}>{option.label}</option>)}
-                  </select>
-                </div>
-              </div>
-              <div className="mb-5 row">
-                <label for="max_access_attempts" className="col-sm-2 col-form-label">Access Attempts</label>
-                <div className="col-sm-10">
-                  <select id="max_access_attempts" name="max_access_attempts" onChange={handleInputChange} className="form-select">
-                    {maxattemptsoptions.map((option) => <option value={option.value}>{option.label}</option>)}
-                  </select>
-                </div>
-              </div>
-              <div className="mb-6 row">
-                <label for="ip_based_access_attempts" className="col-sm-2 col-form-label">Ip Based Attempts</label>
-                <div className="col-sm-10">
-                  <select id="ip_based_access_attempts" name="ip_based_access_attempts" onChange={handleInputChange} className="form-select">
-                    {ipbasedattemptsoptions.map((option) => <option value={option.value}>{option.label}</option>)}
-                  </select>
-                </div>
-              </div>
-              <div className="mb-7 row">
-                <label for="allow_insecure_password" className="col-sm-2 col-form-label">Allow Insecure Password</label>
-                <div className="col-sm-10">
-                  <select id="allow_insecure_password" name="allow_insecure_password" onChange={handleInputChange} className="form-select">
-                    {allowinsecurepasswordoptions.map((option) => <option value={option.value}>{option.label}</option>)}
-                  </select>
-                </div>
-              </div>
-              <div className="mb-8 row">
-                <label for="no_encryption" className="col-sm-2 col-form-label">Encryption</label>
-                <div className="col-sm-10">
-                  <select id="no_encryption" name="no_encryption" onChange={handleInputChange} className="form-select">
-                    {noencryptionoptions.map((option) => <option value={option.value}>{option.label}</option>)}
-                  </select>
-                </div>
-              </div>
-              <div className="mb-8 row">
-                <label for="no_encryption" className="col-sm-2 col-form-label">Public Key Encryption</label>
-                <textarea id="public_key_input" name="public_key_input" placeholder="Enter public key..." onChange={handleInputChange} className="form-control" rows="3"></textarea>
               </div>
             </div>
           </div>
