@@ -7,6 +7,7 @@
 */
 
 import crypto from 'crypto-js'
+import cryptoDefault from 'crypto'
 
 const idLength = 8/2
 const keySize = 256/32
@@ -14,41 +15,44 @@ const nonceSize = 128/8
 const ivSize = 128/8
 const iterations = 100
 
-export const methods = ['aes', 'des', 'tripledes', 'rabbit', 'rc4', 'rc4drop']
+export const methods = ['aes', 'des', 'tripledes', 'rabbit', 'rc4', 'rc4drop', 'publickey']
 
 export function generateIdentifier() {
   return crypto.lib.WordArray.random(idLength).toString()
-}
-
-export function encryptWithPublicKey(body, publicKey) {
-  return crypto.publicEncrypt(publicKey, body);
-}
-
-export function decryptWithPrivateKey(body, privateKey) {
-  return crypto.privateDecrypt(privateKey, body);
 }
 
 export function encrypt(body, passphrase, method = 'aes') {
   if (!methods.includes(method))
     return false
 
-  var nonce = crypto.lib.WordArray.random(nonceSize)
-  var key = createKey(passphrase, nonce)
-  var config = {
-    'iv': crypto.lib.WordArray.random(ivSize),
-    'padding': crypto.pad.Pkcs7,
-    'mode': crypto.mode.CBC,
-    'hasher': crypto.algo.SHA256
+  if ( method === 'publickey' ) {
+    return cryptoDefault.publicEncrypt(
+      {
+        key: passphrase,
+        oaepHash: "sha256",
+      },
+      Buffer.from(body)
+    )
   }
+  else {
+    var nonce = crypto.lib.WordArray.random(nonceSize)
+    var key = createKey(passphrase, nonce)
+    var config = {
+      'iv': crypto.lib.WordArray.random(ivSize),
+      'padding': crypto.pad.Pkcs7,
+      'mode': crypto.mode.CBC,
+      'hasher': crypto.algo.SHA256
+    }
 
-  return nonce.toString() + config.iv.toString() + ({
-    'aes': crypto.AES.encrypt(body, key, config),
-    'des': crypto.DES.encrypt(body, key, config),
-    'tripledes': crypto.TripleDES.encrypt(body, key, config),
-    'rabbit': crypto.Rabbit.encrypt(body, key, config),
-    'rc4': crypto.RC4.encrypt(body, key, config),
-    'rc4drop': crypto.RC4Drop.encrypt(body, key, config)
-  })[method.toLowerCase()].toString()
+    return nonce.toString() + config.iv.toString() + ({
+      'aes': crypto.AES.encrypt(body, key, config),
+      'des': crypto.DES.encrypt(body, key, config),
+      'tripledes': crypto.TripleDES.encrypt(body, key, config),
+      'rabbit': crypto.Rabbit.encrypt(body, key, config),
+      'rc4': crypto.RC4.encrypt(body, key, config),
+      'rc4drop': crypto.RC4Drop.encrypt(body, key, config)
+    })[method.toLowerCase()].toString()
+  }
 }
 
 export function decrypt(body, passphrase, method = 'aes') {

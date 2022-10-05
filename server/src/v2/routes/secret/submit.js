@@ -24,8 +24,11 @@ export async function secretSubmit(req, res, next) {
   const DEFAULT_EXPIRY = 1800 // 30 minutes
   const MAX_EXPIRY = 604800   // 7 days
   const DEFAULT_ACCESS_ATTEMPTS = 5
+  const METHODS_NO_PASSPHRASE = ['publickey']
 
   try {
+    var requiresPassphrase = true;
+
     var secretId = cipher.generateIdentifier()
 
     if (!hasProperty(req.body, 'text') && !(req.files && Object.keys(req.files).length))
@@ -35,13 +38,28 @@ export async function secretSubmit(req, res, next) {
       return next({message: 'Param `method` must be one of: ' + METHODS.join(', ')})
     var method = hasProperty(req.body, 'method') ? req.body.method.toLowerCase() : DEFAULT_METHOD
 
+    if ( METHODS_NO_PASSPHRASE.includes(method) ) {
+      requiresPassphrase = false;
+    }
+
+    // Passphrase referes to both the password and public key if the public key item is selected
     if (!hasProperty(req.body, 'passphrase'))
       return next({message: 'Missing required body param: `passphrase`.'})
     var passphrase = req.body.passphrase.toString()
 
-    var pwned = await pwnedPassphrase(passphrase)
-    if (pwned)
-      return next({message: 'Passphrase has been pwned (leaked online); please use something else.'})
+    if(method === 'publickey') {
+      var pubkeyRegex = /-{5}BEGIN PUBLIC KEY-{5}.*-{5}END PUBLIC KEY-{5}/s
+      if(! pubkeyRegex.test(passphrase)) {
+        return next({message: 'Public key format does not match the format of X.509 SubjectPublicKeyInfo/OpenSSL PEM public key.'})
+      }
+    }
+
+    // Check if the Method being used requires a passphrase
+    if ( requiresPassphrase ) {
+      var pwned = await pwnedPassphrase(passphrase)
+      if (pwned)
+        return next({message: 'Passphrase has been pwned (leaked online); please use something else.'})
+    }
 
     if (hasProperty(req.body, 'expiry') && !Number.isInteger(parseInt(req.body.expiry))
     || parseInt(req.body.expiry) < 0
@@ -65,11 +83,15 @@ export async function secretSubmit(req, res, next) {
 
     var text = hasProperty(req.body, 'text') ? textUtils.escape(req.body.text.toString()) : ''
     var encryptedText = cipher.encrypt(text, passphrase, method)
+    
     if (!encryptedText)
       return next({message: 'Your message could not be encrypted; please try again checking your parameters are correct.'})
 
     var fileMetadata = [];
     if (req.files && Object.keys(req.files).length) {
+      if(method === 'publickey')
+        return next({message: 'File upload is not supported by public key encryption yet.'})
+
       if (typeof req.files !== 'object')
         return next({message: 'Files must be a multer object.'})
 
