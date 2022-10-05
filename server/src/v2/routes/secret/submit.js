@@ -12,14 +12,24 @@ import * as cipher from '../../helpers/cipher.js'
 import * as textUtils from '../../helpers/text.js'
 import { pwnedPassphrase } from '../../helpers/pwned.js'
 import * as file from '../../modules/file.js'
-import { humanReadableSize } from '../../../../../src/helpers/file.js'
 
 function hasProperty(body, property) {
   // need to reprocess otherwise [Object: null prototype]
   return {...body}.hasOwnProperty(property)
 }
 
-function humanUnreadableSize(text) { //https://stackoverflow.com/questions/6974614/how-to-convert-human-readable-memory-size-into-bytes
+async function humanReadableSize(bytes) { //Copied from client/src/helpers/file.js, and converted to function 
+  let size = parseInt(bytes)
+  for (let unit of ['B', 'KB', 'MB', 'GB']) {
+    if (size < 1024) return `${size.toFixed(1)} ${unit}`
+    size /= 1024.0
+  }
+
+  return size;
+}
+
+
+async function humanUnreadableSize(text) { //https://stackoverflow.com/questions/6974614/how-to-convert-human-readable-memory-size-into-bytes
   var powers = { 'k': 1, 'm': 2, 'g': 3, 't': 4 };
   var regex = /(\d+(?:\.\d+)?)\s?(k|m|g|t)/i;
 
