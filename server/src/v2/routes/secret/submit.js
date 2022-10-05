@@ -12,6 +12,7 @@ import * as cipher from '../../helpers/cipher.js'
 import * as textUtils from '../../helpers/text.js'
 import { pwnedPassphrase } from '../../helpers/pwned.js'
 import * as file from '../../modules/file.js'
+import { humanReadableSize } from '../../../../../src/helpers/file.js'
 
 function hasProperty(body, property) {
   // need to reprocess otherwise [Object: null prototype]
@@ -24,12 +25,16 @@ export async function secretSubmit(req, res, next) {
   const DEFAULT_EXPIRY = 1800 // 30 minutes
   const MAX_EXPIRY = 604800   // 7 days
   const DEFAULT_ACCESS_ATTEMPTS = 5
+  const SECRET_SIZE_LIMIT = 2097152; //2MiB in bytes
 
   try {
     var secretId = cipher.generateIdentifier()
 
     if (!hasProperty(req.body, 'text') && !(req.files && Object.keys(req.files).length))
       return next({message: 'Missing required body param: `text` OR `file` (must use one).'})
+
+    if (hasProperty(req.body, 'length') && req.body.length > SECRET_SIZE_LIMIT)
+      return next({ message: `Secret size beyond limit of ${humanReadableSize(SECRET_SIZE_LIMIT)}.` });
 
     if (!hasProperty(req.body, 'passphrase'))
       return next({message: 'Missing required body param: `passphrase`.'})
@@ -68,7 +73,9 @@ export async function secretSubmit(req, res, next) {
     if (!encryptedText)
       return next({message: 'Your message could not be encrypted; please try again checking your parameters are correct.'})
 
+    //File operations
     var fileMetadata = [];
+    var totalFileSize = 0;
     if (req.files && Object.keys(req.files).length) {
       if (typeof req.files !== 'object')
         return next({message: 'Files must be a multer object.'})
@@ -77,6 +84,17 @@ export async function secretSubmit(req, res, next) {
         var f = req.files[i]
         var originalName = f.originalname
         var encryptedFileName = cipher.encrypt(originalName, passphrase, method)
+
+        //Make sure that the file isn't too big for the length
+        if (f.buffer.length > SECRET_SIZE_LIMIT) {
+          return next({message: `Uploaded file '${originalName}' is larger than the maximum size of ${humanReadableSize(SECRET_SIZE_LIMIT)}`});
+        }
+
+        //Check that the total isn't too big either
+        totalFileSize += f.buffer.length;
+        if (totalFileSize > SECRET_SIZE_LIMIT) {
+          return next({message: `Total uploaded files in secret exceeds maximum size of ${humanReadableSize(SECRET_SIZE_LIMIT)}!`});
+        }
 
         var savedFile = await file.writeSecretFile(f.buffer, passphrase, method, secretId)
         if (!savedFile.success) {
