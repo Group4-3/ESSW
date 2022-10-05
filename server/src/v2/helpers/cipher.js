@@ -15,7 +15,7 @@ const nonceSize = 128/8
 const ivSize = 128/8
 const iterations = 100
 
-export const methods = ['aes', 'des', 'tripledes', 'rabbit', 'rc4', 'rc4drop', 'publickey']
+export const methods = ['aes', 'des', 'tripledes', 'rabbit', 'rc4', 'rc4drop', 'none', 'publickey']
 
 export function generateIdentifier() {
   return crypto.lib.WordArray.random(idLength).toString()
@@ -33,6 +33,9 @@ export function encrypt(body, passphrase, method = 'aes') {
       },
       Buffer.from(body)
     )
+  }
+  else if (method === 'none') {
+    return body
   }
   else {
     var nonce = crypto.lib.WordArray.random(nonceSize)
@@ -58,6 +61,9 @@ export function encrypt(body, passphrase, method = 'aes') {
 export function decrypt(body, passphrase, method = 'aes') {
   if (!methods.includes(method))
     return false
+
+  if (method === 'none')
+    return body
 
   var nonce = crypto.enc.Hex.parse(body.substr(0, nonceSize*2))
   var key = createKey(passphrase, nonce)

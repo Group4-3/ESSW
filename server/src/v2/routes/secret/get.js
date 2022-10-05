@@ -23,7 +23,7 @@ export async function secretGet(req, res, next) {
 
     var row = await db.retrieveSecret(id)
     if (!row.data || row.data && Date.parse(row.data.expiry_date) < Date.now())
-      return next({status: 404, message: 'Secret with that ID does not exist or has been deleted.'});
+      return next({status: 404, message: 'Secret with that ID does not exist or has been deleted.'})
 
     row = row.data
     var file_metadata = row.secret_file_metadata;
@@ -62,7 +62,7 @@ export async function secretGet(req, res, next) {
         for (let i = 0, i_length = file_metadata.length; i < i_length; ++i) {
           let file_data = file_metadata[i];
           let file_name = cipher.decrypt(file_data.encrypted_file_name, passphrase, row.method); //Decrypt the file name, using the text method
-          let decrypted_file_content = await file.readSecret(file_data.location); 
+          let decrypted_file_content = await file.readSecret(file_data.location);
 
           if (!decrypted_file_content.success) {
             throw error;
@@ -71,7 +71,7 @@ export async function secretGet(req, res, next) {
           if (file_data.checksum != crypto.SHA256(decrypted_file_content).toString()) { //Ensure that the file matches saved checksum. If not, fail out
             throw {message: "File checksum mismatch!"};
           }
-  
+
           decrypted_files.push({ //Push file data into object, and add to array
             name : file_name,
             encoding: file_data.encoding,
