@@ -31,7 +31,7 @@ export async function secretSubmit(req, res, next) {
   const DEFAULT_EXPIRY = 1800 // 30 minutes
   const MAX_EXPIRY = 604800   // 7 days
   const DEFAULT_ACCESS_ATTEMPTS = 5
-  const SECRET_SIZE_LIMIT = process.env.MAXIMUM_SECRET_SIZE ? humanUnreadableSize(process.env.MAXIMUM_SECRET_SIZE) : 2097152; //Default to 2MiB in bytes
+  const SECRET_SIZE_LIMIT = process.env.MAXIMUM_BODY_SIZE ? humanUnreadableSize(process.env.MAXIMUM_BODY_SIZE) : 2097152; //Default to 2MiB in bytes
 
   try {
     var secretId = cipher.generateIdentifier()
