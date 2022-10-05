@@ -11,12 +11,9 @@ import * as db from '../../modules/db.js'
 import * as cipher from '../../helpers/cipher.js'
 import * as textUtils from '../../helpers/text.js'
 import { pwnedPassphrase } from '../../helpers/pwned.js'
+import { hasProperty, isBooleanProperty, parseInsecureBoolean } from '../../helpers/validation.js'
 import * as file from '../../modules/file.js'
 
-function hasProperty(body, property) {
-  // need to reprocess otherwise [Object: null prototype]
-  return {...body}.hasOwnProperty(property)
-}
 
 export async function secretSubmit(req, res, next) {
   const METHODS = cipher.methods
