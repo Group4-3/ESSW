@@ -11,13 +11,14 @@ import * as db from '../../modules/db.js'
 import * as cipher from '../../helpers/cipher.js'
 import * as ipHelper from '../../helpers/ip.js'
 import * as secretHelper from '../../helpers/secret.js'
+import { hasProperty } from '../../helpers/validation.js'
 import * as file from '../../modules/file.js'
 
 export async function secretGet(req, res, next) {
   try {
     var remoteIp = ipHelper.getRemoteIp(req)
 
-    if (!req.params.hasOwnProperty('id'))
+    if (!hasProperty(req.body, 'id'))
       return next({message: 'Missing required request param: `id`.'})
     var id = req.params.id
 
@@ -31,7 +32,7 @@ export async function secretGet(req, res, next) {
     if (!secretHelper.canAttemptAccess(row, remoteIp))
       return next({status: 429, message: 'Too many unsuccessful access attempts; the requested secret is locked.'})
 
-    if (!req.body.hasOwnProperty('passphrase'))
+    if (!hasProperty(req.body, 'passphrase'))
       return next({message: 'Missing required body param: `passphrase`.'})
     var passphrase = req.body.passphrase.toString()
 
@@ -57,7 +58,7 @@ export async function secretGet(req, res, next) {
         for (let i = 0, i_length = file_metadata.length; i < i_length; ++i) {
           let file_data = file_metadata[i];
           let file_name = cipher.decrypt(file_data.encrypted_file_name, passphrase, row.method); //Decrypt the file name, using the text method
-          let decrypted_file_content = await file.readSecret(file_data.location); 
+          let decrypted_file_content = await file.readSecret(file_data.location);
 
           if (!decrypted_file_content.success) {
             throw error;
@@ -66,7 +67,7 @@ export async function secretGet(req, res, next) {
           if (file_data.checksum != crypto.SHA256(decrypted_file_content).toString()) { //Ensure that the file matches saved checksum. If not, fail out
             throw {message: "File checksum mismatch!"};
           }
-  
+
           decrypted_files.push({ //Push file data into object, and add to array
             name : file_name,
             encoding: file_data.encoding,
@@ -76,8 +77,8 @@ export async function secretGet(req, res, next) {
             size : file_data.size,
             checksum : file_data.checksum
           });
-          
-  
+
+
         };
 
 
