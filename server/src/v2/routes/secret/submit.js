@@ -59,6 +59,9 @@ export async function secretSubmit(req, res, next) {
     if (hasProperty(req.body, 'ip_based_access_attempts') && !isBooleanProperty(req.body.ip_based_access_attempts))
       return next({message: 'Param `ip_based_access_attempts` must be of type Boolean.'})
 
+    if (typeof req.body.ip_based_access_attempts === 'string')
+      req.body.ip_based_access_attempts = req.body.ip_based_access_attempts === 'true' ? true : false
+
     var unauthorizedAttempts = JSON.stringify({
       max_attempts: hasProperty(req.body, 'max_access_attempts') ? parseInt(req.body.max_access_attempts) : DEFAULT_ACCESS_ATTEMPTS,
       ip_based: hasProperty(req.body, 'ip_based_access_attempts') ? parseInsecureBoolean(req.body.ip_based_access_attempts) : false,
