@@ -11,13 +11,14 @@ import * as db from '../../modules/db.js'
 import * as cipher from '../../helpers/cipher.js'
 import * as ipHelper from '../../helpers/ip.js'
 import * as secretHelper from '../../helpers/secret.js'
+import { hasProperty } from '../../helpers/validation.js'
 import * as file from '../../modules/file.js'
 
 export async function secretGet(req, res, next) {
   try {
     var remoteIp = ipHelper.getRemoteIp(req)
 
-    if (!req.params.hasOwnProperty('id'))
+    if (!hasProperty(req.body, 'id'))
       return next({message: 'Missing required request param: `id`.'})
     var id = req.params.id
 
@@ -31,7 +32,7 @@ export async function secretGet(req, res, next) {
     if (!secretHelper.canAttemptAccess(row, remoteIp))
       return next({status: 429, message: 'Too many unsuccessful access attempts; the requested secret is locked.'})
 
-    if (!req.body.hasOwnProperty('passphrase'))
+    if (!hasProperty(req.body, 'passphrase'))
       return next({message: 'Missing required body param: `passphrase`.'})
     var passphrase = req.body.passphrase.toString()
 
