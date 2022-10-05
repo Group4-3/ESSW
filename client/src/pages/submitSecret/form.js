@@ -16,6 +16,18 @@ function genPassword(){
                 }
             document.getElementById("passphrase").value = password;
     }
+const [Home, setHome] = useState("");
+const ValidateText = /^[a-zA-Z0-9_]*$/;
+
+function GetInput(){
+    console.log("youclickme");
+        if (Home===""){
+            alert('You must type something');
+            }
+        else if (!ValidateText.test(Home)){
+            alert('Message must not contain special characters');
+            }
+}
 
 const expiryOptions = [
   {label: '5 minutes', value: 5*60},
@@ -136,7 +148,7 @@ const Form = ({formResponse}) => {
               </div>
             </div>
           </div>
-          <button type="submit" className="btn btn-primary d-block w-100">Submit secret</button>
+          <button onClick={GetInput} type="submit" className="btn btn-primary d-block w-100">Submit secret</button>
           <button onClick={genPassword} type="submit" class="" value="save">Generate</button>
         </div>
       </form>
