@@ -78,7 +78,7 @@ export async function secretSubmit(req, res, next) {
         var originalName = f.originalname
         var encryptedFileName = cipher.encrypt(originalName, passphrase, method)
 
-        var savedFile = await file.writeSecretFile(f.buffer, passphrase, method, secretId)
+        var savedFile = await file.writeSecretFile(f.buffer, passphrase, method, secretId, i)
         if (!savedFile.success) {
           return next({status: 500, message: 'Unable to save encrypted file to disk.', error: savedFile.error})
         }

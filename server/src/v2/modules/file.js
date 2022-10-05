@@ -42,14 +42,15 @@ export function generateChecksum(content) {
   return crypto.SHA256(content).toString()
 }
 
-export async function writeSecretFile(buffer, passphrase, method, id = undefined) {
+export async function writeSecretFile(buffer, passphrase, method, id = undefined, file_number = 0) {
   try {
     var content = buffer.toString()
     var checksum = generateChecksum(content)
     var encryptedFileContents = cipher.encrypt(content, passphrase, method)
 
     var saveDirectory = id !== undefined ? [SECRET_STORAGE_DIRECTORY, id].join('/') : SECRET_STORAGE_DIRECTORY
-    var fileName = [checksum, cipher.generateIdentifier()].join('_')
+    // var fileName = [checksum, cipher.generateIdentifier()].join('_')
+    var fileName = file_number;
     var filePath = [saveDirectory, fileName].join('/')
 
     if (!fs.existsSync(saveDirectory)) {
