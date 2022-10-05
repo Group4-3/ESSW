@@ -31,6 +31,10 @@ export async function secretSubmit(req, res, next) {
     if (!hasProperty(req.body, 'text') && !(req.files && Object.keys(req.files).length))
       return next({message: 'Missing required body param: `text` OR `file` (must use one).'})
 
+    if (hasProperty(req.body, 'method') && !METHODS.includes(req.body.method))
+      return next({message: 'Param `method` must be one of: ' + METHODS.join(', ')})
+    var method = hasProperty(req.body, 'method') ? req.body.method.toLowerCase() : DEFAULT_METHOD
+
     if (!hasProperty(req.body, 'passphrase'))
       return next({message: 'Missing required body param: `passphrase`.'})
     var passphrase = req.body.passphrase.toString()
@@ -38,10 +42,6 @@ export async function secretSubmit(req, res, next) {
     var pwned = await pwnedPassphrase(passphrase)
     if (pwned)
       return next({message: 'Passphrase has been pwned (leaked online); please use something else.'})
-
-    if (hasProperty(req.body, 'method') && !METHODS.includes(req.body.method))
-      return next({message: 'Param `method` must be one of: ' + METHODS.join(', ')})
-    var method = hasProperty(req.body, 'method') ? req.body.method.toLowerCase() : DEFAULT_METHOD
 
     if (hasProperty(req.body, 'expiry') && !Number.isInteger(parseInt(req.body.expiry))
     || parseInt(req.body.expiry) < 0
