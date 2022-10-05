@@ -16,13 +16,22 @@ import * as file from '../../modules/file.js'
 import { humanReadableSize } from '../../../../../src/helpers/file.js'
 
 
+function humanUnreadableSize(text) { //https://stackoverflow.com/questions/6974614/how-to-convert-human-readable-memory-size-into-bytes
+  var powers = { 'k': 1, 'm': 2, 'g': 3, 't': 4 };
+  var regex = /(\d+(?:\.\d+)?)\s?(k|m|g|t)/i;
+
+  var res = regex.exec(text);
+
+  return res[1] * Math.pow(1024, powers[res[2].toLowerCase()]); //Assuming bytes as 1024, not 1000
+}
+
 export async function secretSubmit(req, res, next) {
   const METHODS = cipher.methods
   const DEFAULT_METHOD = 'aes'
   const DEFAULT_EXPIRY = 1800 // 30 minutes
   const MAX_EXPIRY = 604800   // 7 days
   const DEFAULT_ACCESS_ATTEMPTS = 5
-  const SECRET_SIZE_LIMIT = 2097152; //2MiB in bytes
+  const SECRET_SIZE_LIMIT = process.env.MAXIMUM_SECRET_SIZE ? humanUnreadableSize(process.env.MAXIMUM_SECRET_SIZE) : 2097152; //Default to 2MiB in bytes
 
   try {
     var secretId = cipher.generateIdentifier()
@@ -91,7 +100,7 @@ export async function secretSubmit(req, res, next) {
         var encryptedFileName = cipher.encrypt(originalName, passphrase, method)
 
         //Make sure that the file isn't too big for the length
-        if (f.buffer.length > SECRET_SIZE_LIMIT) {
+        if (f.buffer.length > SECRET_SIZE_LIMIT) { //https://stackoverflow.com/questions/43755523/express-fileuploadget-check-size-in-express-js
           return next({message: `Uploaded file '${originalName}' is larger than the maximum size of ${humanReadableSize(SECRET_SIZE_LIMIT)}`});
         }
 
