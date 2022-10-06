@@ -81,6 +81,9 @@ export async function secretSubmit(req, res, next) {
     if (hasProperty(req.body, 'ip_based_access_attempts') && !isBooleanProperty(req.body.ip_based_access_attempts))
       return next({message: 'Param `ip_based_access_attempts` must be of type Boolean.'})
 
+    if (typeof req.body.ip_based_access_attempts === 'string')
+      req.body.ip_based_access_attempts = req.body.ip_based_access_attempts === 'true' ? true : false
+
     var unauthorizedAttempts = JSON.stringify({
       max_attempts: hasProperty(req.body, 'max_access_attempts') ? parseInt(req.body.max_access_attempts) : DEFAULT_ACCESS_ATTEMPTS,
       ip_based: hasProperty(req.body, 'ip_based_access_attempts') ? parseInsecureBoolean(req.body.ip_based_access_attempts) : false,
@@ -106,7 +109,7 @@ export async function secretSubmit(req, res, next) {
         var originalName = f.originalname
         var encryptedFileName = cipher.encrypt(originalName, passphrase, method)
 
-        var savedFile = await file.writeSecretFile(f.buffer, passphrase, method, secretId)
+        var savedFile = await file.writeSecretFile(f.buffer, passphrase, method, secretId, i)
         if (!savedFile.success) {
           return next({status: 500, message: 'Unable to save encrypted file to disk.', error: savedFile.error})
         }
