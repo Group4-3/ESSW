@@ -58,6 +58,10 @@ const Form = ({formResponse}) => {
     });
   };
 
+  const handleGenerateKeyPair = async (e) => {
+    console.log('Pressed')
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
