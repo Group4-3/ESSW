@@ -18,7 +18,7 @@ export async function secretGet(req, res, next) {
   try {
     var remoteIp = ipHelper.getRemoteIp(req)
 
-    if (!hasProperty(req.body, 'id'))
+    if (!hasProperty(req.params, 'id'))
       return next({message: 'Missing required request param: `id`.'})
     var id = req.params.id
 
