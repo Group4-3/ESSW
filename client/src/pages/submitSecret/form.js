@@ -2,6 +2,7 @@ import React from 'react';
 import Collapse from 'bootstrap/js/dist/collapse';
 import { getFileIcon, humanReadableSize } from '../../helpers/file';
 import * as Constants from "../../helpers/constants.js";
+import * as Cryptography from "../../helpers/cryptography.js";
 
 const expiryOptions = [
   {label: '5 minutes', value: 5*60},
@@ -21,6 +22,7 @@ const encryptionOptions = [
   {label: 'rabbit', value: 'rabbit'},
   {label: 'rc4', value: 'rc4'},
   {label: 'rc4drop', value: 'rc4drop'},
+  {label: 'Public Key', value: 'publickey'},
   {label: 'none', value: 'none'}
 ];
 
@@ -37,11 +39,27 @@ const Form = ({formResponse}) => {
     allow_insecure_passphrase: false
   }));
 
+  // HTML replacement
+  const INPUT_PASS_DEFAULT = "<input type=\"password\" id=\"passphrase\" name=\"passphrase\" class=\"form-control\">"
+  const INPUT_PASS_PUB = "<textarea rows=\"7\" cols=\"80\" id=\"passphrase\" name=\"passphrase\" placeholder=\"-----BEGIN PUBLIC KEY-----&#10;MIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAvk3&#10;...&#10;-----END PUBLIC KEY-----\" onChange={handleInputChange} className=\"form-control\" rows=\"3\"></textarea>"
+
   const handleInputChange = (e) => {
     updateFormData({
       ...formData,
       [e.target.name]: e.target.value.trim()
     });
+
+    if(e.target.id === 'method') {
+      if(e.target.value === 'publickey') {
+        document.getElementById('div-input-pass-pub').innerHTML = INPUT_PASS_PUB
+        document.getElementById('div-input-pass-pub-label').innerText = 'Public key'
+        document.getElementById('div-input-pass-pub-genkey').style.visibility = 'visible';
+      } else {
+        document.getElementById('div-input-pass-pub').innerHTML = INPUT_PASS_DEFAULT
+        document.getElementById('div-input-pass-pub-label').innerText = 'Secret key'
+        document.getElementById('div-input-pass-pub-genkey').style.visibility = 'hidden';
+      }
+    }
   };
 
   const handleSwitchChange = (e) => {
@@ -81,7 +99,15 @@ const Form = ({formResponse}) => {
   };
 
   const handleGenerateKeyPair = async (e) => {
-    console.log('Pressed')
+    var keyPair = await Cryptography.generateKeyPair()
+    console.log(keyPair)
+    document.getElementById('passphrase').value = keyPair.publicKey
+    updateFormData({
+      ...formData,
+      ['passphrase']: document.getElementById('passphrase').value.trim()
+    });
+    sessionStorage.setItem('privateKey', keyPair.privateKey)
+    document.getElementById('priv-key-copy-button').style.visibility = 'visible';
   }
 
   const handleSubmit = async (e) => {
@@ -117,6 +143,14 @@ const Form = ({formResponse}) => {
     };
   }
 
+  const copyPrivateKey = async (e) => {
+    e.preventDefault();
+    navigator.clipboard.writeText(sessionStorage.getItem('privateKey'));
+    console.log(e);
+    e.target.innerText = 'Copy private key (Copied!)';
+    sessionStorage.removeItem('privateKey');
+  }
+
   return (
     <>
       <h1>Create a secret message</h1>
@@ -129,12 +163,14 @@ const Form = ({formResponse}) => {
           <input id="files" type="file" onChange={handleFileChange} className="form-control"/>
           <div id="files-list" className="row row-cols-4 g-1 mt-1"></div>
           <div className="col">
-            <div className="row">
-              <label for="passphrase" className="col-sm-2 col-form-label">Secret key</label>
-              <div className="col-sm-10">
+              <label id="div-input-pass-pub-label" for="passphrase" className="col-sm-2 col-form-label">Secret key</label>
+              <div id="div-input-pass-pub" className="col-sm-10">
                 <input type="password" id="passphrase" name="passphrase" onChange={handleInputChange} className="form-control"/>
               </div>
-            </div>
+              <div className='row'>
+                <button id="div-input-pass-pub-genkey" type="button" onClick={handleGenerateKeyPair} className="btn btn-primary d-block w-5" style={{visibility: 'hidden'}}>Generate Key Pair</button>
+                <a id="priv-key-copy-button" href='#' onClick={copyPrivateKey} style={{visibility: 'hidden'}}>Copy private key</a>
+              </div>
           </div>
           <div className="card">
             <div className="card-body">
@@ -187,10 +223,6 @@ const Form = ({formResponse}) => {
                             <input className="form-check-input" type="checkbox" id="allow_insecure_passphrase" name="allow_insecure_passphrase" onChange={handleSwitchChange}/>
                           </div>
                         </div>
-                      </div>
-                      <div className="mb-3 row">
-                        <label for="no_encryption" className="col-sm-2 col-form-label">Public Key Encryption</label>
-                        <textarea id="public_key_input" name="public_key_input" placeholder="Enter public key..." onChange={handleInputChange} className="form-control" rows="3"></textarea>
                       </div>
                     </div>
                   </div>
