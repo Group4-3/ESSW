@@ -24,7 +24,7 @@ export async function secretGet(req, res, next) {
 
     var row = await db.retrieveSecret(id)
     if (!row.data || row.data && Date.parse(row.data.expiry_date) < Date.now())
-      return next({status: 404, message: 'Secret with that ID does not exist or has been deleted.'});
+      return next({status: 404, message: 'Secret with that ID does not exist or has been deleted.'})
 
     row = row.data
     var file_metadata = row.secret_file_metadata;

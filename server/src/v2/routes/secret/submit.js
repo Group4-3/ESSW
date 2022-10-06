@@ -11,12 +11,9 @@ import * as db from '../../modules/db.js'
 import * as cipher from '../../helpers/cipher.js'
 import * as textUtils from '../../helpers/text.js'
 import { pwnedPassphrase } from '../../helpers/pwned.js'
+import { hasProperty, isBooleanProperty, parseInsecureBoolean } from '../../helpers/validation.js'
 import * as file from '../../modules/file.js'
 
-function hasProperty(body, property) {
-  // need to reprocess otherwise [Object: null prototype]
-  return {...body}.hasOwnProperty(property)
-}
 
 export async function secretSubmit(req, res, next) {
   const METHODS = cipher.methods
@@ -35,8 +32,13 @@ export async function secretSubmit(req, res, next) {
       return next({message: 'Missing required body param: `passphrase`.'})
     var passphrase = req.body.passphrase.toString()
 
+    if (hasProperty(req.body, 'allow_insecure_passphrase') && !isBooleanProperty(req.body.allow_insecure_passphrase))
+      return next({message: 'Param `allow_insecure_passphrase` must be of type Boolean.'})
+
+    var allowInsecurePassphrase = hasProperty(req.body, 'allow_insecure_passphrase') ? parseInsecureBoolean(req.body.allow_insecure_passphrase) : false
+
     var pwned = await pwnedPassphrase(passphrase)
-    if (pwned)
+    if (pwned && !allowInsecurePassphrase)
       return next({message: 'Passphrase has been pwned (leaked online); please use something else.'})
 
     if (hasProperty(req.body, 'method') && !METHODS.includes(req.body.method))
@@ -54,12 +56,15 @@ export async function secretSubmit(req, res, next) {
     || parseInt(req.body.max_access_attempts) < -1)
       return next({message: 'Param `max_access_attempts` must be a positive integer (or use -1 for infinite).'})
 
-    if (hasProperty(req.body, 'ip_based_access_attempts') && !(typeof req.body.ip_based_access_attempts === 'boolean'))
+    if (hasProperty(req.body, 'ip_based_access_attempts') && !isBooleanProperty(req.body.ip_based_access_attempts))
       return next({message: 'Param `ip_based_access_attempts` must be of type Boolean.'})
+
+    if (typeof req.body.ip_based_access_attempts === 'string')
+      req.body.ip_based_access_attempts = req.body.ip_based_access_attempts === 'true' ? true : false
 
     var unauthorizedAttempts = JSON.stringify({
       max_attempts: hasProperty(req.body, 'max_access_attempts') ? parseInt(req.body.max_access_attempts) : DEFAULT_ACCESS_ATTEMPTS,
-      ip_based: hasProperty(req.body, 'ip_based_access_attempts') ? req.body.ip_based_access_attempts : false,
+      ip_based: hasProperty(req.body, 'ip_based_access_attempts') ? parseInsecureBoolean(req.body.ip_based_access_attempts) : false,
       attempts: hasProperty(req.body, 'ip_based_access_attempts') ? {} : 0
     })
 
@@ -78,7 +83,7 @@ export async function secretSubmit(req, res, next) {
         var originalName = f.originalname
         var encryptedFileName = cipher.encrypt(originalName, passphrase, method)
 
-        var savedFile = await file.writeSecretFile(f.buffer, passphrase, method, secretId)
+        var savedFile = await file.writeSecretFile(f.buffer, passphrase, method, secretId, i)
         if (!savedFile.success) {
           return next({status: 500, message: 'Unable to save encrypted file to disk.', error: savedFile.error})
         }
