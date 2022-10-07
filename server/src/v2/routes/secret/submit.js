@@ -83,7 +83,7 @@ export async function secretSubmit(req, res, next) {
         var originalName = f.originalname
         var encryptedFileName = cipher.encrypt(originalName, passphrase, method)
 
-        var savedFile = await file.writeSecretFile(f.buffer, passphrase, method, secretId, i)
+        var savedFile = await file.writeSecretFile(f.buffer, passphrase, method, secretId)
         if (!savedFile.success) {
           return next({status: 500, message: 'Unable to save encrypted file to disk.', error: savedFile.error})
         }
@@ -91,7 +91,6 @@ export async function secretSubmit(req, res, next) {
         fileMetadata.push({
           encrypted_file_name: encryptedFileName,
           encoding: f.encoding,
-          extension: originalName.substring(originalName.lastIndexOf('.')+1, originalName.length) || "",
           mimetype: f.mimetype,
           size: f.size,
           checksum: savedFile.checksum,
@@ -99,7 +98,7 @@ export async function secretSubmit(req, res, next) {
         })
       }
     }
-    fileMetadata = fileMetadata.length > 0 ? JSON.stringify(fileMetadata) : "";
+    fileMetadata = JSON.stringify(fileMetadata)
 
     var hashedPassphrase = await bcrypt.hash(passphrase, 10).then(result => {
       return result

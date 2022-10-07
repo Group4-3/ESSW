@@ -8,22 +8,15 @@
 
 import fs from 'fs'
 import multer from 'multer'
-import crypto from 'crypto-js'
 import * as path from 'path'
 import * as cipher from '../helpers/cipher.js'
+import { stripTrailingSlash } from '../helpers/text.js'
 
-function stripTrail(path) { //Remove trailing slashes
-  if (path.substr(-1) === '/') {
-    return path.substr(0, path.length - 1);
-  }
-  return path;
-}
+const SECRET_STORAGE_DIRECTORY = stripTrailingSlash(process.env.FILE_STORAGE_PATH ? process.env.FILE_STORAGE_PATH : './uploads')
 
-const SECRET_STORAGE_DIRECTORY = stripTrail(process.env.FILE_STORAGE_PATH ? process.env.FILE_STORAGE_PATH : './uploads')
-
-function isDirectory(path) {//Make sure that it's not a directory. May happen if secret path was malformed, and no ID was given. It is not possible to read a directory as a file.
-  return fs.readdir(path).isDirectory();
-}
+export const fileAttacher = multer({
+  storage: multer.memoryStorage()
+}).array('files', 1)
 
 function initialiseSecretStorage() { //Initialise, and ensure that the secret storage directory is valid
   if (!fs.existsSync(SECRET_STORAGE_DIRECTORY)) { //Create directory if the secret storage directory doesn't exist
@@ -34,30 +27,21 @@ function initialiseSecretStorage() { //Initialise, and ensure that the secret st
 
 initialiseSecretStorage();
 
-export const fileAttacher = multer({
-  storage: multer.memoryStorage()
-}).array('files', 1)
-
-export function generateChecksum(content) {
-  return crypto.SHA256(content).toString()
-}
-
-export async function writeSecretFile(buffer, passphrase, method, id = undefined, file_number = 0) {
+export async function writeSecretFile(buffer, passphrase, method, parentId = undefined, fileId = cipher.generateIdentifier()) {
   try {
     var content = buffer.toString()
-    var checksum = generateChecksum(content)
-    var encryptedFileContents = cipher.encrypt(content, passphrase, method)
+    var checksum = cipher.generateChecksum(content)
+    var encryptedFileContent = cipher.encrypt(content, passphrase, method)
 
-    var saveDirectory = id !== undefined ? [SECRET_STORAGE_DIRECTORY, id].join('/') : SECRET_STORAGE_DIRECTORY
-    // var fileName = [checksum, cipher.generateIdentifier()].join('_')
-    var fileName = file_number;
+    var saveDirectory = parentId !== undefined ? [SECRET_STORAGE_DIRECTORY, parentId].join('/') : SECRET_STORAGE_DIRECTORY
+    var fileName = fileId;
     var filePath = [saveDirectory, fileName].join('/')
 
     if (!fs.existsSync(saveDirectory)) {
       fs.mkdirSync(saveDirectory);
     }
 
-    fs.writeFileSync(filePath, encryptedFileContents);
+    fs.writeFileSync(filePath, encryptedFileContent)
 
     return { success: true, path: filePath, checksum: checksum }
   } catch (err) {
@@ -65,44 +49,36 @@ export async function writeSecretFile(buffer, passphrase, method, id = undefined
   }
 }
 
-export async function readSecret(secret_path, passphrase, method) {
-  if (isDirectory(secret_path)){
-    return {success:false, error : `Secret path ${secret_path} is a directory!`}
-  }
+export async function readSecretFile(filePath, passphrase, method) {
+  try {
+    // if (fs.readdir(filePath).isDirectory()) {
+    //   return { success: false, error: `Secret path ${filePath} is a directory not a file` }
+    // }
 
-    var file;
-    try {
-      let encrypted_file_content = fs.readFileSync(secret_path);
-      let decrypted_file_content = cipher.decrypt(encrypted_file_content, passphrase, method); //We can assume that passphrase is correct, as validation has already occurred
-      file = Buffer.from(decrypted_file_content);
-    }
-    catch (err) {
-        return {success : false, error: err}
-    }
-    finally {
-        return {success:true, file_content : file}
-    }
+    var encryptedBuffer = fs.readFileSync(filePath)
+    var encryptedContent = encryptedBuffer.toString()
+    // we can assume that passphrase is correct as validation should have already occurred
+    var decryptedFileContent = cipher.decrypt(encryptedContent, passphrase, method)
+    var buffer = Buffer.from(decryptedFileContent)
+
+    return { success: true, content: buffer }
+  } catch (err) {
+    return { success: false, error: err.message }
+  }
 }
 
-// async function deleteFile(filePath) {
-//     fs.unlink(filePath);
-// }
-
-export async function deleteSecret(id) { //Code to delete given secret directory, and contents.
-  var file_count;
+export async function deleteSecretFileDirectory(id) {
   try {
-    let secret_path = [SECRET_STORAGE_DIRECTORY, id].join('/');
-    if (fs.existsSync(secret_path)) {
-
-      file_count = fs.readdirSync(secret_path).length;
-
-      fs.rmSync(secret_path, {recursive:true});
+    let secretDirectory = [SECRET_STORAGE_DIRECTORY, id].join('/')
+    if (!fs.existsSync(secretDirectory)) {
+      return { success: false, error: 'Directory does not exist' }
     }
-  }
-  catch (err) {
-    return {success : false, error:err};
-  }
-  finally {
-    return {success:true, deleted_file_count:file_count};
+
+    fileCount = fs.readdirSync(secretDirectory).length
+    fs.rmdirSync(secret_path, { recursive: true })
+
+    return { success: true, deleted_file_count: fileCount }
+  } catch (err) {
+    return { success: false, error: err.message }
   }
 }
