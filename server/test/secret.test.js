@@ -1,5 +1,6 @@
 import request from 'supertest'
 import should from 'should'
+import fs from 'fs'
 import { app, server } from '../app.js'
 import { methods } from '../src/v2/helpers/cipher.js'
 
@@ -98,6 +99,21 @@ describe('Test /secret', () => {
           done()
         })
     })
+
+    it('should return successfully with persisted secret id when using a file', (done) => {
+      request(app)
+        .post('/api/v2/secret/submit')
+        .attach('files', './test/fixtures/sample.jpg')
+        .field('passphrase', '#SuperS3cr3tP@ssw0rd')
+        .expect(200)
+        .expect((res) => {
+          return res.body.should.have.property('id')
+        })
+        .end((err, res) => {
+          if (err) return done(err)
+          done()
+        })
+    })
   })
 
   // this series of tests use the secret submitted as part of
@@ -129,6 +145,28 @@ describe('Test /secret', () => {
         .end((err, res) => {
           if (err) return done(err)
           done()
+        })
+    })
+
+    it('should return a decrypted file buffer matching the original file when providing the correct passphrase', (done) => {
+      request(app)
+        .post('/api/v2/secret/submit')
+        .attach('files', './test/fixtures/sample.jpg')
+        .field('passphrase', '#SuperS3cr3tP@ssw0rd')
+        .then((res) => {
+          request(app)
+            .post('/api/v2/secret/' + res.body.id)
+            .send({
+              'passphrase': '#SuperS3cr3tP@ssw0rd'
+            })
+            .expect(200)
+            .expect((res) => {
+              return res.body.should.have.property('files') && res.body.files[0].blob === fs.readFileSync('./test/fixtures/sample.jpg')
+            })
+            .end((err, res) => {
+              if (err) return done(err)
+              done()
+            })
         })
     })
 
