@@ -69,7 +69,7 @@ export async function secretGet(req, res, next) {
 
       return res.status(200).send({text: decryptedText, files: decryptedFiles})
     } else {
-      db.updateUnauthorizedAttempts(row.id, secretHelper.incrementUnauthorizedAttempt(row, remoteIp))
+      db.updateUnauthorizedAttempts(secret.id, secretHelper.incrementUnauthorizedAttempt(secret, remoteIp))
 
       return next({status: 401, message: 'Unauthorized.'})
     }
