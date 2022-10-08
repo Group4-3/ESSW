@@ -29,38 +29,39 @@ export function encrypt(body, passphrase, method = 'aes') {
     return cryptoDefault.publicEncrypt(
       {
         key: passphrase,
-        oaepHash: "sha256",
+        oaepHash: 'sha256',
       },
       Buffer.from(body)
     )
   }
-  else if (method === 'none') {
+  if (method === 'none') {
     return body
   }
-  else {
-    var nonce = crypto.lib.WordArray.random(nonceSize)
-    var key = createKey(passphrase, nonce)
-    var config = {
-      'iv': crypto.lib.WordArray.random(ivSize),
-      'padding': crypto.pad.Pkcs7,
-      'mode': crypto.mode.CBC,
-      'hasher': crypto.algo.SHA256
-    }
-
-    return nonce.toString() + config.iv.toString() + ({
-      'aes': crypto.AES.encrypt(body, key, config),
-      'des': crypto.DES.encrypt(body, key, config),
-      'tripledes': crypto.TripleDES.encrypt(body, key, config),
-      'rabbit': crypto.Rabbit.encrypt(body, key, config),
-      'rc4': crypto.RC4.encrypt(body, key, config),
-      'rc4drop': crypto.RC4Drop.encrypt(body, key, config)
-    })[method.toLowerCase()].toString()
+  var nonce = crypto.lib.WordArray.random(nonceSize)
+  var key = createKey(passphrase, nonce)
+  var config = {
+    'iv': crypto.lib.WordArray.random(ivSize),
+    'padding': crypto.pad.Pkcs7,
+    'mode': crypto.mode.CBC,
+    'hasher': crypto.algo.SHA256
   }
+
+  return nonce.toString() + config.iv.toString() + ({
+    'aes': crypto.AES.encrypt(body, key, config),
+    'des': crypto.DES.encrypt(body, key, config),
+    'tripledes': crypto.TripleDES.encrypt(body, key, config),
+    'rabbit': crypto.Rabbit.encrypt(body, key, config),
+    'rc4': crypto.RC4.encrypt(body, key, config),
+    'rc4drop': crypto.RC4Drop.encrypt(body, key, config)
+  })[method.toLowerCase()].toString()
 }
 
 export function decrypt(body, passphrase, method = 'aes') {
   if (!methods.includes(method))
     return false
+
+  if (method === 'publickey')
+    return body
 
   if (method === 'none')
     return body

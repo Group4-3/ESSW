@@ -39,50 +39,46 @@ export async function secretGet(req, res, next) {
       var decrypted_text;
       var decrypted_files = [];
 
-      if(row.method === 'publickey') {
-        decrypted_text = row.secret_text;
-      } else {
-        decrypted_text = cipher.decrypt(row.secret_text, passphrase, row.method)
+      decrypted_text = cipher.decrypt(row.secret_text, passphrase, row.method)
 
-      // //Read uploaded files
-      // if (encrypted_files.files >= 1) { //Only decrypt if there are files to decrypt.
-      //   encrypted_files.files.forEach(stored_file => {
-      //     let file_name = stored_file.original_file_name;
-      //     let encrypted_file_content = file.readSecret(stored_file.path); //Read file secret, from given filename
-      //
-      //     let file_content = cipher.decrypt(encrypted_file_content, passphrase, row.method); //Decrypt using file content
-      //     if (!file_content) //Error if file decryption fails for some reason
-      //       return next({status : 500, message: 'File decryption error.'});
-      //
-      //     decrypted_files.files.push({name : file_name, content : file_content});
-      //   });
-      // }
+    // //Read uploaded files
+    // if (encrypted_files.files >= 1) { //Only decrypt if there are files to decrypt.
+    //   encrypted_files.files.forEach(stored_file => {
+    //     let file_name = stored_file.original_file_name;
+    //     let encrypted_file_content = file.readSecret(stored_file.path); //Read file secret, from given filename
+    //
+    //     let file_content = cipher.decrypt(encrypted_file_content, passphrase, row.method); //Decrypt using file content
+    //     if (!file_content) //Error if file decryption fails for some reason
+    //       return next({status : 500, message: 'File decryption error.'});
+    //
+    //     decrypted_files.files.push({name : file_name, content : file_content});
+    //   });
+    // }
 
-      //Read Encrypted files
-        for (let i = 0, i_length = file_metadata.length; i < i_length; ++i) {
-          let file_data = file_metadata[i];
-          let file_name = cipher.decrypt(file_data.encrypted_file_name, passphrase, row.method); //Decrypt the file name, using the text method
-          let decrypted_file_content = await file.readSecret(file_data.location);
+    //Read Encrypted files
+      for (let i = 0, i_length = file_metadata.length; i < i_length; ++i) {
+        let file_data = file_metadata[i];
+        let file_name = cipher.decrypt(file_data.encrypted_file_name, passphrase, row.method); //Decrypt the file name, using the text method
+        let decrypted_file_content = await file.readSecret(file_data.location);
 
-          if (!decrypted_file_content.success) {
-            throw error;
-          }
+        if (!decrypted_file_content.success) {
+          throw error;
+        }
 
-          if (file_data.checksum != crypto.SHA256(decrypted_file_content).toString()) { //Ensure that the file matches saved checksum. If not, fail out
-            throw {message: "File checksum mismatch!"};
-          }
+        if (file_data.checksum != crypto.SHA256(decrypted_file_content).toString()) { //Ensure that the file matches saved checksum. If not, fail out
+          throw {message: "File checksum mismatch!"};
+        }
 
-          decrypted_files.push({ //Push file data into object, and add to array
-            name : file_name,
-            encoding: file_data.encoding,
-            file: decrypted_file_content,
-            extension: file_data.extension,
-            mimetype: file_data.mimetype,
-            size : file_data.size,
-            checksum : file_data.checksum
-          });
-        };
-      }
+        decrypted_files.push({ //Push file data into object, and add to array
+          name : file_name,
+          encoding: file_data.encoding,
+          file: decrypted_file_content,
+          extension: file_data.extension,
+          mimetype: file_data.mimetype,
+          size : file_data.size,
+          checksum : file_data.checksum
+        });
+      };
       file.deleteSecret(id);
       db.deleteSecret(id)
       return res.status(200).send({text: decrypted_text, files: decrypted_files})
