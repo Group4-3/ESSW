@@ -7,7 +7,7 @@
 */
 
 import crypto from 'crypto-js'
-import cryptoDefault from 'crypto'
+import { publicEncrypt } from 'crypto'
 
 const idLength = 8/2
 const keySize = 256/32
@@ -26,7 +26,7 @@ export function encrypt(body, passphrase, method = 'aes') {
     return false
 
   if ( method === 'publickey' ) {
-    return cryptoDefault.publicEncrypt(
+    return publicEncrypt(
       {
         key: passphrase,
         oaepHash: 'sha256',
