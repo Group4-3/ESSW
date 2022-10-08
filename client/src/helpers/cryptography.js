@@ -40,7 +40,7 @@ export async function generateKeyPair() {
     const publicKeyBase64 = window.btoa(publicKeyString)
     const publicKeyPem = `-----BEGIN PUBLIC KEY-----\n${publicKeyBase64}\n-----END PUBLIC KEY-----`
 
-    return {'privateKey': privateKeyPem, 'publicKey': publicKeyPem}
+    return { privateKey: privateKeyPem, publicKey: publicKeyPem }
 }
 
 export async function generatePublicKey(privateKey) {
