@@ -152,18 +152,22 @@ const Form = ({formResponse}) => {
           }
           <div className="col">
               <label id="div-input-pass-pub-label" for="passphrase" className="col-sm-2 col-form-label">Secret key</label>
+              <div className='row'>
               {formData.method !== 'publickey' &&
-                    <div id="div-input-pass-pub" className="col-sm-10">
-                      <input type="password" id="passphrase" name="passphrase" onChange={handleInputChange} className="form-control"/>
-                    </div>
+                  <>
+                      <div id="div-input-pass-pub" className="col-sm-10">
+                        <input type="password" id="passphrase" name="passphrase" onChange={handleInputChange} className="form-control"/>
+                      </div>
+                  </>
               }
               {formData.method === 'publickey' &&
-                    <div className='row'>
+                  <>
                       <textarea rows="7" cols="80" id="passphrase" name="passphrase" placeholder="-----BEGIN PUBLIC KEY-----&#10;MIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAvk3&#10;...&#10;-----END PUBLIC KEY-----\" onChange={handleInputChange} className="form-control" rows="3"/ >
                       <button id="div-input-pass-pub-genkey" type="button" onClick={handleGenerateKeyPair} className="btn btn-primary d-block w-5">Generate Key Pair</button>
                       <a id="priv-key-copy-button" href='#' onClick={copyPrivateKey}>Copy private key</a>
-                    </div>
+                  </>
               }
+              </div>
           </div>
           <div className="card">
             <div className="card-body">
