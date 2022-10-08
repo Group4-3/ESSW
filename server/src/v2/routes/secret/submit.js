@@ -24,8 +24,6 @@ export async function secretSubmit(req, res, next) {
   const METHODS_NO_PASSPHRASE = ['publickey']
 
   try {
-    var requiresPassphrase = true;
-
     var secretId = cipher.generateIdentifier()
 
     if (!hasProperty(req.body, 'text') && !(req.files && Object.keys(req.files).length))
@@ -34,10 +32,7 @@ export async function secretSubmit(req, res, next) {
     if (hasProperty(req.body, 'method') && !METHODS.includes(req.body.method))
       return next({message: 'Param `method` must be one of: ' + METHODS.join(', ')})
     var method = hasProperty(req.body, 'method') ? req.body.method.toLowerCase() : DEFAULT_METHOD
-
-    if ( METHODS_NO_PASSPHRASE.includes(method) ) {
-      requiresPassphrase = false;
-    }
+    var usingPassphraselessMethod = METHODS_NO_PASSPHRASE.includes(method)
 
     // Passphrase referes to both the password and public key if the public key item is selected
     if (!hasProperty(req.body, 'passphrase'))
@@ -53,15 +48,10 @@ export async function secretSubmit(req, res, next) {
 
     if (hasProperty(req.body, 'allow_insecure_passphrase') && !isBooleanProperty(req.body.allow_insecure_passphrase))
       return next({message: 'Param `allow_insecure_passphrase` must be of type Boolean.'})
-
     var allowInsecurePassphrase = hasProperty(req.body, 'allow_insecure_passphrase') ? parseInsecureBoolean(req.body.allow_insecure_passphrase) : false
 
-    var pwned = await pwnedPassphrase(passphrase)
-    if (pwned && !allowInsecurePassphrase)
-      return next({message: 'Passphrase has been pwned (leaked online); please use something else.'})
-
     // Check if the Method being used requires a passphrase
-    if ( requiresPassphrase ) {
+    if ( ! (allowInsecurePassphrase || usingPassphraselessMethod) ) {
       var pwned = await pwnedPassphrase(passphrase)
       if (pwned)
         return next({message: 'Passphrase has been pwned (leaked online); please use something else.'})
