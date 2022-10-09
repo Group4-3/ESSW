@@ -15,17 +15,6 @@ import { hasProperty, isBooleanProperty, parseInsecureBoolean } from '../../help
 import * as file from '../../modules/file.js'
 
 
-async function humanReadableSize(bytes) { //Copied from client/src/helpers/file.js, and converted to function 
-  let size = parseInt(bytes)
-  for (let unit of ['B', 'KB', 'MB', 'GB']) {
-    if (size < 1024) return `${size.toFixed(1)} ${unit}`
-    size /= 1024.0
-  }
-
-  return size;
-}
-
-
 async function humanUnreadableSize(text) { //https://stackoverflow.com/questions/6974614/how-to-convert-human-readable-memory-size-into-bytes
   var powers = { 'k': 1, 'm': 2, 'g': 3, 't': 4 };
   var regex = /(\d+(?:\.\d+)?)\s?(k|m|g|t)/i;
@@ -43,16 +32,6 @@ async function humanReadableSize(bytes) { //Copied from client/src/helpers/file.
   }
 
   return size;
-}
-
-
-async function humanUnreadableSize(text) { //https://stackoverflow.com/questions/6974614/how-to-convert-human-readable-memory-size-into-bytes
-  var powers = { 'k': 1, 'm': 2, 'g': 3, 't': 4 };
-  var regex = /(\d+(?:\.\d+)?)\s?(k|m|g|t)/i;
-
-  var res = regex.exec(text);
-
-  return res[1] * Math.pow(1024, powers[res[2].toLowerCase()]); //Assuming bytes as 1024, not 1000
 }
 
 export async function secretSubmit(req, res, next) {
@@ -132,18 +111,6 @@ export async function secretSubmit(req, res, next) {
         //Make sure that the file isn't too big for the length
         if (f.buffer.length > SECRET_SIZE_LIMIT) { //https://stackoverflow.com/questions/43755523/express-fileuploadget-check-size-in-express-js
           return next({message: `Uploaded file '${originalName}' is larger than the maximum size of ${humanReadableSize(SECRET_SIZE_LIMIT)}`});
-        }
-
-        //Check that the total isn't too big either
-        totalFileSize += f.buffer.length;
-        if (totalFileSize > SECRET_SIZE_LIMIT) {
-          return next({message: `Total uploaded files in secret exceeds maximum size of ${humanReadableSize(SECRET_SIZE_LIMIT)}!`});
-        }
-
-        var savedFile = await file.writeSecretFile(f.buffer, passphrase, method, secretId, i)
-
-        if (!savedFile.success) {
-          return next({status: 500, message: 'Unable to save encrypted file to disk.', error: savedFile.error})
         }
 
         //Check that the total isn't too big either
