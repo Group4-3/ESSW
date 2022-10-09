@@ -6,7 +6,7 @@ import * as file from '../modules/file.js';
 //Based on https://www.digitalocean.com/community/tutorials/nodejs-cron-jobs-by-examples
 //Cron syntax provided by https://www.digitalocean.com/community/tutorials/how-to-use-cron-to-automate-tasks-on-a-vps
 
-function timeDateString() { 
+function timeDateString() {
     return new Date(Date.now()).toString(); //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date
 }
 
@@ -19,8 +19,8 @@ cron.schedule('*/4 * * * *', () => {
         if (!expiredSecrets.success) {
             throw err = expiredSecrets.error; //Throw an error if it is n ot possible to read expired secrets,f or some reason (may need to set up variable properly)
         }
-        for (const secret in expiredSecrets) { 
-            var deletedFiles = file.deleteSecret(secret);
+        for (const secret in expiredSecrets) {
+            var deletedFiles = file.deleteSecretFileDirectory(secret);
             if (!deletedFiles.success) {
                 throw deletedFiles.error;
             }

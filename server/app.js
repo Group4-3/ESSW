@@ -33,6 +33,7 @@ app.use('/api/v2', v2)
 app.use(express.static('public'))
 
 app.use((err, req, res, next) => {
+  console.log(err)
   res.status(err.status || 400).json({
     message: err.message || 'An unexpected error occurred.',
     errors: err.error

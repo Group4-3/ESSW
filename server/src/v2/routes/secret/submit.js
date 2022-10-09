@@ -91,7 +91,7 @@ export async function secretSubmit(req, res, next) {
       attempts: hasProperty(req.body, 'ip_based_access_attempts') ? {} : 0
     })
 
-    var text = hasProperty(req.body, 'text') ? textUtils.escape(req.body.text.toString()) : ''
+    var text = hasProperty(req.body, 'text') ? textUtils.escape(req.body.text.toString()) : ' '
     var encryptedText = cipher.encrypt(text, passphrase, method)
     if (!encryptedText)
       return next({message: 'Your message could not be encrypted; please try again checking your parameters are correct.'})
@@ -108,9 +108,9 @@ export async function secretSubmit(req, res, next) {
         var originalName = f.originalname
         var encryptedFileName = cipher.encrypt(originalName, passphrase, method)
 
-        //Make sure that the file isn't too big for the length
-        if (f.buffer.length > SECRET_SIZE_LIMIT) { //https://stackoverflow.com/questions/43755523/express-fileuploadget-check-size-in-express-js
-          return next({message: `Uploaded file '${originalName}' is larger than the maximum size of ${humanReadableSize(SECRET_SIZE_LIMIT)}`});
+        var savedFile = await file.writeSecretFile(f.buffer, passphrase, method, secretId)
+        if (!savedFile.success) {
+          return next({status: 500, message: 'Unable to save encrypted file to disk.', error: savedFile.error})
         }
 
         //Check that the total isn't too big either
@@ -119,12 +119,11 @@ export async function secretSubmit(req, res, next) {
           return next({message: `Total uploaded files in secret exceeds maximum size of ${humanReadableSize(SECRET_SIZE_LIMIT)}!`});
         }
 
-          return next({status: 500, message: 'Unable to save encrypted file to disk.', error: savedFile.error})
-        }
+        //   return next({status: 500, message: 'Unable to save encrypted file to disk.', error: savedFile.error})
+        // }
         fileMetadata.push({
           encrypted_file_name: encryptedFileName,
           encoding: f.encoding,
-          extension: originalName.substring(originalName.lastIndexOf('.')+1, originalName.length) || "",
           mimetype: f.mimetype,
           size: f.size,
           checksum: savedFile.checksum,
@@ -155,7 +154,9 @@ export async function secretSubmit(req, res, next) {
     } else {
       return next({status: 500, message: 'Unable to save secret.', error: transaction.error})
     }
+  } 
   } catch (err) {
+    console.log(err)
     return next({status: 500, error: err.message})
   }
 }
