@@ -1,9 +1,11 @@
 import React from 'react';
 import * as Constants from "../../helpers/constants.js";
-
-
+import {
+  useParams
+} from "react-router-dom";
 
 const RetrieveSecret = ({formResponse}) => {
+  const { id } = useParams();
   const [errorMessage, updateErrorMessage] = React.useState('');
   const [formData, updateFormData] = React.useState(Object.freeze({
     passphrase: '',
@@ -22,26 +24,25 @@ const handleSubmit = async (e) => {
   e.preventDefault();
 
   try {
-    let body = new FormData();
+    var formBody = [];
     for (const [key, value] of Object.entries(formData)) {
-      console.log([key, value])
-      if (key === 'files') {
-        for (const file of formData.files) {
-          body.append('files', file);
-        }
-        continue;
-      }
-
-      body.append(key, value);
+        var encodedKey = encodeURIComponent(key);
+        var encodedValue = encodeURIComponent(value);
+        formBody.push(encodedKey + "=" + encodedValue);
     };
-    let res = await fetch(Constants.getApiAddress() + '/api/v2/secret/{:id}', {
+    formBody = formBody.join("&");
+
+    let res = await fetch(Constants.getApiAddress() + '/api/v2/secret/' + id, {
       method: 'POST',
-      body: body
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+      },
+      body: formBody
     });
 
     let json = await res.json();
     if (res.status === 200) {
-      formResponse(json);
+      //formResponse(json);
     } else {
       // TODO error message should come from client validations
       updateErrorMessage(JSON.stringify(json, null, 4))
