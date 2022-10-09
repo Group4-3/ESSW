@@ -140,12 +140,13 @@ describe('Test /secret', () => {
         })
     })
 
-    it('fail if very large files are uploaded (assuming file limits are not overstuffed', (done) => {
+    it('fail if very large files are uploaded (assuming file limits are not overstuffed)', (done) => {
       request(app)
       .post('/api/v2/secret/submit')
-      .attach('files', './fixtures/50MB.bin')
+      .attach('files', './test/fixtures/5MB.bin')
       .field('passphrase', '#SuperS3cr3tP@ssw0rd')
-      .expect(413)
+      .field('method', 'none')
+      .expect(400)
       .end((err, res) => {
         if (err) return done(err)
         done()

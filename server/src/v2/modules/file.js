@@ -15,7 +15,10 @@ import { stripTrailingSlash } from '../helpers/text.js'
 const SECRET_STORAGE_DIRECTORY = stripTrailingSlash(process.env.FILE_STORAGE_PATH ? process.env.FILE_STORAGE_PATH : './uploads')
 
 export const fileAttacher = multer({
-  storage: multer.memoryStorage()
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 2097152
+  }
 }).array('files', 1)
 
 function initialiseSecretStorage() { //Initialise, and ensure that the secret storage directory is valid
@@ -45,6 +48,7 @@ export async function writeSecretFile(buffer, passphrase, method, parentId = und
 
     return { success: true, path: filePath, checksum: checksum }
   } catch (err) {
+    console.log(err)
     return { success: false, error: err.message }
   }
 }

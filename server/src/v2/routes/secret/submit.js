@@ -68,7 +68,7 @@ export async function secretSubmit(req, res, next) {
       attempts: hasProperty(req.body, 'ip_based_access_attempts') ? {} : 0
     })
 
-    var text = hasProperty(req.body, 'text') ? textUtils.escape(req.body.text.toString()) : ''
+    var text = hasProperty(req.body, 'text') ? textUtils.escape(req.body.text.toString()) : ' '
     var encryptedText = cipher.encrypt(text, passphrase, method)
     if (!encryptedText)
       return next({message: 'Your message could not be encrypted; please try again checking your parameters are correct.'})
@@ -123,6 +123,7 @@ export async function secretSubmit(req, res, next) {
       return next({status: 500, message: 'Unable to save secret.', error: transaction.error})
     }
   } catch (err) {
+    console.log(err)
     return next({status: 500, error: err.message})
   }
 }
