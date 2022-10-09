@@ -11,11 +11,28 @@ import * as db from '../../modules/db.js'
 import * as cipher from '../../helpers/cipher.js'
 import * as textUtils from '../../helpers/text.js'
 import { pwnedPassphrase } from '../../helpers/pwned.js'
+import { hasProperty, isBooleanProperty, parseInsecureBoolean } from '../../helpers/validation.js'
 import * as file from '../../modules/file.js'
 
-function hasProperty(body, property) {
-  // need to reprocess otherwise [Object: null prototype]
-  return {...body}.hasOwnProperty(property)
+
+async function humanReadableSize(bytes) { //Copied from client/src/helpers/file.js, and converted to function 
+  let size = parseInt(bytes)
+  for (let unit of ['B', 'KB', 'MB', 'GB']) {
+    if (size < 1024) return `${size.toFixed(1)} ${unit}`
+    size /= 1024.0
+  }
+
+  return size;
+}
+
+
+async function humanUnreadableSize(text) { //https://stackoverflow.com/questions/6974614/how-to-convert-human-readable-memory-size-into-bytes
+  var powers = { 'k': 1, 'm': 2, 'g': 3, 't': 4 };
+  var regex = /(\d+(?:\.\d+)?)\s?(k|m|g|t)/i;
+
+  var res = regex.exec(text);
+
+  return res[1] * Math.pow(1024, powers[res[2].toLowerCase()]); //Assuming bytes as 1024, not 1000
 }
 
 async function humanReadableSize(bytes) { //Copied from client/src/helpers/file.js, and converted to function 
@@ -59,8 +76,13 @@ export async function secretSubmit(req, res, next) {
       return next({message: 'Missing required body param: `passphrase`.'})
     var passphrase = req.body.passphrase.toString()
 
+    if (hasProperty(req.body, 'allow_insecure_passphrase') && !isBooleanProperty(req.body.allow_insecure_passphrase))
+      return next({message: 'Param `allow_insecure_passphrase` must be of type Boolean.'})
+
+    var allowInsecurePassphrase = hasProperty(req.body, 'allow_insecure_passphrase') ? parseInsecureBoolean(req.body.allow_insecure_passphrase) : false
+
     var pwned = await pwnedPassphrase(passphrase)
-    if (pwned)
+    if (pwned && !allowInsecurePassphrase)
       return next({message: 'Passphrase has been pwned (leaked online); please use something else.'})
 
     if (hasProperty(req.body, 'method') && !METHODS.includes(req.body.method))
@@ -78,12 +100,15 @@ export async function secretSubmit(req, res, next) {
     || parseInt(req.body.max_access_attempts) < -1)
       return next({message: 'Param `max_access_attempts` must be a positive integer (or use -1 for infinite).'})
 
-    if (hasProperty(req.body, 'ip_based_access_attempts') && !(typeof req.body.ip_based_access_attempts === 'boolean'))
+    if (hasProperty(req.body, 'ip_based_access_attempts') && !isBooleanProperty(req.body.ip_based_access_attempts))
       return next({message: 'Param `ip_based_access_attempts` must be of type Boolean.'})
+
+    if (typeof req.body.ip_based_access_attempts === 'string')
+      req.body.ip_based_access_attempts = req.body.ip_based_access_attempts === 'true' ? true : false
 
     var unauthorizedAttempts = JSON.stringify({
       max_attempts: hasProperty(req.body, 'max_access_attempts') ? parseInt(req.body.max_access_attempts) : DEFAULT_ACCESS_ATTEMPTS,
-      ip_based: hasProperty(req.body, 'ip_based_access_attempts') ? req.body.ip_based_access_attempts : false,
+      ip_based: hasProperty(req.body, 'ip_based_access_attempts') ? parseInsecureBoolean(req.body.ip_based_access_attempts) : false,
       attempts: hasProperty(req.body, 'ip_based_access_attempts') ? {} : 0
     })
 
@@ -115,11 +140,8 @@ export async function secretSubmit(req, res, next) {
           return next({message: `Total uploaded files in secret exceeds maximum size of ${humanReadableSize(SECRET_SIZE_LIMIT)}!`});
         }
 
-        var savedFile = await file.writeSecretFile(f.buffer, passphrase, method, secretId)
-        if (!savedFile.success) {
           return next({status: 500, message: 'Unable to save encrypted file to disk.', error: savedFile.error})
         }
-
         fileMetadata.push({
           encrypted_file_name: encryptedFileName,
           encoding: f.encoding,
@@ -130,7 +152,6 @@ export async function secretSubmit(req, res, next) {
           location: savedFile.path
         })
       }
-    }
     fileMetadata = fileMetadata.length > 0 ? JSON.stringify(fileMetadata) : "";
 
     var hashedPassphrase = await bcrypt.hash(passphrase, 10).then(result => {

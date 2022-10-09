@@ -15,3 +15,25 @@ $h3-font-size: $font-size-base * 1.6;
 $h4-font-size: $font-size-base * 1.4;
 $h5-font-size: $font-size-base * 1.2;
 $h6-font-size: $font-size-base;
+
+
+$accordion-padding-y:                     0;
+$accordion-padding-x:                     0;
+$accordion-color:                         $body-color;
+$accordion-bg:                            $body-bg;
+$accordion-border-width:                  0;
+$accordion-border-color:                  rgba(0, 0, 0, 1);
+
+$accordion-body-padding-y:                $accordion-padding-y;
+$accordion-body-padding-x:                $accordion-padding-x;
+
+$accordion-button-padding-y:              $accordion-padding-y;
+$accordion-button-padding-x:              $accordion-padding-x;
+$accordion-button-color:                  $accordion-color;
+$accordion-button-bg:                     $accordion-bg;
+$accordion-transition:                    $btn-transition, border-radius .15s ease;
+$accordion-button-active-bg:              $accordion-bg;
+$accordion-button-active-color:           $accordion-color;
+
+$accordion-button-focus-border-color:     none;
+$accordion-button-focus-box-shadow:       none;
