@@ -140,6 +140,34 @@ describe('Test /secret', () => {
         })
     })
 
+    it('fail if very large files are uploaded (assuming file limits are not overstuffed)', (done) => {
+      request(app)
+      .post('/api/v2/secret/submit')
+      .attach('files', './test/fixtures/5MB.bin')
+      .field('passphrase', '#SuperS3cr3tP@ssw0rd')
+      .field('method', 'none')
+      .expect(400)
+      .end((err, res) => {
+        if (err) return done(err)
+        done()
+        })
+    })
+
+    it('return successfully for multiple files uploaded', (done) => {
+      request(app)
+        .post('/api/v2/secret/submit')
+        .attach('files', './test/fixtures/sample.jpg')
+        .attach('files', './test/fixtures/developer_cat.jpg')
+        .field('passphrase', '#SuperS3cr3tP@ssw0rd')
+        .expect(200)
+        .expect((res) => {
+          return res.body.should.have.property('id')
+        })
+        .end((err, res) => {
+          if (err) return done(err)
+          done()
+        })
+    })
   })
 
   // this series of tests use the secret submitted as part of
