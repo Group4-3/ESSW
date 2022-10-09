@@ -140,17 +140,6 @@ describe('Test /secret', () => {
         })
     })
 
-    it('fail if very large files are uploaded (assuming file limits are not overstuffed', (done) => {
-      request(app)
-      .post('/api/v2/secret/submit')
-      .attach('files', './fixtures/50MB.bin')
-      .field('passphrase', '#SuperS3cr3tP@ssw0rd')
-      .expect(413)
-      .end((err, res) => {
-        if (err) return done(err)
-        done()
-        })
-    })
   })
 
   // this series of tests use the secret submitted as part of
