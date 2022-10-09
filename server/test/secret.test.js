@@ -5,6 +5,31 @@ import { app, server } from '../app.js'
 import { methods } from '../src/v2/helpers/cipher.js'
 
 var secretId = undefined
+const createEmptyFileOfSize = (filename, size) => { //https://stackoverflow.com/questions/49433241/creating-an-empty-file-of-a-certain-size
+  return new Promise((resolve, reject) => {
+    if (size < 0) { //Check file size validity
+      reject("File size is invalid");
+      return;
+    }
+    setTimeout(() => {
+      try {
+        //Open file for writing
+
+        fd = openSync(filename, 'w');
+        if (size > 0) {
+          //Write byte at offset to force file expansion, and fill rest of the file with junk
+          fs.writeSync(fd, Buffer.alloc(1), 0, 1, size - 1);
+        }
+        fs.closeSync(fd);
+        resolve(true);
+      }
+      catch (error) {
+        reject(error);
+      }
+      //Creates file after processing JS event loop
+    }, 0)
+  })
+}
 
 describe('Test /secret', () => {
   after(() => {
@@ -112,6 +137,18 @@ describe('Test /secret', () => {
         .end((err, res) => {
           if (err) return done(err)
           done()
+        })
+    })
+
+    it('fail if very large files are uploaded (assuming file limits are not overstuffed', (done) => {
+      request(app)
+      .post('/api/v2/secret/submit')
+      .attach('files', './fixtures/50MB.bin')
+      .field('passphrase', '#SuperS3cr3tP@ssw0rd')
+      .expect(413)
+      .end((err, res) => {
+        if (err) return done(err)
+        done()
         })
     })
   })
