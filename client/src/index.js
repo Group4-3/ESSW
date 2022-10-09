@@ -15,8 +15,8 @@ root.render(
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<SubmitSecret />} />
-          <Route path="*" element={<NotFound />} />
           <Route path="/secret/:id"  element={<RetrieveSecret/>} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
     </Layout>
