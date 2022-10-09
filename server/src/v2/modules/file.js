@@ -12,12 +12,32 @@ import * as path from 'path'
 import * as cipher from '../helpers/cipher.js'
 import { stripTrailingSlash } from '../helpers/text.js'
 
+
+async function humanUnreadableSize(text) { //https://stackoverflow.com/questions/6974614/how-to-convert-human-readable-memory-size-into-bytes
+  var powers = { 'k': 1, 'm': 2, 'g': 3, 't': 4 };
+  var regex = /(\d+(?:\.\d+)?)\s?(k|m|g|t)/i;
+
+  var res = regex.exec(text);
+
+  return res[1] * Math.pow(1024, powers[res[2].toLowerCase()]); //Assuming bytes as 1024, not 1000
+}
+
+async function humanReadableSize(bytes) { //Copied from client/src/helpers/file.js, and converted to function 
+  let size = parseInt(bytes)
+  for (let unit of ['B', 'KB', 'MB', 'GB']) {
+    if (size < 1024) return `${size.toFixed(1)} ${unit}`
+    size /= 1024.0
+  }
+
+  return size;
+}
+
 const SECRET_STORAGE_DIRECTORY = stripTrailingSlash(process.env.FILE_STORAGE_PATH ? process.env.FILE_STORAGE_PATH : './uploads')
 
 export const fileAttacher = multer({
   storage: multer.memoryStorage(),
   limits: {
-    fileSize: 2097152
+    fileSize: process.env.MAXIMUM_SIZE_LIMIT ? process.env.MAXIMUM_SIZE_LIMIT : 2097152
   }
 }).array('files', 1)
 
