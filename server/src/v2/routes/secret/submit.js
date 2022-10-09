@@ -140,6 +140,18 @@ export async function secretSubmit(req, res, next) {
           return next({message: `Total uploaded files in secret exceeds maximum size of ${humanReadableSize(SECRET_SIZE_LIMIT)}!`});
         }
 
+        var savedFile = await file.writeSecretFile(f.buffer, passphrase, method, secretId, i)
+
+        if (!savedFile.success) {
+          return next({status: 500, message: 'Unable to save encrypted file to disk.', error: savedFile.error})
+        }
+
+        //Check that the total isn't too big either
+        totalFileSize += f.buffer.length;
+        if (totalFileSize > SECRET_SIZE_LIMIT) {
+          return next({message: `Total uploaded files in secret exceeds maximum size of ${humanReadableSize(SECRET_SIZE_LIMIT)}!`});
+        }
+
           return next({status: 500, message: 'Unable to save encrypted file to disk.', error: savedFile.error})
         }
         fileMetadata.push({
