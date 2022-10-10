@@ -9,7 +9,7 @@ RUN chown node /home/node/app/
 RUN npm i -g envsub
 USER node
 COPY --chown=node:node . /home/node/app/.
-RUN npm install
+RUN npm ci
 ENV API_HOST_NAME=$HOST_NAME
 RUN envsub /home/node/app/src/helpers/constants.js /home/node/app/src/helpers/constants.js
 
