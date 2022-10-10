@@ -8,11 +8,24 @@
 */
 
 /*
-Convert an ArrayBuffer into a string
-from https://developer.chrome.com/blog/how-to-convert-arraybuffer-to-and-from-string/
+    Convert an ArrayBuffer into a string
+    from https://developer.chrome.com/blog/how-to-convert-arraybuffer-to-and-from-string/
 */
 function ab2str(buf) {
   return String.fromCharCode.apply(null, new Uint8Array(buf));
+}
+
+/*
+    Convert an String into a ArrayBuffer
+    from https://developer.chrome.com/blog/how-to-convert-arraybuffer-to-and-from-string/
+*/
+function str2ab(str) {
+    var buf = new ArrayBuffer(str.length*2); // 2 bytes for each char
+    var bufView = new Uint16Array(buf);
+    for (var i=0, strLen=str.length; i < strLen; i++) {
+    bufView[i] = str.charCodeAt(i);
+    }
+    return buf;
 }
 
 export async function generateKeyPair() {
@@ -43,8 +56,9 @@ export async function generateKeyPair() {
     return { privateKey: privateKeyPem, publicKey: publicKeyPem }
 }
 
-export async function generatePublicKey(privateKey) {
-
+export async function privateToPublicKey(privateKey) {
+    console.log(privateKey.replace('-----BEGIN PUBLIC KEY-----\n','').replace('\n-----END PUBLIC KEY-----',''));
+    
 }
 
 export function decryptUsingPrivateKey(buffer, privateKey) {
