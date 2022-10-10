@@ -14,13 +14,13 @@ import { pwnedPassphrase } from '../../helpers/pwned.js'
 import { hasProperty, isBooleanProperty, parseInsecureBoolean } from '../../helpers/validation.js'
 import * as file from '../../modules/file.js'
 
-
 export async function secretSubmit(req, res, next) {
   const METHODS = cipher.methods
   const DEFAULT_METHOD = 'aes'
   const DEFAULT_EXPIRY = 1800 // 30 minutes
   const MAX_EXPIRY = 604800   // 7 days
   const DEFAULT_ACCESS_ATTEMPTS = 5
+  const SECRET_SIZE_LIMIT = process.env.MAXIMUM_BODY_SIZE ? file.humanUnreadableSize(process.env.MAXIMUM_BODY_SIZE) : 2097152 // default to 2MiB in bytes
 
   try {
     var secretId = cipher.generateIdentifier()
@@ -73,20 +73,29 @@ export async function secretSubmit(req, res, next) {
     if (!encryptedText)
       return next({message: 'Your message could not be encrypted; please try again checking your parameters are correct.'})
 
-    var fileMetadata = [];
+    var fileMetadata = []
+    var totalFileSize = 0
     if (req.files && Object.keys(req.files).length) {
       if (typeof req.files !== 'object')
         return next({message: 'Files must be a multer object.'})
 
       for (var i = 0; i < req.files.length; i++) {
         var f = req.files[i]
+
+        // check whether total file size is over limit
+        // if so, we drop the secret and delete any files we've stored
+        totalFileSize += f.buffer.length
+        if (totalFileSize > SECRET_SIZE_LIMIT) {
+          file.deleteSecretFileDirectory(secretId)
+          return next({message: `Total uploaded files in secret exceeds maximum size of ${file.humanReadableSize(SECRET_SIZE_LIMIT)}.`})
+        }
+
         var originalName = f.originalname
         var encryptedFileName = cipher.encrypt(originalName, passphrase, method)
 
         var savedFile = await file.writeSecretFile(f.buffer, passphrase, method, secretId)
-        if (!savedFile.success) {
+        if (!savedFile.success)
           return next({status: 500, message: 'Unable to save encrypted file to disk.', error: savedFile.error})
-        }
 
         fileMetadata.push({
           encrypted_file_name: encryptedFileName,

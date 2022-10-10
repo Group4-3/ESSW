@@ -18,18 +18,18 @@ const FILE_COUNT_LIMIT = process.env.FILE_COUNT_LIMIT ? process.env.FILE_COUNT_L
 export const fileAttacher = multer({
   storage: multer.memoryStorage(),
   limits: {
-    fileSize: 2097152
+    fileSize: process.env.MAXIMUM_SIZE_LIMIT ? process.env.MAXIMUM_SIZE_LIMIT : 2097152
   }
 }).array('files', FILE_COUNT_LIMIT)
 
-function initialiseSecretStorage() { //Initialise, and ensure that the secret storage directory is valid
-  if (!fs.existsSync(SECRET_STORAGE_DIRECTORY)) { //Create directory if the secret storage directory doesn't exist
-    console.warn('Secret storage directory %s does not exist, creating.', SECRET_STORAGE_DIRECTORY);
-    fs.mkdirSync(SECRET_STORAGE_DIRECTORY);
-  }
-}
+function initialiseSecretStorage() {
+  // clean out stale secrets (if any) and create a fresh storage directory
+  if (fs.existsSync(SECRET_STORAGE_DIRECTORY))
+    fs.rmdirSync(SECRET_STORAGE_DIRECTORY, { recursive: true })
 
-initialiseSecretStorage();
+  fs.mkdirSync(SECRET_STORAGE_DIRECTORY)
+}
+initialiseSecretStorage()
 
 export async function writeSecretFile(buffer, passphrase, method, parentId = undefined, fileId = cipher.generateIdentifier()) {
   try {
@@ -74,16 +74,37 @@ export async function readSecretFile(filePath, passphrase, method) {
 
 export async function deleteSecretFileDirectory(id) {
   try {
-    let secretDirectory = [SECRET_STORAGE_DIRECTORY, id].join('/')
-    if (!fs.existsSync(secretDirectory)) {
-      return { success: false, error: 'Directory does not exist' }
-    }
+    var secretDirectory = [SECRET_STORAGE_DIRECTORY, id].join('/')
 
-    fileCount = fs.readdirSync(secretDirectory).length
-    fs.rmdirSync(secret_path, { recursive: true })
+    if (!fs.existsSync(secretDirectory))
+      return { success: false, error: 'Directory does not exist' }
+
+    var fileCount = fs.readdirSync(secretDirectory).length
+    fs.rmdirSync(secretDirectory, { recursive: true })
 
     return { success: true, deleted_file_count: fileCount }
   } catch (err) {
     return { success: false, error: err.message }
   }
+}
+
+// copied from client/src/helpers/file.js, and converted to function
+export function humanReadableSize(bytes) {
+  var size = parseInt(bytes)
+  for (var unit of ['B', 'KB', 'MB', 'GB']) {
+    if (size < 1024) return `${size.toFixed(1)} ${unit}`
+    size /= 1024.0
+  }
+
+  return size
+}
+
+// https://stackoverflow.com/questions/6974614/how-to-convert-human-readable-memory-size-into-bytes
+export function humanUnreadableSize(text) {
+  var powers = { 'k': 1, 'm': 2, 'g': 3, 't': 4 }
+  var regex = /(\d+(?:\.\d+)?)\s?(k|m|g|t)/i
+
+  var res = regex.exec(text)
+
+  return res[1] * Math.pow(1024, powers[res[2].toLowerCase()]) // assuming bytes as 1024, not 1000
 }
