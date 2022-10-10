@@ -42,7 +42,7 @@ export function encrypt(body, passphrase, method = 'aes') {
       oaepHash: 'sha512'
     }
 
-    return publicEncrypt(pubEncKey, Buffer.from(body))
+    return publicEncrypt(pubEncKey, Buffer.from(body)).toString("base64");
   }
 
   var nonce = crypto.lib.WordArray.random(nonceSize)
