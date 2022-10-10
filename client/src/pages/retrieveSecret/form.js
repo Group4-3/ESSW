@@ -13,7 +13,9 @@ const Form = ({formResponse}) => {
   const [formData, updateFormData] = React.useState(Object.freeze({
     passphrase: ''
   }));
-  var [isPubkey] = React.useState(false);
+  var [isPubkey, updateIsPublicKey] = React.useState(Object.freeze({
+    checked: false
+  }));
 
   const handleInputChange = (e) => {
     updateFormData({
@@ -28,12 +30,16 @@ const Form = ({formResponse}) => {
     try {
       var formBody = [];
       for (const [key, value] of Object.entries(formData)) {
-        if (key === 'passphrase') {
-          Cryptography.privateToPublicKey(value);
+        var encodedKey = encodeURIComponent(key)
+        var encodedValue
+        if (key === 'passphrase' && Object.entries(isPubkey)[0][1] === true) {
+          var pubKey = await Cryptography.privateToPublicKey(value)
+          encodedValue = encodeURIComponent(pubKey)
         }
-        var encodedKey = encodeURIComponent(key);
-        var encodedValue = encodeURIComponent(value);
-        formBody.push(encodedKey + "=" + encodedValue);
+        else {
+          encodedValue = encodeURIComponent(value)
+        }
+        formBody.push(encodedKey + "=" + encodedValue)
       };
       formBody = formBody.join("&");
 
@@ -46,6 +52,7 @@ const Form = ({formResponse}) => {
       });
 
       let json = await res.json();
+      console.log(json.message)
       if (res.status === 200) {
         formResponse(json);
       } else {
@@ -59,6 +66,10 @@ const Form = ({formResponse}) => {
 
   const handlePubkeyChange = async (e) => {
     isPubkey = e.target.checked;
+    updateIsPublicKey({
+      ...isPubkey,
+      ['checked']: e.target.checked
+    });
   };
 
   return (
@@ -82,16 +93,16 @@ const Form = ({formResponse}) => {
             </div>
             <div className="row">
               <div className="col-sm-10">
-                {isPubkey === false &&
+                {Object.entries(isPubkey)[0][1] === false &&
                   <>
                     <label for="passphrase" className="col-sm-2 col-form-label">Passphrase</label>
                     <input type="password" id="passphrase" name="passphrase" onChange={handleInputChange} className="form-control"/>
                   </>
                 }
-                {isPubkey === true &&
+                {Object.entries(isPubkey)[0][1] === true &&
                   <>
-                    <label for="passphrase" className="col-sm-2 col-form-label">Private Key (Will never be sent to the server!)</label>
-                    <input type="password" id="passphrase" name="passphrase" onChange={handleInputChange} className="form-control"/>
+                    <label for="passphrase" className="col-sm-10 col-form-label">Private Key (Will never be sent to the server!)</label>
+                    <textarea rows='7' cols='80' id='passphrase' name='passphrase' placeholder='-----BEGIN PUBLIC KEY-----&#10;MIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAvk3&#10;...&#10;-----END PUBLIC KEY-----' onChange={handleInputChange} className='form-control'/>
                   </>
                 }
               </div>
