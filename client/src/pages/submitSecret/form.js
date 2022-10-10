@@ -163,7 +163,7 @@ const Form = ({formResponse}) => {
           <div className='col-12'>
             {formData.method !== 'publickey' &&
               <div className='row g-3'>
-                <label id='div-input-pass-pub-label' for='passphrase' className='col-sm-2 col-form-label'>Secret key</label>
+                <label id='div-input-pass-pub-label' for='passphrase' className='col-sm-2 col-form-label'>Passphrase</label>
                 <div id='div-input-pass-pub' className='col-sm-10'>
                   <input type='password' id='passphrase' name='passphrase' onChange={handleInputChange} className='form-control'/>
                 </div>
