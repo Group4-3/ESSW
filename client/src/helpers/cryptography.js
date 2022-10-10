@@ -7,12 +7,15 @@
 
 */
 
+
+import { JSEncrypt } from "jsencrypt";
+
 /*
-    Convert an ArrayBuffer into a string
+    Convert an ArrayBuffer into a String
     from https://developer.chrome.com/blog/how-to-convert-arraybuffer-to-and-from-string/
 */
-function ab2str(buf) {
-  return String.fromCharCode.apply(null, new Uint8Array(buf));
+function ab2str(buffer){
+  return String.fromCharCode.apply(null, Array.from(new Uint8Array(buffer)));      
 }
 
 /*
@@ -20,35 +23,32 @@ function ab2str(buf) {
     from https://developer.chrome.com/blog/how-to-convert-arraybuffer-to-and-from-string/
 */
 function str2ab(str) {
-    var buf = new ArrayBuffer(str.length*2); // 2 bytes for each char
-    var bufView = new Uint16Array(buf);
-    for (var i=0, strLen=str.length; i < strLen; i++) {
+  const buf = new ArrayBuffer(str.length);
+  const bufView = new Uint8Array(buf);
+  for (let i = 0, strLen = str.length; i < strLen; i++) {
     bufView[i] = str.charCodeAt(i);
-    }
-    return buf;
+  }
+  return buf;
 }
 
 export async function generateKeyPair() {
     var keyPair = await window.crypto.subtle.generateKey(
         {
-            name: "RSA-OAEP",
+            name: 'RSA-OAEP',
             modulusLength: 4096,
             publicExponent: new Uint8Array([0x01, 0x00, 0x01]),
-            hash: {name: "SHA-512"}
+            hash: {name: 'SHA-512'}
         },
         true,
-        ["encrypt", "decrypt"]
+        ['encrypt', 'decrypt']
     );
 
-    // Test
-
-
-    var privateKey = await window.crypto.subtle.exportKey("pkcs8", keyPair.privateKey)
+    var privateKey = await window.crypto.subtle.exportKey('pkcs8', keyPair.privateKey)
     const privateKeyString = ab2str(privateKey)
     const privateKeyBase64 = window.btoa(privateKeyString)
     const privateKeyPem = `-----BEGIN PRIVATE KEY-----\n${privateKeyBase64}\n-----END PRIVATE KEY-----`
 
-    var publicKey = await window.crypto.subtle.exportKey("spki", keyPair.publicKey)
+    var publicKey = await window.crypto.subtle.exportKey('spki', keyPair.publicKey)
     const publicKeyString = ab2str(publicKey)
     const publicKeyBase64 = window.btoa(publicKeyString)
     const publicKeyPem = `-----BEGIN PUBLIC KEY-----\n${publicKeyBase64}\n-----END PUBLIC KEY-----`
@@ -57,27 +57,9 @@ export async function generateKeyPair() {
 }
 
 export async function privateToPublicKey(privateKey) {
-    // Remove PEM headers
-    const privKeyBase64 = privateKey.replace('-----BEGIN PRIVATE KEY-----','').replace('-----END PRIVATE KEY-----','')
-    
-    // Encode string
-    const privKeyString = window.atob(privKeyBase64)
-
-    // Convert string to array buffer
-    const privKey = str2ab(privKeyString)
-
-    var keyPair = await window.crypto.subtle.importKey("pkcs8", privKey, {
-            name: "RSA-OAEP",
-            hash: "SHA-512"
-        }, true, ["encrypt"])
-    console.log(keyPair)
-
-    //var publicKey = await window.crypto.subtle.exportKey("spki", keyPair.publicKey)
-    //const publicKeyString = ab2str(publicKey)
-    //const publicKeyBase64 = window.btoa(publicKeyString)
-    //const publicKeyPem = `-----BEGIN PUBLIC KEY-----\n${publicKeyBase64}\n-----END PUBLIC KEY-----`
-
-    //return publicKeyPem;
+    var key = new JSEncrypt()
+    key.setPrivateKey(privateKey)
+    return key.getPublicKey()
 }
 
 export function decryptUsingPrivateKey(buffer, privateKey) {
