@@ -6,6 +6,7 @@ import './scss/index.scss';
 import Layout from './components/layout';
 import NotFound from './pages/notFound';
 import SubmitSecret from './pages/submitSecret';
+import RetrieveSecret from './pages/retrieveSecret/index';
 
 const root = ReactDOM.createRoot(document.getElementById('root'))
 root.render(
@@ -14,6 +15,7 @@ root.render(
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<SubmitSecret />} />
+          <Route path="/secret/:id"  element={<RetrieveSecret/>} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
