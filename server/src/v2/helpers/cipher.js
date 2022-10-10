@@ -29,18 +29,18 @@ export function encrypt(body, passphrase, method = 'aes') {
   if (!methods.includes(method))
     return false
 
-  if ( method === 'publickey' ) {
-    return publicEncrypt(
-      {
-        key: passphrase,
-        oaepHash: 'sha256',
-      },
-      Buffer.from(body)
-    )
-  }
-  if (method === 'none') {
+  if (method === 'none')
     return body
+
+  if (method === 'publickey') {
+    var pubEncKey = {
+      key: passphrase,
+      oaepHash: 'sha256'
+    }
+
+    return publicEncrypt(pubEncKey, Buffer.from(body))
   }
+
   var nonce = crypto.lib.WordArray.random(nonceSize)
   var key = createKey(passphrase, nonce)
   var config = {
@@ -64,10 +64,12 @@ export function decrypt(body, passphrase, method = 'aes') {
   if (!methods.includes(method))
     return false
 
-  if (method === 'publickey')
+  if (method === 'none')
     return body
 
-  if (method === 'none')
+  // decryption needs to be done by the client using the
+  // corresponding private key to the public key used to encrypt
+  if (method === 'publickey')
     return body
 
   var nonce = crypto.enc.Hex.parse(body.substr(0, nonceSize*2))

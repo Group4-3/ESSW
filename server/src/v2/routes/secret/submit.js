@@ -34,24 +34,23 @@ export async function secretSubmit(req, res, next) {
     var method = hasProperty(req.body, 'method') ? req.body.method.toLowerCase() : DEFAULT_METHOD
     var usingPassphraselessMethod = METHODS_NO_PASSPHRASE.includes(method)
 
-    // Passphrase referes to both the password and public key if the public key item is selected
+    // passphrase referes to both the password and public key if the public key item is selected
     if (!hasProperty(req.body, 'passphrase'))
       return next({message: 'Missing required body param: `passphrase`.'})
     var passphrase = req.body.passphrase.toString()
 
-    if(method === 'publickey') {
+    if (method === 'publickey') {
       var pubkeyRegex = /-{5}BEGIN PUBLIC KEY-{5}.*-{5}END PUBLIC KEY-{5}/s
-      if(! pubkeyRegex.test(passphrase)) {
+      if (!pubkeyRegex.test(passphrase))
         return next({message: 'Public key format does not match the format of X.509 SubjectPublicKeyInfo/OpenSSL PEM public key.'})
-      }
     }
 
     if (hasProperty(req.body, 'allow_insecure_passphrase') && !isBooleanProperty(req.body.allow_insecure_passphrase))
       return next({message: 'Param `allow_insecure_passphrase` must be of type Boolean.'})
     var allowInsecurePassphrase = hasProperty(req.body, 'allow_insecure_passphrase') ? parseInsecureBoolean(req.body.allow_insecure_passphrase) : false
 
-    // Check if the Method being used requires a passphrase
-    if ( ! (allowInsecurePassphrase || usingPassphraselessMethod) ) {
+    // check if the Method being used requires a passphrase
+    if (!(allowInsecurePassphrase || usingPassphraselessMethod)) {
       var pwned = await pwnedPassphrase(passphrase)
       if (pwned)
         return next({message: 'Passphrase has been pwned (leaked online); please use something else.'})
@@ -89,8 +88,8 @@ export async function secretSubmit(req, res, next) {
     var fileMetadata = []
     var totalFileSize = 0
     if (req.files && Object.keys(req.files).length) {
-      if(method === 'publickey')
-        return next({message: 'File upload is not supported by public key encryption yet.'})
+      if (method === 'publickey')
+        return next({message: 'File upload is not supported by public key encryption.'})
 
       if (typeof req.files !== 'object')
         return next({message: 'Files must be a multer object.'})
