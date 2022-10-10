@@ -52,7 +52,10 @@ export async function generateKeyPair() {
     var key = new JSEncrypt()
     key.setPrivateKey(privateKeyPem)
 
-    return { privateKey: key.getPrivateKey(), publicKey: key.getPublicKey() }
+    return { 
+        privateKey: key.getPrivateKey().replace('-----BEGIN RSA PRIVATE KEY-----','-----BEGIN PRIVATE KEY-----').replace('-----END RSA PRIVATE KEY-----','-----END PRIVATE KEY-----'), 
+        publicKey: key.getPublicKey() 
+    }
 }
 
 export async function privateToPublicKey(privateKey) {
