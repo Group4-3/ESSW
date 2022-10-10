@@ -102,7 +102,7 @@ const Form = ({formResponse}) => {
                 {Object.entries(isPubkey)[0][1] === true &&
                   <>
                     <label for="passphrase" className="col-sm-10 col-form-label">Private Key (Will never be sent to the server!)</label>
-                    <textarea rows='7' cols='80' id='passphrase' name='passphrase' placeholder='-----BEGIN PUBLIC KEY-----&#10;MIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAvk3&#10;...&#10;-----END PUBLIC KEY-----' onChange={handleInputChange} className='form-control'/>
+                    <textarea rows='7' cols='80' id='passphrase' name='passphrase' placeholder='-----BEGIN PRIVATE KEY-----&#10;MIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAvk3&#10;...&#10;-----END PRIVATE KEY-----' onChange={handleInputChange} className='form-control'/>
                   </>
                 }
               </div>
