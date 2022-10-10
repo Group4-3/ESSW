@@ -28,9 +28,6 @@ export async function secretSubmit(req, res, next) {
     if (!hasProperty(req.body, 'text') && !(req.files && Object.keys(req.files).length))
       return next({message: 'Missing required body param: `text` OR `file` (must use one).'})
 
-    if (hasProperty(req.body, 'length') && req.body.length > SECRET_SIZE_LIMIT)
-      return next({message: 'Secret size beyond limit of ' + file.humanReadableSize(SECRET_SIZE_LIMIT)})
-
     if (!hasProperty(req.body, 'passphrase'))
       return next({message: 'Missing required body param: `passphrase`.'})
     var passphrase = req.body.passphrase.toString()
