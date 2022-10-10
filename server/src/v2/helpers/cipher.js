@@ -20,6 +20,10 @@ export function generateIdentifier() {
   return crypto.lib.WordArray.random(idLength).toString()
 }
 
+export function generateChecksum(content) {
+  return crypto.MD5(content).toString()
+}
+
 export function encrypt(body, passphrase, method = 'aes') {
   if (!methods.includes(method))
     return false
