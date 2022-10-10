@@ -14,33 +14,13 @@ import { pwnedPassphrase } from '../../helpers/pwned.js'
 import { hasProperty, isBooleanProperty, parseInsecureBoolean } from '../../helpers/validation.js'
 import * as file from '../../modules/file.js'
 
-
-async function humanUnreadableSize(text) { //https://stackoverflow.com/questions/6974614/how-to-convert-human-readable-memory-size-into-bytes
-  var powers = { 'k': 1, 'm': 2, 'g': 3, 't': 4 };
-  var regex = /(\d+(?:\.\d+)?)\s?(k|m|g|t)/i;
-
-  var res = regex.exec(text);
-
-  return res[1] * Math.pow(1024, powers[res[2].toLowerCase()]); //Assuming bytes as 1024, not 1000
-}
-
-async function humanReadableSize(bytes) { //Copied from client/src/helpers/file.js, and converted to function 
-  let size = parseInt(bytes)
-  for (let unit of ['B', 'KB', 'MB', 'GB']) {
-    if (size < 1024) return `${size.toFixed(1)} ${unit}`
-    size /= 1024.0
-  }
-
-  return size;
-}
-
 export async function secretSubmit(req, res, next) {
   const METHODS = cipher.methods
   const DEFAULT_METHOD = 'aes'
   const DEFAULT_EXPIRY = 1800 // 30 minutes
   const MAX_EXPIRY = 604800   // 7 days
   const DEFAULT_ACCESS_ATTEMPTS = 5
-  const SECRET_SIZE_LIMIT = process.env.MAXIMUM_BODY_SIZE ? humanUnreadableSize(process.env.MAXIMUM_BODY_SIZE) : 2097152; //Default to 2MiB in bytes
+  const SECRET_SIZE_LIMIT = process.env.MAXIMUM_BODY_SIZE ? file.humanUnreadableSize(process.env.MAXIMUM_BODY_SIZE) : 2097152 // default to 2MiB in bytes
 
   try {
     var secretId = cipher.generateIdentifier()
@@ -49,7 +29,7 @@ export async function secretSubmit(req, res, next) {
       return next({message: 'Missing required body param: `text` OR `file` (must use one).'})
 
     if (hasProperty(req.body, 'length') && req.body.length > SECRET_SIZE_LIMIT)
-      return next({ message: `Secret size beyond limit of ${humanReadableSize(SECRET_SIZE_LIMIT)}.` });
+      return next({message: 'Secret size beyond limit of ' + file.humanReadableSize(SECRET_SIZE_LIMIT)})
 
     if (!hasProperty(req.body, 'passphrase'))
       return next({message: 'Missing required body param: `passphrase`.'})
@@ -96,31 +76,30 @@ export async function secretSubmit(req, res, next) {
     if (!encryptedText)
       return next({message: 'Your message could not be encrypted; please try again checking your parameters are correct.'})
 
-    //File operations
-    var fileMetadata = [];
-    var totalFileSize = 0;
+    var fileMetadata = []
+    var totalFileSize = 0
     if (req.files && Object.keys(req.files).length) {
       if (typeof req.files !== 'object')
         return next({message: 'Files must be a multer object.'})
 
       for (var i = 0; i < req.files.length; i++) {
         var f = req.files[i]
+
+        // check whether total file size is over limit
+        // if so, we drop the secret and delete any files we've stored
+        totalFileSize += f.buffer.length
+        if (totalFileSize > SECRET_SIZE_LIMIT) {
+          file.deleteSecretFileDirectory(secretId)
+          return next({message: `Total uploaded files in secret exceeds maximum size of ${file.humanReadableSize(SECRET_SIZE_LIMIT)}.`})
+        }
+
         var originalName = f.originalname
         var encryptedFileName = cipher.encrypt(originalName, passphrase, method)
 
         var savedFile = await file.writeSecretFile(f.buffer, passphrase, method, secretId)
-        if (!savedFile.success) {
+        if (!savedFile.success)
           return next({status: 500, message: 'Unable to save encrypted file to disk.', error: savedFile.error})
-        }
 
-        //Check that the total isn't too big either
-        totalFileSize += f.buffer.length;
-        if (totalFileSize > SECRET_SIZE_LIMIT) {
-          return next({message: `Total uploaded files in secret exceeds maximum size of ${humanReadableSize(SECRET_SIZE_LIMIT)}!`});
-        }
-
-        //   return next({status: 500, message: 'Unable to save encrypted file to disk.', error: savedFile.error})
-        // }
         fileMetadata.push({
           encrypted_file_name: encryptedFileName,
           encoding: f.encoding,
@@ -130,7 +109,8 @@ export async function secretSubmit(req, res, next) {
           location: savedFile.path
         })
       }
-    fileMetadata = fileMetadata.length > 0 ? JSON.stringify(fileMetadata) : "";
+    }
+    fileMetadata = JSON.stringify(fileMetadata)
 
     var hashedPassphrase = await bcrypt.hash(passphrase, 10).then(result => {
       return result
@@ -154,7 +134,6 @@ export async function secretSubmit(req, res, next) {
     } else {
       return next({status: 500, message: 'Unable to save secret.', error: transaction.error})
     }
-  } 
   } catch (err) {
     return next({status: 500, error: err.message})
   }
