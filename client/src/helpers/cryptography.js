@@ -57,8 +57,27 @@ export async function generateKeyPair() {
 }
 
 export async function privateToPublicKey(privateKey) {
-    console.log(privateKey.replace('-----BEGIN PUBLIC KEY-----\n','').replace('\n-----END PUBLIC KEY-----',''));
+    // Remove PEM headers
+    const privKeyBase64 = privateKey.replace('-----BEGIN PRIVATE KEY-----','').replace('-----END PRIVATE KEY-----','')
     
+    // Encode string
+    const privKeyString = window.atob(privKeyBase64)
+
+    // Convert string to array buffer
+    const privKey = str2ab(privKeyString)
+
+    var keyPair = await window.crypto.subtle.importKey("pkcs8", privKey, {
+            name: "RSA-OAEP",
+            hash: "SHA-512"
+        }, true, ["encrypt"])
+    console.log(keyPair)
+
+    //var publicKey = await window.crypto.subtle.exportKey("spki", keyPair.publicKey)
+    //const publicKeyString = ab2str(publicKey)
+    //const publicKeyBase64 = window.btoa(publicKeyString)
+    //const publicKeyPem = `-----BEGIN PUBLIC KEY-----\n${publicKeyBase64}\n-----END PUBLIC KEY-----`
+
+    //return publicKeyPem;
 }
 
 export function decryptUsingPrivateKey(buffer, privateKey) {

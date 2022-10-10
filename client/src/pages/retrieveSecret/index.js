@@ -1,5 +1,6 @@
 import React from 'react';
 import * as Constants from "../../helpers/constants.js";
+import * as Cryptography from "../../helpers/cryptography.js";
 import {
   useParams
 } from "react-router-dom";
@@ -10,7 +11,7 @@ const RetrieveSecret = ({formResponse}) => {
   const [formData, updateFormData] = React.useState(Object.freeze({
     passphrase: '',
   }));
-  const [isPubkey] = React.useState(false);
+  var [isPubkey] = React.useState(false);
 
   const handleInputChange = (e) => {
     updateFormData({
@@ -27,9 +28,12 @@ const RetrieveSecret = ({formResponse}) => {
     try {
       var formBody = [];
       for (const [key, value] of Object.entries(formData)) {
-          var encodedKey = encodeURIComponent(key);
-          var encodedValue = encodeURIComponent(value);
-          formBody.push(encodedKey + "=" + encodedValue);
+        if(key === 'passphrase'){
+          Cryptography.privateToPublicKey(value);
+        }
+        var encodedKey = encodeURIComponent(key);
+        var encodedValue = encodeURIComponent(value);
+        formBody.push(encodedKey + "=" + encodedValue);
       };
       formBody = formBody.join("&");
 
@@ -53,6 +57,10 @@ const RetrieveSecret = ({formResponse}) => {
     };
   }
 
+  const handlePubkeyChange = async (e) => {
+    isPubkey = e.target.checked
+  }
+
   return (
     <>
       <h1>View Secret [{id}]</h1>
@@ -60,7 +68,6 @@ const RetrieveSecret = ({formResponse}) => {
         <div className='alert alert-danger'>{errorMessage}</div>
       )}
     <form onSubmit={handleSubmit}>
-        
       <div className='row g-3'>
         <div id="files-list" className="row row-cols-4 g-1 mt-1"></div>
         <div className="col">
@@ -68,10 +75,10 @@ const RetrieveSecret = ({formResponse}) => {
             <label for="pubkey" className="col-sm-2 col-form-label">Passphrase</label>
             <div className='col-sm-1'>
               <div className='form-check form-switch row' style={{justifyContent: 'center'}}>
-                <input className='form-check-input' type='checkbox' id='pubkey' name='pubkey' onChange={e => isPubkey(e.target.checked)} style={{width: '50%'}} />
+                <input className='form-check-input' type='checkbox' id='pubkey' name='pubkey' onChange={handlePubkeyChange} style={{width: '50%'}} />
               </div>
             </div>
-            <label for="pubkey" className="col-sm-2 col-form-label">Public Key</label>
+            <label for="pubkey" className="col-sm-2 col-form-label">Private Key</label>
           </div>
           <div className="row">
             <div className="col-sm-10">
