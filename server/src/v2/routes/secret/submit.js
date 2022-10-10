@@ -14,14 +14,14 @@ import { pwnedPassphrase } from '../../helpers/pwned.js'
 import { hasProperty, isBooleanProperty, parseInsecureBoolean } from '../../helpers/validation.js'
 import * as file from '../../modules/file.js'
 
-
 export async function secretSubmit(req, res, next) {
   const METHODS = cipher.methods
+  const METHODS_NO_PASSPHRASE = ['publickey']
   const DEFAULT_METHOD = 'aes'
   const DEFAULT_EXPIRY = 1800 // 30 minutes
   const MAX_EXPIRY = 604800   // 7 days
   const DEFAULT_ACCESS_ATTEMPTS = 5
-  const METHODS_NO_PASSPHRASE = ['publickey']
+  const SECRET_SIZE_LIMIT = process.env.MAXIMUM_BODY_SIZE ? file.humanUnreadableSize(process.env.MAXIMUM_BODY_SIZE) : 2097152 // default to 2MiB in bytes
 
   try {
     var secretId = cipher.generateIdentifier()
@@ -80,13 +80,14 @@ export async function secretSubmit(req, res, next) {
       attempts: hasProperty(req.body, 'ip_based_access_attempts') ? {} : 0
     })
 
-    var text = hasProperty(req.body, 'text') ? textUtils.escape(req.body.text.toString()) : ''
+    var text = hasProperty(req.body, 'text') ? textUtils.escape(req.body.text.toString()) : ' '
     var encryptedText = cipher.encrypt(text, passphrase, method)
-    
+
     if (!encryptedText)
       return next({message: 'Your message could not be encrypted; please try again checking your parameters are correct.'})
 
-    var fileMetadata = [];
+    var fileMetadata = []
+    var totalFileSize = 0
     if (req.files && Object.keys(req.files).length) {
       if(method === 'publickey')
         return next({message: 'File upload is not supported by public key encryption yet.'})
@@ -96,18 +97,25 @@ export async function secretSubmit(req, res, next) {
 
       for (var i = 0; i < req.files.length; i++) {
         var f = req.files[i]
+
+        // check whether total file size is over limit
+        // if so, we drop the secret and delete any files we've stored
+        totalFileSize += f.buffer.length
+        if (totalFileSize > SECRET_SIZE_LIMIT) {
+          file.deleteSecretFileDirectory(secretId)
+          return next({message: `Total uploaded files in secret exceeds maximum size of ${file.humanReadableSize(SECRET_SIZE_LIMIT)}.`})
+        }
+
         var originalName = f.originalname
         var encryptedFileName = cipher.encrypt(originalName, passphrase, method)
 
-        var savedFile = await file.writeSecretFile(f.buffer, passphrase, method, secretId, i)
-        if (!savedFile.success) {
+        var savedFile = await file.writeSecretFile(f.buffer, passphrase, method, secretId)
+        if (!savedFile.success)
           return next({status: 500, message: 'Unable to save encrypted file to disk.', error: savedFile.error})
-        }
 
         fileMetadata.push({
           encrypted_file_name: encryptedFileName,
           encoding: f.encoding,
-          extension: originalName.substring(originalName.lastIndexOf('.')+1, originalName.length) || "",
           mimetype: f.mimetype,
           size: f.size,
           checksum: savedFile.checksum,
@@ -115,7 +123,7 @@ export async function secretSubmit(req, res, next) {
         })
       }
     }
-    fileMetadata = fileMetadata.length > 0 ? JSON.stringify(fileMetadata) : "";
+    fileMetadata = JSON.stringify(fileMetadata)
 
     var hashedPassphrase = await bcrypt.hash(passphrase, 10).then(result => {
       return result
