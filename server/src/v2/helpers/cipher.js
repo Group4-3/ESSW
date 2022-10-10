@@ -7,6 +7,7 @@
 */
 
 import crypto from 'crypto-js'
+import { publicEncrypt } from 'crypto'
 
 const idLength = 8/2
 const keySize = 256/32
@@ -14,7 +15,7 @@ const nonceSize = 128/8
 const ivSize = 128/8
 const iterations = 100
 
-export const methods = ['aes', 'des', 'tripledes', 'rabbit', 'rc4', 'rc4drop', 'none']
+export const methods = ['aes', 'des', 'tripledes', 'rabbit', 'rc4', 'rc4drop', 'none', 'publickey']
 
 export function generateIdentifier() {
   return crypto.lib.WordArray.random(idLength).toString()
@@ -28,9 +29,18 @@ export function encrypt(body, passphrase, method = 'aes') {
   if (!methods.includes(method))
     return false
 
-  if (method === 'none')
+  if ( method === 'publickey' ) {
+    return publicEncrypt(
+      {
+        key: passphrase,
+        oaepHash: 'sha256',
+      },
+      Buffer.from(body)
+    )
+  }
+  if (method === 'none') {
     return body
-
+  }
   var nonce = crypto.lib.WordArray.random(nonceSize)
   var key = createKey(passphrase, nonce)
   var config = {
@@ -53,6 +63,9 @@ export function encrypt(body, passphrase, method = 'aes') {
 export function decrypt(body, passphrase, method = 'aes') {
   if (!methods.includes(method))
     return false
+
+  if (method === 'publickey')
+    return body
 
   if (method === 'none')
     return body

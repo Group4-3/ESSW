@@ -64,7 +64,6 @@ export async function secretGet(req, res, next) {
         decryptedFiles.push(targetFile)
       }
 
-      // file.deleteSecretFileDirectory(id)
       db.deleteSecret(id)
 
       return res.status(200).send({text: decryptedText, files: decryptedFiles})
