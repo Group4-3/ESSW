@@ -33,7 +33,20 @@ app.use('/api/v2', v2)
 app.use(express.static('public'))
 
 app.use((err, req, res, next) => {
-  console.log(err)
+  if (err.name === 'MulterError') {
+    const multerCode = err.code
+    const multerErrors = {
+      LIMIT_UNEXPECTED_FILE: { code: 413, message: 'Too many files attached.' },
+      LIMIT_FILE_SIZE: { code: 413, message: 'File size is too large.' }
+    }
+
+    err.status = multerErrors[multerCode].code || 400
+    err.message = multerErrors[multerCode].message || err.message
+  }
+
+  if (['dev', 'development'].includes(process.env.NODE_ENV))
+    console.log(err)
+
   res.status(err.status || 400).json({
     message: err.message || 'An unexpected error occurred.',
     errors: err.error

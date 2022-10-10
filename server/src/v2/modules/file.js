@@ -33,13 +33,14 @@ async function humanReadableSize(bytes) { //Copied from client/src/helpers/file.
 }
 
 const SECRET_STORAGE_DIRECTORY = stripTrailingSlash(process.env.FILE_STORAGE_PATH ? process.env.FILE_STORAGE_PATH : './uploads')
+const FILE_COUNT_LIMIT = process.env.FILE_COUNT_LIMIT ? process.env.FILE_COUNT_LIMIT : 2
 
 export const fileAttacher = multer({
   storage: multer.memoryStorage(),
   limits: {
     fileSize: process.env.MAXIMUM_SIZE_LIMIT ? process.env.MAXIMUM_SIZE_LIMIT : 2097152
   }
-}).array('files', 1)
+}).array('files', FILE_COUNT_LIMIT)
 
 function initialiseSecretStorage() { //Initialise, and ensure that the secret storage directory is valid
   if (!fs.existsSync(SECRET_STORAGE_DIRECTORY)) { //Create directory if the secret storage directory doesn't exist

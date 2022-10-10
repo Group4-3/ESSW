@@ -156,7 +156,6 @@ export async function secretSubmit(req, res, next) {
     }
   } 
   } catch (err) {
-    console.log(err)
     return next({status: 500, error: err.message})
   }
 }
