@@ -33,7 +33,18 @@ app.use('/api/v2', v2)
 app.use(express.static('public'))
 
 app.use((err, req, res, next) => {
-  console.log(err)
+  if (err.name === 'MulterError') {
+    const multerErrors = {
+      'LIMIT_UNEXPECTED_FILE': 400,
+      'LIMIT_FILE_SIZE': 413
+    }
+
+    err.status = multerErrors[err.code] || 400
+  }
+
+  if (['dev', 'development'].includes(process.env.NODE_ENV))
+    console.log(err)
+
   res.status(err.status || 400).json({
     message: err.message || 'An unexpected error occurred.',
     errors: err.error

@@ -19,7 +19,7 @@ export const fileAttacher = multer({
   limits: {
     fileSize: 2097152
   }
-}).array('files', 1)
+}).array('files', 4)
 
 function initialiseSecretStorage() { //Initialise, and ensure that the secret storage directory is valid
   if (!fs.existsSync(SECRET_STORAGE_DIRECTORY)) { //Create directory if the secret storage directory doesn't exist

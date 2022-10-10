@@ -5,31 +5,6 @@ import { app, server } from '../app.js'
 import { methods } from '../src/v2/helpers/cipher.js'
 
 var secretId = undefined
-const createEmptyFileOfSize = (filename, size) => { //https://stackoverflow.com/questions/49433241/creating-an-empty-file-of-a-certain-size
-  return new Promise((resolve, reject) => {
-    if (size < 0) { //Check file size validity
-      reject("File size is invalid");
-      return;
-    }
-    setTimeout(() => {
-      try {
-        //Open file for writing
-
-        fd = openSync(filename, 'w');
-        if (size > 0) {
-          //Write byte at offset to force file expansion, and fill rest of the file with junk
-          fs.writeSync(fd, Buffer.alloc(1), 0, 1, size - 1);
-        }
-        fs.closeSync(fd);
-        resolve(true);
-      }
-      catch (error) {
-        reject(error);
-      }
-      //Creates file after processing JS event loop
-    }, 0)
-  })
-}
 
 describe('Test /secret', () => {
   after(() => {
@@ -146,11 +121,11 @@ describe('Test /secret', () => {
       .attach('files', './test/fixtures/5MB.bin')
       .field('passphrase', '#SuperS3cr3tP@ssw0rd')
       .field('method', 'none')
-      .expect(400)
+      .expect(413)
       .end((err, res) => {
         if (err) return done(err)
         done()
-        })
+      })
     })
 
     it('return successfully for multiple files uploaded', (done) => {
