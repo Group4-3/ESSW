@@ -7,7 +7,7 @@
 */
 
 import crypto from 'crypto-js'
-import { publicEncrypt } from 'crypto'
+import { publicEncrypt, createHash } from 'crypto'
 
 const idLength = 8/2
 const keySize = 256/32
@@ -25,6 +25,10 @@ export function generateChecksum(content) {
   return crypto.MD5(content).toString()
 }
 
+export function getFingerprintFromPublic(publicKey) {
+  return createHash('sha512').update(publicKey).digest('hex')
+}
+
 export function encrypt(body, passphrase, method = 'aes') {
   if (!methods.includes(method))
     return false
@@ -35,7 +39,7 @@ export function encrypt(body, passphrase, method = 'aes') {
   if (method === 'publickey') {
     var pubEncKey = {
       key: passphrase,
-      oaepHash: 'sha256'
+      oaepHash: 'sha512'
     }
 
     return publicEncrypt(pubEncKey, Buffer.from(body))
