@@ -123,7 +123,6 @@ export async function secretSubmit(req, res, next) {
       return next({status: 500, message: 'Unable to save secret.', error: transaction.error})
     }
   } catch (err) {
-    console.log(err)
     return next({status: 500, error: err.message})
   }
 }

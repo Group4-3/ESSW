@@ -121,11 +121,11 @@ describe('Test /secret', () => {
       .attach('files', './test/fixtures/5MB.bin')
       .field('passphrase', '#SuperS3cr3tP@ssw0rd')
       .field('method', 'none')
-      .expect(400)
+      .expect(413)
       .end((err, res) => {
         if (err) return done(err)
         done()
-        })
+      })
     })
 
     it('return successfully for multiple files uploaded', (done) => {
