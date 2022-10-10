@@ -124,7 +124,7 @@ export async function secretSubmit(req, res, next) {
     }
     fileMetadata = JSON.stringify(fileMetadata)
 
-    var hashedPassphrase = await bcrypt.hash(passphrase, 10).then(result => {
+    var hashedPassphrase = await bcrypt.hash(passphrase.replace('\r', '').replace('\n', ''), 10).then(result => {
       return result
     })
 
