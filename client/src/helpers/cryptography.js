@@ -63,4 +63,7 @@ export async function privateToPublicKey(privateKey) {
 }
 
 export function decryptUsingPrivateKey(buffer, privateKey) {
+    var key = new JSEncrypt()
+    key.setPrivateKey(privateKey)
+    return key.decrypt(buffer)
 }
