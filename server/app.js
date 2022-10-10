@@ -34,12 +34,14 @@ app.use(express.static('public'))
 
 app.use((err, req, res, next) => {
   if (err.name === 'MulterError') {
+    const multerCode = err.code
     const multerErrors = {
-      'LIMIT_UNEXPECTED_FILE': 400,
-      'LIMIT_FILE_SIZE': 413
+      LIMIT_UNEXPECTED_FILE: { code: 413, message: 'Too many files attached.' },
+      LIMIT_FILE_SIZE: { code: 413, message: 'File size is too large.' }
     }
 
-    err.status = multerErrors[err.code] || 400
+    err.status = multerErrors[multerCode].code || 400
+    err.message = multerErrors[multerCode].message || err.message
   }
 
   if (['dev', 'development'].includes(process.env.NODE_ENV))

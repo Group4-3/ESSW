@@ -100,7 +100,7 @@ describe('Test /secret', () => {
         })
     })
 
-    it('should return successfully with persisted secret id when using a file', (done) => {
+    it('should return successfully with persisted secret id when uploading a file', (done) => {
       request(app)
         .post('/api/v2/secret/submit')
         .attach('files', './test/fixtures/sample.jpg')
@@ -115,20 +115,7 @@ describe('Test /secret', () => {
         })
     })
 
-    it('fail if very large files are uploaded (assuming file limits are not overstuffed)', (done) => {
-      request(app)
-      .post('/api/v2/secret/submit')
-      .attach('files', './test/fixtures/5MB.bin')
-      .field('passphrase', '#SuperS3cr3tP@ssw0rd')
-      .field('method', 'none')
-      .expect(413)
-      .end((err, res) => {
-        if (err) return done(err)
-        done()
-      })
-    })
-
-    it('return successfully for multiple files uploaded', (done) => {
+    it('should return successfully with persisted secret id when uploading multiple files', (done) => {
       request(app)
         .post('/api/v2/secret/submit')
         .attach('files', './test/fixtures/sample.jpg')
@@ -142,6 +129,34 @@ describe('Test /secret', () => {
           if (err) return done(err)
           done()
         })
+    })
+
+    it('should return an error 413 when an uploading more than the supported file count (default 2)', (done) => {
+      request(app)
+        .post('/api/v2/secret/submit')
+        .attach('files', './test/fixtures/sample.jpg')
+        .attach('files', './test/fixtures/developer_cat.jpg')
+        .attach('files', './test/fixtures/this_is_fine.jpg')
+        .field('passphrase', '#SuperS3cr3tP@ssw0rd')
+        .field('allow_insecure_passphrase', true)
+        .expect(413)
+        .end((err, res) => {
+          if (err) return done(err)
+          done()
+        })
+    })
+
+    it('should return an error 413 when an uploaded file is over the supported file size limit (default 2MB)', (done) => {
+      request(app)
+      .post('/api/v2/secret/submit')
+      .attach('files', './test/fixtures/5MB.bin')
+      .field('passphrase', '#SuperS3cr3tP@ssw0rd')
+      .field('method', 'none')
+      .expect(413)
+      .end((err, res) => {
+        if (err) return done(err)
+        done()
+      })
     })
   })
 

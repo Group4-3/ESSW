@@ -13,7 +13,7 @@ import * as cipher from '../helpers/cipher.js'
 import { stripTrailingSlash } from '../helpers/text.js'
 
 const SECRET_STORAGE_DIRECTORY = stripTrailingSlash(process.env.FILE_STORAGE_PATH ? process.env.FILE_STORAGE_PATH : './uploads')
-const FILE_COUNT_LIMIT = process.env.FILE_COUNT_LIMIT ? process.env.FILE_COUNT_LIMIT : 4; //Default to 4 files
+const FILE_COUNT_LIMIT = process.env.FILE_COUNT_LIMIT ? process.env.FILE_COUNT_LIMIT : 2
 
 export const fileAttacher = multer({
   storage: multer.memoryStorage(),
