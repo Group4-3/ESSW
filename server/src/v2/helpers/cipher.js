@@ -7,7 +7,7 @@
 */
 
 import crypto from 'crypto-js'
-import { publicEncrypt, createHash } from 'crypto'
+import { createHash } from 'crypto'
 
 const idLength = 8/2
 const keySize = 256/32
@@ -33,16 +33,11 @@ export function encrypt(body, passphrase, method = 'aes') {
   if (!methods.includes(method))
     return false
 
-  if (method === 'none')
+  if (method === 'none' || method === 'publickey')
     return body
 
   if (method === 'publickey') {
-    var pubEncKey = {
-      key: passphrase,
-      oaepHash: 'sha512'
-    }
-
-    return publicEncrypt(pubEncKey, Buffer.from(body)).toString("base64");
+    return body
   }
 
   var nonce = crypto.lib.WordArray.random(nonceSize)
