@@ -48,10 +48,10 @@ export async function generateKeyPair() {
     const privateKeyBase64 = window.btoa(privateKeyString)
     const privateKeyPem = `-----BEGIN PRIVATE KEY-----\n${privateKeyBase64}\n-----END PRIVATE KEY-----`
 
-    var publicKey = await window.crypto.subtle.exportKey('spki', keyPair.publicKey)
-    const publicKeyString = ab2str(publicKey)
-    const publicKeyBase64 = window.btoa(publicKeyString)
-    const publicKeyPem = `-----BEGIN PUBLIC KEY-----\n${publicKeyBase64}\n-----END PUBLIC KEY-----`
+    // To ensure same format
+    var key = new JSEncrypt()
+    key.setPrivateKey(privateKeyPem)
+    var publicKeyPem = key.getPublicKey()
 
     return { privateKey: privateKeyPem, publicKey: publicKeyPem }
 }
