@@ -51,9 +51,8 @@ export async function generateKeyPair() {
     // To ensure same format
     var key = new JSEncrypt()
     key.setPrivateKey(privateKeyPem)
-    var publicKeyPem = key.getPublicKey()
 
-    return { privateKey: privateKeyPem, publicKey: publicKeyPem }
+    return { privateKey: key.getPrivateKey(), publicKey: key.getPublicKey() }
 }
 
 export async function privateToPublicKey(privateKey) {
