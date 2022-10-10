@@ -13,13 +13,14 @@ import * as cipher from '../helpers/cipher.js'
 import { stripTrailingSlash } from '../helpers/text.js'
 
 const SECRET_STORAGE_DIRECTORY = stripTrailingSlash(process.env.FILE_STORAGE_PATH ? process.env.FILE_STORAGE_PATH : './uploads')
+const FILE_COUNT_LIMIT = process.env.FILE_COUNT_LIMIT ? process.env.FILE_COUNT_LIMIT : 4; //Default to 4 files
 
 export const fileAttacher = multer({
   storage: multer.memoryStorage(),
   limits: {
     fileSize: 2097152
   }
-}).array('files', 4)
+}).array('files', FILE_COUNT_LIMIT)
 
 function initialiseSecretStorage() { //Initialise, and ensure that the secret storage directory is valid
   if (!fs.existsSync(SECRET_STORAGE_DIRECTORY)) { //Create directory if the secret storage directory doesn't exist
