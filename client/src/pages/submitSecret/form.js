@@ -105,6 +105,10 @@ const Form = ({formResponse}) => {
       for (const [key, value] of Object.entries(formData)) {
         console.log([key, value])
         if (key === 'files') {
+          // skip loading file data if method is set to public key
+          if (formData.method === 'publickey')
+            continue;
+
           for (const file of formData.files) {
             body.append('files', file);
           }
