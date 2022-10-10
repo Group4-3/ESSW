@@ -56,7 +56,7 @@ const Form = ({formResponse}) => {
       if (res.status === 200) {
         // Decrypt if encrypted with public key
         if(Object.entries(isPubkey)[0][1] === true){
-          console.log(Cryptography.decryptUsingPrivateKey(json.text, privateKey))
+          json.text = Cryptography.decryptUsingPrivateKey(json.text, privateKey)
         }
 
         formResponse(json);
