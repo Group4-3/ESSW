@@ -26,13 +26,14 @@ const Form = ({formResponse}) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    var privateKey
     try {
       var formBody = [];
       for (const [key, value] of Object.entries(formData)) {
         var encodedKey = encodeURIComponent(key)
         var encodedValue
         if (key === 'passphrase' && Object.entries(isPubkey)[0][1] === true) {
+          privateKey = value
           var pubKey = await Cryptography.privateToPublicKey(value)
           encodedValue = encodeURIComponent(pubKey)
         }
@@ -52,8 +53,12 @@ const Form = ({formResponse}) => {
       });
 
       let json = await res.json();
-      console.log(json.message)
       if (res.status === 200) {
+        // Decrypt if encrypted with public key
+        if(Object.entries(isPubkey)[0][1] === true){
+          console.log(Cryptography.decryptUsingPrivateKey(json.text, privateKey))
+        }
+
         formResponse(json);
       } else {
         // TODO error message should come from client validations
@@ -74,7 +79,6 @@ const Form = ({formResponse}) => {
 
   return (
     <>
-      <h1>View Secret [{id}]</h1>
       {errorMessage && (
         <div className='alert alert-danger'>{errorMessage}</div>
       )}
