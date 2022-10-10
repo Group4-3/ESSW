@@ -84,7 +84,6 @@ const Form = ({formResponse}) => {
 
   const handleGenerateKeyPair = async (e) => {
     var keyPair = await Cryptography.generateKeyPair()
-    console.log(keyPair)
     document.getElementById('passphrase').value = keyPair.publicKey
     updateFormData({
       ...formData,
@@ -103,7 +102,6 @@ const Form = ({formResponse}) => {
     try {
       let body = new FormData();
       for (const [key, value] of Object.entries(formData)) {
-        console.log([key, value])
         if (key === 'files') {
           // skip loading file data if method is set to public key
           if (formData.method === 'publickey')
@@ -114,8 +112,12 @@ const Form = ({formResponse}) => {
           }
           continue;
         }
-
-        body.append(key, value);
+        // Perform public key encryption on client end
+        else if (key === 'text' && Object.entries(formData)[4][1] === 'publickey') {
+          var pubKey = Object.entries(formData)[2][1]
+          body.append(key, Cryptography.encryptUsingPublicKey(value, pubKey))
+        }
+        body.append(key, value)
       };
       let res = await fetch(Constants.getApiAddress() + '/api/v2/secret/submit', {
         method: 'POST',
