@@ -151,7 +151,7 @@ const Form = ({formResponse}) => {
 
   return (
     <>
-      <h1>Create a secret message</h1>
+      <h1>Share a secret</h1>
       {errorMessage && (
         <div className='alert alert-danger'>{errorMessage}</div>
       )}
@@ -194,7 +194,7 @@ const Form = ({formResponse}) => {
                 <div className='accordion'>
                   <div className='accordion-item'>
                     <div className='accordion-header'>
-                      <button className='accordion-button fw-bold' type='button' data-bs-toggle='collapse' data-bs-target='#advanced-options-menu' aria-expanded='false'>
+                      <button className='accordion-button collapsed fw-bold' type='button' data-bs-toggle='collapse' data-bs-target='#advanced-options-menu' aria-expanded='false'>
                         Advanced Options
                       </button>
                     </div>
@@ -216,9 +216,9 @@ const Form = ({formResponse}) => {
                             </select>
                           </div>
                         </div>
-                        <label for='infinite_access_attempts'>Infinite access attempts</label>
-                        <input className='form-check-input' type='checkbox' id='infinite_access_attempts' aria-expanded='true' data-bs-toggle='collapse' data-bs-target='#access_attempts' name='max_access_attempts' checked/>
-                        {/* Hide access attempt form by default */}
+                        {/* <label for='infinite_access_attempts'>Infinite access attempts</label>
+                         <input className='form-check-input' type='checkbox' id='infinite_access_attempts' aria-expanded='true' data-bs-toggle='collapse' data-bs-target='#access_attempts' name='max_access_attempts' checked/>
+                         {/* Hide access attempt form by default */}
                         <div className='mb-3 row' id='access_attempts'>
                           <label for='max_access_attempts' className='col-sm-6 col-form-label'>
                             Max access attempts

@@ -13,3 +13,5 @@ export function getApiAddress() {
 	const regex = /(\$\{.*\})/
 	return (regex.test(API_HOST_NAME) ? 'http://localhost:3001' : 'https://' + API_HOST_NAME)
 }
+
+export const HOST_NAME = window.location.protocol + "//" + window.location.host;
