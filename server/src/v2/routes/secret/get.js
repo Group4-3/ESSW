@@ -35,7 +35,7 @@ export async function secretGet(req, res, next) {
       return next({message: 'Missing required body param: `passphrase`.'})
     var passphrase = req.body.passphrase.toString()
 
-    if (bcrypt.compareSync(passphrase.replace('\r', '').replace('\n', ''), secret.passphrase)) {
+    if (bcrypt.compareSync(passphrase.replace(/(?:\r\n|\r|\n)/g, ''), secret.passphrase)) {
       var decryptedText = cipher.decrypt(secret.secret_text, passphrase, secret.method)
 
       var decryptedFiles = []
