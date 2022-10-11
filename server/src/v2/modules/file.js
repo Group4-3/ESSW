@@ -66,6 +66,7 @@ export async function readSecretFile(filePath, passphrase, method) {
     var decryptedFileContent = cipher.decrypt(encryptedContent, passphrase, method)
     var buffer = Buffer.from(decryptedFileContent)
 
+    var buffer = Buffer.from(decryptedFileContent, 'base64')
     return { success: true, content: buffer }
   } catch (err) {
     return { success: false, error: err.message }
