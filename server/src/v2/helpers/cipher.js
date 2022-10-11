@@ -7,6 +7,7 @@
 */
 
 import crypto from 'crypto-js'
+import { createHash } from 'crypto'
 
 const idLength = 8/2
 const keySize = 256/32
@@ -14,7 +15,7 @@ const nonceSize = 128/8
 const ivSize = 128/8
 const iterations = 100
 
-export const methods = ['aes', 'des', 'tripledes', 'rabbit', 'rc4', 'rc4drop', 'none']
+export const methods = ['aes', 'des', 'tripledes', 'rabbit', 'rc4', 'rc4drop', 'none', 'publickey']
 
 export function generateIdentifier() {
   return crypto.lib.WordArray.random(idLength).toString()
@@ -24,12 +25,20 @@ export function generateChecksum(content) {
   return crypto.MD5(content).toString()
 }
 
+export function getFingerprintFromPublic(publicKey) {
+  return createHash('sha512').update(publicKey).digest('hex')
+}
+
 export function encrypt(body, passphrase, method = 'aes') {
   if (!methods.includes(method))
     return false
 
-  if (method === 'none')
+  if (method === 'none' || method === 'publickey')
     return body
+
+  if (method === 'publickey') {
+    return body
+  }
 
   var nonce = crypto.lib.WordArray.random(nonceSize)
   var key = createKey(passphrase, nonce)
@@ -55,6 +64,11 @@ export function decrypt(body, passphrase, method = 'aes') {
     return false
 
   if (method === 'none')
+    return body
+
+  // decryption needs to be done by the client using the
+  // corresponding private key to the public key used to encrypt
+  if (method === 'publickey')
     return body
 
   var nonce = crypto.enc.Hex.parse(body.substr(0, nonceSize*2))

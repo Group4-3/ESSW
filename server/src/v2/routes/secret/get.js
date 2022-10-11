@@ -35,7 +35,7 @@ export async function secretGet(req, res, next) {
       return next({message: 'Missing required body param: `passphrase`.'})
     var passphrase = req.body.passphrase.toString()
 
-    if (bcrypt.compareSync(passphrase, secret.passphrase)) {
+    if (bcrypt.compareSync(passphrase.replace(/(?:\r\n|\r|\n)/g, ''), secret.passphrase)) {
       var decryptedText = cipher.decrypt(secret.secret_text, passphrase, secret.method)
 
       var decryptedFiles = []
@@ -50,9 +50,12 @@ export async function secretGet(req, res, next) {
           return next ({status: 500, message: 'Unable to read encrypted file from disk.', error: readFile.error})
         }
 
-        if (targetFile.checksum !== cipher.generateChecksum(readFile.content.toString())) {
-          return next ({status: 500, error: 'Decrypted file checksum does not match the expected hash; has there been some tampering?'})
-        }
+        // FIXME
+        // this isn't comparing the right things and needs to be looked into
+        //
+        // if (targetFile.checksum !== cipher.generateChecksum(readFile.content.toString())) {
+        //   return next ({status: 500, error: 'Decrypted file checksum does not match the expected hash; has there been some tampering?'})
+        // }
 
         targetFile.file_name = fileName
         targetFile.blob = readFile.content
@@ -64,7 +67,6 @@ export async function secretGet(req, res, next) {
         decryptedFiles.push(targetFile)
       }
 
-      // file.deleteSecretFileDirectory(id)
       db.deleteSecret(id)
 
       return res.status(200).send({text: decryptedText, files: decryptedFiles})

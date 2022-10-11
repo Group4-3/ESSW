@@ -33,7 +33,7 @@ initialiseSecretStorage()
 
 export async function writeSecretFile(buffer, passphrase, method, parentId = undefined, fileId = cipher.generateIdentifier()) {
   try {
-    var content = buffer.toString()
+    var content = buffer.toString('base64')
     var checksum = cipher.generateChecksum(content)
     var encryptedFileContent = cipher.encrypt(content, passphrase, method)
 
@@ -64,8 +64,8 @@ export async function readSecretFile(filePath, passphrase, method) {
     var encryptedContent = encryptedBuffer.toString()
     // we can assume that passphrase is correct as validation should have already occurred
     var decryptedFileContent = cipher.decrypt(encryptedContent, passphrase, method)
-    var buffer = Buffer.from(decryptedFileContent)
-
+    
+    var buffer = Buffer.from(decryptedFileContent, 'base64')
     return { success: true, content: buffer }
   } catch (err) {
     return { success: false, error: err.message }

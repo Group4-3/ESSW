@@ -16,6 +16,7 @@ import * as file from '../../modules/file.js'
 
 export async function secretSubmit(req, res, next) {
   const METHODS = cipher.methods
+  const METHODS_NO_PASSPHRASE = ['publickey']
   const DEFAULT_METHOD = 'aes'
   const DEFAULT_EXPIRY = 1800 // 30 minutes
   const MAX_EXPIRY = 604800   // 7 days
@@ -28,22 +29,32 @@ export async function secretSubmit(req, res, next) {
     if (!hasProperty(req.body, 'text') && !(req.files && Object.keys(req.files).length))
       return next({message: 'Missing required body param: `text` OR `file` (must use one).'})
 
+    if (hasProperty(req.body, 'method') && !METHODS.includes(req.body.method))
+      return next({message: 'Param `method` must be one of: ' + METHODS.join(', ')})
+    var method = hasProperty(req.body, 'method') ? req.body.method.toLowerCase() : DEFAULT_METHOD
+    var usingPassphraselessMethod = METHODS_NO_PASSPHRASE.includes(method)
+
+    // passphrase referes to both the password and public key if the public key item is selected
     if (!hasProperty(req.body, 'passphrase'))
       return next({message: 'Missing required body param: `passphrase`.'})
     var passphrase = req.body.passphrase.toString()
 
+    if (method === 'publickey') {
+      var pubkeyRegex = /-{5}BEGIN PUBLIC KEY-{5}.*-{5}END PUBLIC KEY-{5}/s
+      if (!pubkeyRegex.test(passphrase))
+        return next({message: 'Public key format does not match the format of X.509 SubjectPublicKeyInfo/OpenSSL PEM public key.'})
+    }
+
     if (hasProperty(req.body, 'allow_insecure_passphrase') && !isBooleanProperty(req.body.allow_insecure_passphrase))
       return next({message: 'Param `allow_insecure_passphrase` must be of type Boolean.'})
-
     var allowInsecurePassphrase = hasProperty(req.body, 'allow_insecure_passphrase') ? parseInsecureBoolean(req.body.allow_insecure_passphrase) : false
 
-    var pwned = await pwnedPassphrase(passphrase)
-    if (pwned && !allowInsecurePassphrase)
-      return next({message: 'Passphrase has been pwned (leaked online); please use something else.'})
-
-    if (hasProperty(req.body, 'method') && !METHODS.includes(req.body.method))
-      return next({message: 'Param `method` must be one of: ' + METHODS.join(', ')})
-    var method = hasProperty(req.body, 'method') ? req.body.method.toLowerCase() : DEFAULT_METHOD
+    // check if the Method being used requires a passphrase
+    if (!(allowInsecurePassphrase || usingPassphraselessMethod)) {
+      var pwned = await pwnedPassphrase(passphrase)
+      if (pwned)
+        return next({message: 'Passphrase has been pwned (leaked online); please use something else.'})
+    }
 
     if (hasProperty(req.body, 'expiry') && !Number.isInteger(parseInt(req.body.expiry))
     || parseInt(req.body.expiry) < 0
@@ -70,12 +81,16 @@ export async function secretSubmit(req, res, next) {
 
     var text = hasProperty(req.body, 'text') ? textUtils.escape(req.body.text.toString()) : ' '
     var encryptedText = cipher.encrypt(text, passphrase, method)
+
     if (!encryptedText)
       return next({message: 'Your message could not be encrypted; please try again checking your parameters are correct.'})
 
     var fileMetadata = []
     var totalFileSize = 0
     if (req.files && Object.keys(req.files).length) {
+      if (method === 'publickey')
+        return next({message: 'File upload is not supported by public key encryption.'})
+
       if (typeof req.files !== 'object')
         return next({message: 'Files must be a multer object.'})
 
@@ -109,7 +124,7 @@ export async function secretSubmit(req, res, next) {
     }
     fileMetadata = JSON.stringify(fileMetadata)
 
-    var hashedPassphrase = await bcrypt.hash(passphrase, 10).then(result => {
+    var hashedPassphrase = await bcrypt.hash(passphrase.replace(/(?:\r\n|\r|\n)/g, ''), 10).then(result => {
       return result
     })
 
