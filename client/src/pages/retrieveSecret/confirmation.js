@@ -1,15 +1,12 @@
 import React from 'react';
-import {
-  Link
-} from 'react-router-dom'
-import { getFileIcon, humanReadableSize } from '../../helpers/file';
+import { Link } from 'react-router-dom';
 import { Buffer } from "buffer";
+import { getFileIcon, humanReadableSize } from '../../helpers/file';
 
 const Confirmation = ({secretData}) => {
-
   return (
     <>
-      <div id='files-list' className='row row-cols-4 g-1 mt-1'>
+      <div id='files-list' className='row row-cols-4 g-1 mt-3'>
         {
           secretData.files.map((element, index) => {
             var bytes = new Uint8Array(element.blob.data);
@@ -35,7 +32,8 @@ const Confirmation = ({secretData}) => {
           })
         }
       </div>
-      <textarea rows='20' cols='80' readOnly={true} value={secretData.text}></textarea>
+      <textarea rows='8' cols='80' className='form-control mt-3' readOnly={true} value={secretData.text}></textarea>
+      <a href='/' className='btn btn-light d-block w-100 mt-3'>Share your own secret</a>
     </>
   );
 }

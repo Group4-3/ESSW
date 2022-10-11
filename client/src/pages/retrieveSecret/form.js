@@ -3,9 +3,7 @@ import Collapse from 'bootstrap/js/dist/collapse';
 import { getFileIcon, humanReadableSize } from '../../helpers/file';
 import * as Constants from '../../helpers/constants.js';
 import * as Cryptography from '../../helpers/cryptography.js';
-import {
-  useParams
-} from "react-router-dom";
+import { useParams } from 'react-router-dom';
 
 const Form = ({formResponse}) => {
   const { id } = useParams();
