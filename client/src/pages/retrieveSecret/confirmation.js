@@ -3,6 +3,7 @@ import {
   Link
 } from 'react-router-dom'
 import { getFileIcon, humanReadableSize } from '../../helpers/file';
+import { Buffer } from "buffer";
 
 const Confirmation = ({secretData}) => {
 
@@ -10,7 +11,9 @@ const Confirmation = ({secretData}) => {
     <>
       <div id='files-list' className='row row-cols-4 g-1 mt-1'>
         { secretData.files.map((element, index) => {
-          var file = new File([new Uint8Array(element.blob.data)], element.file_name, {type: element.mimetype });
+          var buffer = Buffer.from(element.blob.data);
+          console.log(buffer)
+          var file = new Blob([buffer]);
 
           return (
           <div class='col'>
