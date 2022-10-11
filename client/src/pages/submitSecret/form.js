@@ -216,13 +216,17 @@ const Form = ({formResponse}) => {
                             </select>
                           </div>
                         </div>
-                        <div className='mb-3 row'>
+                        <label for='infinite_access_attempts'>Infinite access attempts</label>
+                        <input className='form-check-input' type='checkbox' id='infinite_access_attempts' aria-expanded='true' data-bs-toggle='collapse' data-bs-target='#access_attempts' name='max_access_attempts' checked/>
+                        {/* Hide access attempt form by default */}
+                        <div className='mb-3 row' id='access_attempts'>
                           <label for='max_access_attempts' className='col-sm-6 col-form-label'>
                             Max access attempts
                             <small className='text-muted'> (-1 infinite)</small>
                           </label>
                           <div className='col-sm-6'>
                             <input id='max_access_attempts' name='max_access_attempts' type='number' min='-1' max='999' value='-1' onChange={handleInputChange} className='form-control'/>
+                            {/* TODO: Set value to -1 if hidden */}
                           </div>
                         </div>
                         <div className='mb-3 row'>
