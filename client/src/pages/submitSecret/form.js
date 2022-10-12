@@ -157,14 +157,14 @@ const Form = ({formResponse}) => {
     console.log("you clicked me");
 
     var passChars = "0123456789abcdeghijklmnopqrstuvwxyz!@#$%^&*()_+:<>?/ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    var passLength = 10;
+    var passLength = 12;
     var password ="";
 
         for (var i = 0; i <= passLength; i++){
             var randomNumber = Math.floor(Math.random() * passChars.length);
             password+= passChars.substring(randomNumber, randomNumber +1);
         }
-    document.getElementById("passphraseField").value = password;
+    document.getElementById("passphrase").value = passPhraseGen;
   }
 
   const [Input, setInput] = useState("");
