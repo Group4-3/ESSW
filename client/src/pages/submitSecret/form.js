@@ -170,15 +170,18 @@ const Form = ({formResponse}) => {
   const [Input, setInput] = useState("");
   const ValidateText = /^[a-zA-Z0-9_]*$/;
 
-  function getInput(){
+  function getInput(e){
     console.log("youclickme");
         if (Input===""){
             alert('You must type something');
+            e.preventDefault();
             }
          else if (!ValidateText.test(Input)){
              alert('Message must not contain special characters');
+             e.preventDefault();
              }
 }
+
   return (
     <>
       <h1>Share a secret</h1>
