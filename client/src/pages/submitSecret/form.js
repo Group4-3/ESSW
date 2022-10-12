@@ -1,6 +1,7 @@
-import React from 'react';
+//import React from 'react';
 import Collapse from 'bootstrap/js/dist/collapse';
 import { getFileIcon, humanReadableSize } from '../../helpers/file';
+import React, {useState} from 'react';
 import * as Constants from '../../helpers/constants.js';
 import * as Cryptography from '../../helpers/cryptography.js';
 
@@ -149,16 +150,45 @@ const Form = ({formResponse}) => {
     }, 2000);
   }
 
+
+  var passPhraseGen = document.getElementById("passphrase");
+
+  function genPassPhrase(){
+    console.log("you clicked me");
+
+    var passChars = "0123456789abcdeghijklmnopqrstuvwxyz!@#$%^&*()_+:<>?/ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    var passLength = 10;
+    var password ="";
+
+        for (var i = 0; i <= passLength; i++){
+            var randomNumber = Math.floor(Math.random() * passChars.length);
+            password+= passChars.substring(randomNumber, randomNumber +1);
+        }
+    document.getElementById("passphraseField").value = password;
+  }
+
+  const [Input, setInput] = useState("");
+  const ValidateText = /^[a-zA-Z0-9_]*$/;
+
+  function getInput(){
+    console.log("youclickme");
+        if (Input===""){
+            alert('You must type something');
+            }
+         else if (!ValidateText.test(Input)){
+             alert('Message must not contain special characters');
+             }
+}
   return (
     <>
       <h1>Share a secret</h1>
       {errorMessage && (
-        <div className='alert alert-danger'>{errorMessage}</div>
+        <div className='alert alert-danger'>{errorMessage} </div>
       )}
       <form onSubmit={handleSubmit}>
         <div className='row g-3'>
           <div className='col-12'>
-            <textarea id='text' name='text' placeholder='Our little secret...' onChange={handleInputChange} className='form-control' rows='3'></textarea>
+            <textarea id='text' name='text' placeholder='Our little secret...' onChange={handleInputChange} className='form-control' rows='3' onChange={e =>setInput(e.target.value)}></textarea>
           </div>
           {formData.method !== 'publickey' &&
             <div className='col-12'>
@@ -175,6 +205,12 @@ const Form = ({formResponse}) => {
                 </div>
               </div>
             }
+
+            <div className='col-12'>
+                <button onClick={genPassPhrase} type="submit" class="" value="save">Generate Passphrase</button>
+            </div>
+
+
             {formData.method === 'publickey' &&
               <div className='row g-3'>
                 <label id='div-input-pass-pub-label' for='passphrase' className='col-sm-2 col-form-label'>Public key</label>
@@ -253,7 +289,7 @@ const Form = ({formResponse}) => {
             </div>
           </div>
           <div className='col-12'>
-            <button type='submit' className='btn btn-primary d-block w-100'>Submit secret</button>
+            <button onClick={getInput} type='submit' className='btn btn-primary d-block w-100'>Submit secret</button>
           </div>
         </div>
       </form>
