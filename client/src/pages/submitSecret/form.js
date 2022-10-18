@@ -1,7 +1,26 @@
-import React from 'react';
+import React, { useState } from "react";
 import Collapse from 'bootstrap/js/dist/collapse';
 import { getFileIcon, humanReadableSize } from '../../helpers/file';
+<<<<<<< Updated upstream
 import { API_HOST_NAME } from "../../helpers/constants.js";
+=======
+import * as Constants from '../../helpers/constants.js';
+import * as Cryptography from '../../helpers/cryptography.js';
+import styled, { ThemeProvider } from "styled-components";
+import { lightTheme, darkTheme, GlobalStyles } from "./themes.js";
+
+
+const StyledApp = styled.div`
+  color: ${(props) => props.theme.fontColor};
+`;
+
+let theme = "light";
+
+  const themeToggler = () => {
+    theme === "light" ? theme="dark" : theme = "light";
+    console.log(theme)
+  };
+>>>>>>> Stashed changes
 
 const expiryOptions = [
   {label: '5 minutes', value: 5*60},
@@ -114,8 +133,20 @@ const Form = ({formResponse}) => {
   }
 
   return (
+    
     <>
+<<<<<<< Updated upstream
       <h1>Create a secret message</h1>
+=======
+    <ThemeProvider theme={theme === "light" ? lightTheme : darkTheme}>
+      <GlobalStyles />
+      <StyledApp>
+        Hello World
+        <button onClick={() => themeToggler()}>Change Theme</button>
+      </StyledApp>
+    
+      <h1>Share a secret</h1>
+>>>>>>> Stashed changes
       {errorMessage && (
         <div className='alert alert-danger'>{errorMessage}</div>
       )}
@@ -196,9 +227,12 @@ const Form = ({formResponse}) => {
           </div>
           <button type="submit" className="btn btn-primary d-block w-100">Submit secret</button>
         </div>
+      
       </form>
+      </ThemeProvider>
     </>
   )
+
 }
 
 export default Form;
