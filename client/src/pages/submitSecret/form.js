@@ -150,25 +150,10 @@ const Form = ({formResponse}) => {
     }, 2000);
   }
 
-
-  var passPhraseGen = document.getElementById("passphrase");
-
-  function genPassPhrase(){
-    console.log("you clicked me");
-
-    var passChars = "0123456789abcdeghijklmnopqrstuvwxyz!@#$%^&*()_+:<>?/ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    var passLength = 12;
-    var password ="";
-
-        for (var i = 0; i <= passLength; i++){
-            var randomNumber = Math.floor(Math.random() * passChars.length);
-            password+= passChars.substring(randomNumber, randomNumber +1);
-        }
-    document.getElementById("passphrase").value = passPhraseGen;
-  }
-
   const [Input, setInput] = useState("");
+  const [Passphrase, setPassphrase] = useState("");
   const ValidateText = /^[a-zA-Z0-9_]*$/;
+  //const passPhraseGen = document.getElementById("passphrase");
 
   function getInput(e){
     console.log("youclickme");
@@ -176,11 +161,21 @@ const Form = ({formResponse}) => {
             alert('You must type something');
             e.preventDefault();
             }
-         else if (!ValidateText.test(Input)){
+        else if (!ValidateText.test(Input)){
              alert('Message must not contain special characters');
              e.preventDefault();
              }
-}
+        else if(Passphrase===""){
+              alert('passphrase required');
+              e.preventDefault();
+            }
+  }
+
+  function genPassPhrase(e){
+    e.preventDefault();
+  console.log("you click")
+
+    }
 
   return (
     <>
@@ -211,6 +206,7 @@ const Form = ({formResponse}) => {
 
             <div className='col-12'>
                 <button onClick={genPassPhrase} type="submit" class="" value="save">Generate Passphrase</button>
+                {/* <button type="submit" class="" value="save">Generate Passphrase</button> */}
             </div>
 
 
