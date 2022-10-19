@@ -153,7 +153,6 @@ const Form = ({formResponse}) => {
   const [Input, setInput] = useState("");
   const [Passphrase, setPassphrase] = useState("");
   const ValidateText = /^[a-zA-Z0-9_]*$/;
-  //const passPhraseGen = document.getElementById("passphrase");
 
   function getInput(e){
     console.log("youclickme");
@@ -165,16 +164,23 @@ const Form = ({formResponse}) => {
              alert('Message must not contain special characters');
              e.preventDefault();
              }
-        else if(Passphrase===""){
-              alert('passphrase required');
-              e.preventDefault();
-            }
+        // else if(Passphrase===""){
+        //       alert('passphrase required');
+        //       e.preventDefault();
+        //     }
   }
 
-  function genPassPhrase(e){
-    e.preventDefault();
-  console.log("you click")
+    var passPhraseGen = document.getElementById("passphrase");
+    const genPassPhrase = async (e) => {
+      e.preventDefault();
+      console.log("you click");
 
+      let res = await fetch(Constants.getApiAddress() + '/api/v2/passphrase/generate', {
+        method: 'GET', 
+      });
+      
+      document.getElementById("passphrase").value = passPhraseGen;
+      console.log(res);
     }
 
   return (
@@ -206,7 +212,6 @@ const Form = ({formResponse}) => {
 
             <div className='col-12'>
                 <button onClick={genPassPhrase} type="submit" class="" value="save">Generate Passphrase</button>
-                {/* <button type="submit" class="" value="save">Generate Passphrase</button> */}
             </div>
 
 
