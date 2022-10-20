@@ -33,6 +33,9 @@ if($args[0] -eq "start") {
 	}
 } elseif($args[0] -eq "status"){
 	docker compose ps
+} elseif($args[0] -eq "cleanup"){
+	docker compose rm --force --stop --volumes
+	Remove-Item .env
 } elseif($args[0] -eq "help") {
 	Write-Output "---------------------------"
 	Write-Output "|ESSW - Script Application|"
@@ -48,12 +51,15 @@ if($args[0] -eq "start") {
 		Write-Output " 1. -o or --override		- If .env file already exists the override flag will write over the current file"
 	} elseif($args[1] -eq "status") {
 		Write-Output " Options for status."
+	} elseif($args[1] -eq "cleanup") {
+		Write-Output " Options for status."
 	} else {
 		Write-Output " For more options for each command, type 'essw help <command>'."
 		Write-Output " 1. start			- Builds container and starts application"
 		Write-Output " 2. stop			- Stops application"
 		Write-Output " 3. setup			- Sets up environment variables for the application"
 		Write-Output " 4. status		- Gets status of docker containers"
+		Write-Output " 4. cleanup		- Removes the docker containers and deletes the environment file"
 	}
 } else {
 	Write-Output "Unknown command, type 'essw help' to list commands."
