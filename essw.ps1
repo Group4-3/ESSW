@@ -16,11 +16,21 @@ if($args[0] -eq "start") {
 	docker compose stop
 } elseif($args[0] -eq "setup") {
 	if(-not(Test-Path -Path .env -PathType Leaf)) {
-		Write-Output "Environment file doesn't exist, copying example."
 		Copy-Item example.env .env
+		$hostname = Read-Host "Enter hostname"
+		(Get-Content .env) -replace '(HOST_NAME=.*)', "HOST_NAME=$hostname" | Set-Content .env
+	} elseif($args[1] -eq "-o" -or $args[1] -eq "--override") {
+		$confirmation = Read-Host "Confirm override of .env file (y/N)"
+		if($confirmation -eq "Y" -or $confirmation -eq "y") {
+			Copy-Item example.env .env
+			$hostname = Read-Host "Enter hostname"
+			(Get-Content .env) -replace '(HOST_NAME=.*)', "HOST_NAME=$hostname" | Set-Content .env
+		} else {
+			Write-Output "Override not confirmed, cancelling command"
+		}
+	} else {
+		Write-Output ".env file already exists, please use -o or --override to override the file"
 	}
-	$hostname = Read-Host "Enter hostname"
-	(Get-Content .env) -replace '(HOST_NAME=.*)', "HOST_NAME=$hostname" | Set-Content .env
 } elseif($args[0] -eq "help") {
 	Write-Output "---------------------------"
 	Write-Output "|ESSW - Script Application|"
@@ -31,11 +41,15 @@ if($args[0] -eq "start") {
 
 	} elseif($args[1] -eq "stop") {
 		Write-Output " Options for stop."
+	} elseif($args[1] -eq "setup") {
+		Write-Output " Options for setup."
+		Write-Output " 1. -o or --override		- If .env file already exists the override flag will write over the current file"
 	} else {
 		Write-Output " For more options for each command, type 'essw help <command>'."
 		Write-Output " 1. start			- Builds container and starts application"
 		Write-Output " 2. stop			- Stops application"
+		Write-Output " 3. setup			- Sets up environment variables for the application"
 	}
-}else {
+} else {
 	Write-Output "Unknown command, type 'essw help' to list commands."
 }
