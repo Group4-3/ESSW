@@ -31,6 +31,8 @@ if($args[0] -eq "start") {
 	} else {
 		Write-Output ".env file already exists, please use -o or --override to override the file"
 	}
+} elseif($args[0] -eq "status"){
+	docker compose ps
 } elseif($args[0] -eq "help") {
 	Write-Output "---------------------------"
 	Write-Output "|ESSW - Script Application|"
@@ -44,11 +46,14 @@ if($args[0] -eq "start") {
 	} elseif($args[1] -eq "setup") {
 		Write-Output " Options for setup."
 		Write-Output " 1. -o or --override		- If .env file already exists the override flag will write over the current file"
+	} elseif($args[1] -eq "status") {
+		Write-Output " Options for status."
 	} else {
 		Write-Output " For more options for each command, type 'essw help <command>'."
 		Write-Output " 1. start			- Builds container and starts application"
 		Write-Output " 2. stop			- Stops application"
 		Write-Output " 3. setup			- Sets up environment variables for the application"
+		Write-Output " 4. status		- Gets status of docker containers"
 	}
 } else {
 	Write-Output "Unknown command, type 'essw help' to list commands."
