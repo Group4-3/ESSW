@@ -1,9 +1,13 @@
 import React from 'react';
+import SyntaxHighlighter from 'react-syntax-highlighter';
+import { docco } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 import { Link } from 'react-router-dom';
 import { Buffer } from "buffer";
 import { getFileIcon, humanReadableSize } from '../../helpers/file';
+import { unescape } from '../../helpers/text';
 
 const Confirmation = ({secretData}) => {
+  const [isCode, setIsCode] = React.useState(true);
   return (
     <>
       <div id='files-list' className='row row-cols-4 g-1 mt-3'>
@@ -32,7 +36,14 @@ const Confirmation = ({secretData}) => {
           })
         }
       </div>
-      <textarea rows='8' cols='80' className='form-control mt-3' readOnly={true} value={secretData.text}></textarea>
+      {!isCode &&
+        <textarea rows='8' cols='80' className='form-control mt-3' readOnly={true} value={secretData.text}></textarea>
+      }
+      {isCode &&
+        <SyntaxHighlighter language="javascript" style={docco}>
+          {unescape(secretData.text)}
+        </SyntaxHighlighter>
+      }
       <a href='/' className='btn btn-light d-block w-100 mt-3'>Share your own secret</a>
     </>
   );
