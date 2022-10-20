@@ -5,9 +5,11 @@ import { Link } from 'react-router-dom';
 import { Buffer } from "buffer";
 import { getFileIcon, humanReadableSize } from '../../helpers/file';
 import { unescape } from '../../helpers/text';
+import { languages } from '../../helpers/syntaxHighlighterAvailableLanguages';
 
 const Confirmation = ({secretData}) => {
-  const [languageType, setLanguageType] = React.useState('javascript');
+  const [languageType, setLanguageType] = React.useState('plaintext');
+
   return (
     <>
       <div id='files-list' className='row row-cols-4 g-1 mt-3'>
@@ -39,6 +41,15 @@ const Confirmation = ({secretData}) => {
       <SyntaxHighlighter language={languageType} style={docco}>
         {unescape(secretData.text)}
       </SyntaxHighlighter>
+      <select id='method' name='method' onChange={ (e) => setLanguageType(e.target.value) } className='form-select'>
+        {languages.map((option) => {
+            if(option !== 'plaintext')
+              return(<option value={option}>{option}</option>)
+            else
+              return(<option selected='selected' value={option}>{option}</option>)
+          })
+        }
+      </select>
       <a href='/' className='btn btn-light d-block w-100 mt-3'>Share your own secret</a>
     </>
   );
