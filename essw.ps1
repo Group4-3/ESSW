@@ -9,7 +9,7 @@ if($args[0] -eq "start") {
 			docker compose up
 		} else {
 			docker compose build --quiet
-			docker compose start
+			docker compose up -d
 		}
 	}
 } elseif($args[0] -eq "stop") {
