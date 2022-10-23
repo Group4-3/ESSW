@@ -168,7 +168,6 @@ const Form = ({formResponse}) => {
 
     const genPassPhrase = async (e) => {
       
-      const passphraseGenOutPut = document.getElementById('passphraseGenOutPut');
       e.preventDefault();
       let res = await fetch(Constants.getApiAddress() + '/api/v2/passphrase/generate', {
         method: 'GET', 
@@ -176,14 +175,14 @@ const Form = ({formResponse}) => {
 
       let json = await res.json();
 
-      document.getElementById('passphraseGenOutPut').value = json;
+      document.getElementById('passphraseGenOutPut').value = JSON.stringify(json);
       console.log(json);
     }
 
     const copyPassPhrase = async (e) => {
       console.log('you clicked copy');
       e.preventDefault();
-      navigator.clipboard.writeText(sessionStorage.getItem('passphraseGenOutPut'));
+      navigator.clipboard.writeText(document.getElementById('passphraseGenOutPut'));
       e.target.innerText = 'Copied!';
     }
 
