@@ -151,7 +151,6 @@ const Form = ({formResponse}) => {
   }
 
   const [Input, setInput] = useState("");
-  const [Passphrase, setPassphrase] = useState("");
   const ValidateText = /^[a-zA-Z0-9_]*$/;
 
   function getInput(e){
@@ -175,15 +174,17 @@ const Form = ({formResponse}) => {
 
       let json = await res.json();
 
-      document.getElementById('passphraseGenOutPut').value = JSON.stringify(json);
+      document.getElementById('passphraseGenOutPut').value = JSON.stringify(json).trim();
       console.log(json);
     }
 
     const copyPassPhrase = async (e) => {
-      console.log('you clicked copy');
+
+      var GenOutPut = document.getElementById('passphraseGenOutPut').value;
+      navigator.clipboard.writeText(GenOutPut);
       e.preventDefault();
-      navigator.clipboard.writeText(document.getElementById('passphraseGenOutPut'));
       e.target.innerText = 'Copied!';
+
     }
 
   return (
@@ -216,8 +217,7 @@ const Form = ({formResponse}) => {
             <div>
                 <button onClick={genPassPhrase} type="submit" className='btn btn-primary d-block w-60' value="save">Generate Passphrase</button>
                   <div id='div-input-pass-pub' className='col-sm-10'>
-                    {/* <input type= 'password' id='passphraseGenOutPut' /> */}
-                    <textarea type='' id='passphraseGenOutPut'></textarea>
+                    <textarea rows='2' cols='60' type='' id='passphraseGenOutPut' placeholder='Your Passphrase'></textarea>
                   </div>
                 <button type='button' className='btn btn-light w-30 ms-2' onClick={copyPassPhrase}>Copy Passphrase</button>
             </div>
