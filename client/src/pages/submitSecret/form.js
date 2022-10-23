@@ -164,23 +164,27 @@ const Form = ({formResponse}) => {
              alert('Message must not contain special characters');
              e.preventDefault();
              }
-        // else if(Passphrase===""){
-        //       alert('passphrase required');
-        //       e.preventDefault();
-        //     }
   }
 
-    var passPhraseGen = document.getElementById("passphrase");
     const genPassPhrase = async (e) => {
+      
+      const passphraseGenOutPut = document.getElementById('passphraseGenOutPut');
       e.preventDefault();
-      console.log("you click");
-
       let res = await fetch(Constants.getApiAddress() + '/api/v2/passphrase/generate', {
         method: 'GET', 
       });
-      
-      document.getElementById("passphrase").value = passPhraseGen;
-      console.log(res);
+
+      let json = await res.json();
+
+      document.getElementById('passphraseGenOutPut').value = json;
+      console.log(json);
+    }
+
+    const copyPassPhrase = async (e) => {
+      console.log('you clicked copy');
+      e.preventDefault();
+      navigator.clipboard.writeText(sessionStorage.getItem('passphraseGenOutPut'));
+      e.target.innerText = 'Copied!';
     }
 
   return (
@@ -210,8 +214,13 @@ const Form = ({formResponse}) => {
               </div>
             }
 
-            <div className='col-12'>
-                <button onClick={genPassPhrase} type="submit" class="" value="save">Generate Passphrase</button>
+            <div>
+                <button onClick={genPassPhrase} type="submit" className='btn btn-primary d-block w-60' value="save">Generate Passphrase</button>
+                  <div id='div-input-pass-pub' className='col-sm-10'>
+                    {/* <input type= 'password' id='passphraseGenOutPut' /> */}
+                    <textarea type='' id='passphraseGenOutPut'></textarea>
+                  </div>
+                <button type='button' className='btn btn-light w-30 ms-2' onClick={copyPassPhrase}>Copy Passphrase</button>
             </div>
 
 
@@ -246,7 +255,7 @@ const Form = ({formResponse}) => {
                             <select id='expiry' name='expiry' onChange={handleInputChange} className='form-select'>
                               {expiryOptions.map((option) => <option value={option.value}>{option.label}</option>)}
                             </select>
-                          </div>
+                        </div>
                         </div>
                         <div className='mb-3 row'>
                           <label for='method' className='col-sm-6 col-form-label'>Encryption method</label>
