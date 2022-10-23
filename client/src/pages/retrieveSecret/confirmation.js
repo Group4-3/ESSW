@@ -7,8 +7,10 @@ import { getFileIcon, humanReadableSize } from '../../helpers/file';
 import { unescape } from '../../helpers/text';
 import { languages } from '../../helpers/syntaxHighlighterAvailableLanguages';
 
+
+var detectLang = require('lang-detector');
 const Confirmation = ({secretData}) => {
-  const [languageType, setLanguageType] = React.useState('plaintext');
+  const [languageType, setLanguageType] = React.useState(detectLang(unescape(secretData.text)).toLowerCase());
 
   return (
     <>
@@ -41,7 +43,7 @@ const Confirmation = ({secretData}) => {
       <SyntaxHighlighter language={languageType} style={docco}>
         {unescape(secretData.text)}
       </SyntaxHighlighter>
-      <select id='method' name='method' onChange={ (e) => setLanguageType(e.target.value) } className='form-select'>
+      <select id='method' name='method' defaultValue={languageType} onChange={ (e) => setLanguageType(e.target.value) } className='form-select'>
         {languages.map((option) => {
             if(option !== 'plaintext')
               return(<option value={option}>{option}</option>)
