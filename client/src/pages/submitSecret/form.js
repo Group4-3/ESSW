@@ -1,7 +1,7 @@
 //import React from 'react';
 import Collapse from 'bootstrap/js/dist/collapse';
 import { getFileIcon, humanReadableSize } from '../../helpers/file';
-import React, {useState} from 'react';
+import React from 'react';
 import * as Constants from '../../helpers/constants.js';
 import * as Cryptography from '../../helpers/cryptography.js';
 
