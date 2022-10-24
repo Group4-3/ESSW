@@ -8,16 +8,23 @@
 */
 
 import Database from 'better-sqlite3';
+import fs from 'fs';
 
 /*
 Global variable for the database file
 */
 
-const TABLE_NAME = "Secret";
-const DATABASE_PATH = "./secrets.db"
+const TABLE_NAME = process.env.SECRET_TABLE_NAME ? process.env.SECRET_TABLE_NAME : "Secret"; //Only replace if the secret table does not exist.
+const DATABASE_PATH = process.env.DATABASE_PATH ? process.env.DATABASE_PATH : "./secrets.db";
 var databaseFile;
 
 function initialiseSecret() {
+  console.printlo
+  if (fs.existsSync(DATABASE_PATH) && fs.lstatSync(DATABASE_PATH).isDirectory()){
+    console.error("Database path '%s' is a directory, not a file. Halting.", DATABASE_PATH);
+    throw "Database path is directory!";
+  }
+
   databaseFile = new Database(DATABASE_PATH, {
     verbose: (["development"].includes(process.env.NODE_ENV) ? console.log : null)
   });
@@ -63,7 +70,7 @@ CREATE TABLE
 
 initialiseSecret();
 
-function getStatement(preparedStatement, statementParams) {
+function getStatement(preparedStatement, statementParams = null) {
   //Returns data
   let row;
   try {
@@ -154,6 +161,19 @@ export function updateUnauthorizedAttempts(secretID, jsonStr) {
 }
 
 //---
+const SHOW_EXPIRED_SECRETS = databaseFile.prepare(`SELECT id FROM '${TABLE_NAME}' WHERE expiry_date < CURRENT_TIMESTAMP`);
+
+export function showExpiredSecrets() {
+  let secretIterator;
+  try {
+    secretIterator = SHOW_EXPIRED_SECRETS.iterate(); //Provide iterator containing list of secrets. Iterator used, in case of large numbers of secrets
+  }
+  catch (err) {
+    return { data: null, error: err.message, success: false };
+  }
+  return { data: secretIterator, success: true };
+}
+
 const PRUNE_SECRETS_QUERY = databaseFile.prepare(`DELETE FROM '${TABLE_NAME}' WHERE expiry_date < CURRENT_TIMESTAMP`);
 
 export function purgeExpiredSecrets() {

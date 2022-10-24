@@ -14,7 +14,7 @@ router.get('/info_for_nerds', (req, res) => {
     def_res_url: req.url,
     def_res_code: 418,
     def_res_msg: "OK",
-    version_major: 0, version_minor: 1, version_patch: 0
+    version_major: 2, version_minor: 0, version_patch: 0
   })
 })
 

@@ -40,10 +40,11 @@ router.get('/methods', function(req, res, next) {
  *
  * @apiBody {String} text Secret string.
  * @apiBody {String} passphrase Key to protect the secret.
- * @apiBody {String} [method="aes"] Encryption method to use. Available options: aes des tripledes rabbit rc4 rc4drop
+ * @apiBody {String} [method="aes"] Encryption method to use. Available options: aes des tripledes rabbit rc4 rc4drop none publickey
  * @apiBody {Integer} [expiry="1800"] Number of seconds that the secret will automatically expire after. Default 30 minutes (1800). Maximum 7 days (604800).
  * @apiBody {Integer} [max_access_attempts=5] Number of unsuccessful access attempts that can be made before the secret is automatically destroyed. Use -1 for infinite attempts.
  * @apiBody {Boolean} [ip_based_access_attempts=false] Whether unsuccessful access attempts should be counted per IP address or collectively irrespective of request IP.
+ * @apiBody {Boolean} [allow_insecure_passphrase=alse] Whether secure passphrase checks should be ignored.
  * @apiExample Example usage:
  *  endpoint: http://localhost/api/v2/secret/submit
  *
