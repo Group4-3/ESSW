@@ -150,42 +150,61 @@ const Form = ({formResponse}) => {
     }, 2000);
   }
 
-  const [Input, setInput] = useState("");
-  const ValidateText = /^[a-zA-Z0-9_]*$/;
+  const textRegex = /^[a-zA-Z0-9_]*$/;
+  const validateInput = (e) => {
+    const textInput = document.getElementById('text').value;
 
-  function getInput(e){
-    console.log("youclickme");
-        if (Input===""){
-            alert('You must type something');
-            e.preventDefault();
-            }
-        else if (!ValidateText.test(Input)){
-             alert('Message must not contain special characters');
-             e.preventDefault();
-             }
+    if (!textInput.trim()){
+      alert('You must type something');
+      e.preventDefault();
+    }
+    // commenting out as this prevents code being shared
+    // it instead should probably replace unsafe characters with their unicode counterpart
+    //
+    // else if (!textRegex.test(textInput)){
+    //   alert('Message must not contain special characters');
+    //   e.preventDefault();
+    // }
   }
 
-    const genPassPhrase = async (e) => {
-      
-      e.preventDefault();
-      let res = await fetch(Constants.getApiAddress() + '/api/v2/passphrase/generate', {
-        method: 'GET', 
-      });
+  const passphraseSection = document.getElementById('passphraseGenModal');
+  const genPassphrase = async (e) => {
+    e.preventDefault();
+    let res = await fetch(Constants.getApiAddress() + '/api/v2/passphrase/generate', {
+      method: 'GET',
+    });
 
-      let json = await res.json();
+    let json = await res.json();
+    let passphraseField = document.getElementById('passphrase');
+    let output = document.getElementById('passphraseGenOutput');
 
-      document.getElementById('passphraseGenOutPut').value = JSON.stringify(json).trim();
-      console.log(json);
-    }
+    passphraseField.value = json['passphrase'];
+    output.value = json['passphrase'];
+    output.style.margin = '1rem 0';
+    output.select();
+    passphraseSection.style.height = 'auto';
+    passphraseSection.style.opacity = '1';
 
-    const copyPassPhrase = async (e) => {
+    updateFormData({
+      ...formData,
+      ['passphrase']: document.getElementById('passphrase').value.trim()
+    });
+  }
 
-      var GenOutPut = document.getElementById('passphraseGenOutPut').value;
-      navigator.clipboard.writeText(GenOutPut);
-      e.preventDefault();
-      e.target.innerText = 'Copied!';
+  const copyPassphrase = async (e) => {
+    e.preventDefault();
+    let output = document.getElementById('passphraseGenOutput');
+    navigator.clipboard.writeText(output.value);
+    e.target.innerText = 'Copied!';
 
-    }
+
+    setTimeout(() => {
+      passphraseSection.style.opacity = '0';
+      passphraseSection.style.height = '0px';
+      output.style.margin = '0';
+      e.target.innerText = 'Copy Passphrase and Close';
+    }, 2000);
+  }
 
   return (
     <>
@@ -196,7 +215,7 @@ const Form = ({formResponse}) => {
       <form onSubmit={handleSubmit}>
         <div className='row g-3'>
           <div className='col-12'>
-            <textarea id='text' name='text' placeholder='Our little secret...' onChange={handleInputChange} className='form-control' rows='3' onChange={e =>setInput(e.target.value)}></textarea>
+            <textarea id='text' name='text' placeholder='Our little secret...' onChange={handleInputChange} className='form-control' rows='3'></textarea>
           </div>
           {formData.method !== 'publickey' &&
             <div className='col-12'>
@@ -209,20 +228,17 @@ const Form = ({formResponse}) => {
               <div className='row g-3'>
                 <label id='div-input-pass-pub-label' for='passphrase' className='col-sm-2 col-form-label'>Passphrase</label>
                 <div id='div-input-pass-pub' className='col-sm-10'>
-                  <input type='password' id='passphrase' name='passphrase' onChange={handleInputChange} className='form-control'/>
+                  <div className='input-group'>
+                    <input type='password' id='passphrase' name='passphrase' onChange={handleInputChange} className='form-control'/>
+                    <button className='btn btn-outline-dark' onClick={genPassphrase}>Suggest Passphrase</button>
+                  </div>
+                  <div id='passphraseGenModal' style={{height: '0px', opacity: '0', transition: '.2s'}}>
+                    <textarea id='passphraseGenOutput' className='form-control' type='text' placeholder='Your Passphrase'></textarea>
+                    <button type='button' className='btn btn-light w-100' onClick={copyPassphrase}>Copy Passphrase and Close</button>
+                  </div>
                 </div>
               </div>
             }
-
-            <div>
-                <button onClick={genPassPhrase} type="submit" className='btn btn-primary d-block w-60' value="save">Generate Passphrase</button>
-                  <div id='div-input-pass-pub' className='col-sm-10'>
-                    <textarea rows='2' cols='60' type='' id='passphraseGenOutPut' placeholder='Your Passphrase'></textarea>
-                  </div>
-                <button type='button' className='btn btn-light w-30 ms-2' onClick={copyPassPhrase}>Copy Passphrase</button>
-            </div>
-
-
             {formData.method === 'publickey' &&
               <div className='row g-3'>
                 <label id='div-input-pass-pub-label' for='passphrase' className='col-sm-2 col-form-label'>Public key</label>
@@ -301,7 +317,7 @@ const Form = ({formResponse}) => {
             </div>
           </div>
           <div className='col-12'>
-            <button onClick={getInput} type='submit' className='btn btn-primary d-block w-100'>Submit secret</button>
+            <button onClick={validateInput} type='submit' className='btn btn-primary d-block w-100'>Submit secret</button>
           </div>
         </div>
       </form>
