@@ -167,7 +167,7 @@ const Form = ({formResponse}) => {
     // }
   }
 
-  const passphraseSection = document.getElementById('passphraseGenModal');
+  const passphraseSection = document.getElementById('passphrase-gen-section');
   const genPassphrase = async (e) => {
     e.preventDefault();
     let res = await fetch(Constants.getApiAddress() + '/api/v2/passphrase/generate', {
@@ -176,7 +176,7 @@ const Form = ({formResponse}) => {
 
     let json = await res.json();
     let passphraseField = document.getElementById('passphrase');
-    let output = document.getElementById('passphraseGenOutput');
+    let output = document.getElementById('passphrase-gen-output');
 
     passphraseField.value = json['passphrase'];
     output.value = json['passphrase'];
@@ -193,17 +193,31 @@ const Form = ({formResponse}) => {
 
   const copyPassphrase = async (e) => {
     e.preventDefault();
-    let output = document.getElementById('passphraseGenOutput');
-    navigator.clipboard.writeText(output.value);
     e.target.innerText = 'Copied!';
 
+    let output = document.getElementById('passphrase-gen-output');
+    output.select();
+    navigator.clipboard.writeText(output.value);
+    document.getElementById('close-passphrase-btn').classList.remove('disabled');
 
     setTimeout(() => {
-      passphraseSection.style.opacity = '0';
-      passphraseSection.style.height = '0px';
-      output.style.margin = '0';
-      e.target.innerText = 'Copy Passphrase and Close';
+      e.target.innerText = 'Copy Passphrase';
     }, 2000);
+  }
+
+  const closePassphrase = async (e) => {
+    e.preventDefault();
+
+    if (e.target.classList.contains('disabled'))
+      return
+
+    passphraseSection.style.opacity = '0';
+    e.target.classList.add('disabled');
+
+    setTimeout(() => {
+      document.getElementById('passphrase-gen-output').style.margin = '0';
+      passphraseSection.style.height = '0px';
+    }, 300);
   }
 
   return (
@@ -232,9 +246,12 @@ const Form = ({formResponse}) => {
                     <input type='password' id='passphrase' name='passphrase' onChange={handleInputChange} className='form-control'/>
                     <button className='btn btn-outline-dark' onClick={genPassphrase}>Suggest Passphrase</button>
                   </div>
-                  <div id='passphraseGenModal' style={{height: '0px', opacity: '0', transition: '.2s'}}>
-                    <textarea id='passphraseGenOutput' className='form-control' type='text' placeholder='Your Passphrase'></textarea>
-                    <button type='button' className='btn btn-light w-100' onClick={copyPassphrase}>Copy Passphrase and Close</button>
+                  <div id='passphrase-gen-section' style={{height: '0px', opacity: '0', transition: '.2s'}}>
+                    <textarea id='passphrase-gen-output' className='form-control' type='text' placeholder='Your Passphrase'></textarea>
+                    <div className='d-flex flex-row mt-3'>
+                      <button id='copy-passphrase-btn' type='button' className='btn btn-light w-50 me-2' onClick={copyPassphrase}>Copy passphrase</button>
+                      <button id='close-passphrase-btn' type='button' className='btn btn-light disabled w-50 ms-2' onClick={closePassphrase}>Close</button>
+                    </div>
                   </div>
                 </div>
               </div>
