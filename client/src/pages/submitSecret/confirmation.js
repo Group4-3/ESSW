@@ -26,7 +26,7 @@ const Confirmation = ({secretData}) => {
 
   const copyUrl = async (e) => {
     e.preventDefault();
-    navigator.clipboard.writeText(e.target.getAttribute('data-url'));
+    navigator.clipboard.writeText(shareUrl);
     e.target.querySelector('.textCue').innerText = 'Copied!';
 
     setTimeout(() => {
