@@ -14,7 +14,7 @@ const Confirmation = ({secretData}) => {
 
   return (
     <>
-      <div id='files-list' className='row row-cols-4 g-1 mt-3'>
+      <div id='files-list' className='row row-cols-4 g-1 mt-3 mb-3'>
         {
           secretData.files.map((element, index) => {
             var bytes = new Uint8Array(element.blob.data);
@@ -40,18 +40,21 @@ const Confirmation = ({secretData}) => {
           })
         }
       </div>
+      <div className='input-group'>
+        <label className='input-group-text' style={{'border-bottom-left-radius': '0'}}>Highlighting</label>
+        <select id='method' name='method' defaultValue={languageType} onChange={ (e) => setLanguageType(e.target.value) } className='form-select' style={{'border-bottom-right-radius': '0'}}>
+          {languages.map((option) => {
+              if(option !== 'plaintext')
+                return(<option value={option}>{option}</option>)
+              else
+                return(<option selected='selected' value={option}>{option}</option>)
+            })
+          }
+        </select>
+      </div>
       <SyntaxHighlighter language={languageType} style={docco}>
         {unescape(secretData.text)}
       </SyntaxHighlighter>
-      <select id='method' name='method' defaultValue={languageType} onChange={ (e) => setLanguageType(e.target.value) } className='form-select'>
-        {languages.map((option) => {
-            if(option !== 'plaintext')
-              return(<option value={option}>{option}</option>)
-            else
-              return(<option selected='selected' value={option}>{option}</option>)
-          })
-        }
-      </select>
       <a href='/' className='btn btn-light d-block w-100 mt-3'>Share your own secret</a>
     </>
   );
