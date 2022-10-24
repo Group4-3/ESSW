@@ -1,6 +1,7 @@
-import React from 'react';
+//import React from 'react';
 import Collapse from 'bootstrap/js/dist/collapse';
 import { getFileIcon, humanReadableSize } from '../../helpers/file';
+import React from 'react';
 import * as Constants from '../../helpers/constants.js';
 import * as Cryptography from '../../helpers/cryptography.js';
 
@@ -149,11 +150,81 @@ const Form = ({formResponse}) => {
     }, 2000);
   }
 
+  const textRegex = /^[a-zA-Z0-9_]*$/;
+  const validateInput = (e) => {
+    const textInput = document.getElementById('text').value;
+
+    if (!textInput.trim()){
+      alert('You must type something');
+      e.preventDefault();
+    }
+    // commenting out as this prevents code being shared
+    // it instead should probably replace unsafe characters with their unicode counterpart
+    //
+    // else if (!textRegex.test(textInput)){
+    //   alert('Message must not contain special characters');
+    //   e.preventDefault();
+    // }
+  }
+
+  const passphraseSection = document.getElementById('passphrase-gen-section');
+  const genPassphrase = async (e) => {
+    e.preventDefault();
+    let res = await fetch(Constants.getApiAddress() + '/api/v2/passphrase/generate', {
+      method: 'GET',
+    });
+
+    let json = await res.json();
+    let passphraseField = document.getElementById('passphrase');
+    let output = document.getElementById('passphrase-gen-output');
+
+    passphraseField.value = json['passphrase'];
+    output.value = json['passphrase'];
+    output.style.margin = '1rem 0';
+    output.select();
+    passphraseSection.style.height = 'auto';
+    passphraseSection.style.opacity = '1';
+
+    updateFormData({
+      ...formData,
+      ['passphrase']: document.getElementById('passphrase').value.trim()
+    });
+  }
+
+  const copyPassphrase = async (e) => {
+    e.preventDefault();
+    e.target.innerText = 'Copied!';
+
+    let output = document.getElementById('passphrase-gen-output');
+    output.select();
+    navigator.clipboard.writeText(output.value);
+    document.getElementById('close-passphrase-btn').classList.remove('disabled');
+
+    setTimeout(() => {
+      e.target.innerText = 'Copy Passphrase';
+    }, 2000);
+  }
+
+  const closePassphrase = async (e) => {
+    e.preventDefault();
+
+    if (e.target.classList.contains('disabled'))
+      return
+
+    passphraseSection.style.opacity = '0';
+    e.target.classList.add('disabled');
+
+    setTimeout(() => {
+      document.getElementById('passphrase-gen-output').style.margin = '0';
+      passphraseSection.style.height = '0px';
+    }, 300);
+  }
+
   return (
     <>
       <h1>Share a secret</h1>
       {errorMessage && (
-        <div className='alert alert-danger'>{errorMessage}</div>
+        <div className='alert alert-danger'>{errorMessage} </div>
       )}
       <form onSubmit={handleSubmit}>
         <div className='row g-3'>
@@ -171,7 +242,17 @@ const Form = ({formResponse}) => {
               <div className='row g-3'>
                 <label id='div-input-pass-pub-label' for='passphrase' className='col-sm-2 col-form-label'>Passphrase</label>
                 <div id='div-input-pass-pub' className='col-sm-10'>
-                  <input type='password' id='passphrase' name='passphrase' onChange={handleInputChange} className='form-control'/>
+                  <div className='input-group'>
+                    <input type='password' id='passphrase' name='passphrase' onChange={handleInputChange} className='form-control'/>
+                    <button className='btn btn-outline-dark' onClick={genPassphrase}>Suggest Passphrase</button>
+                  </div>
+                  <div id='passphrase-gen-section' style={{height: '0px', opacity: '0', transition: '.2s'}}>
+                    <textarea id='passphrase-gen-output' className='form-control' type='text' placeholder='Your Passphrase'></textarea>
+                    <div className='d-flex flex-row mt-3'>
+                      <button id='copy-passphrase-btn' type='button' className='btn btn-light w-50 me-2' onClick={copyPassphrase}>Copy passphrase</button>
+                      <button id='close-passphrase-btn' type='button' className='btn btn-light disabled w-50 ms-2' onClick={closePassphrase}>Close</button>
+                    </div>
+                  </div>
                 </div>
               </div>
             }
@@ -206,7 +287,7 @@ const Form = ({formResponse}) => {
                             <select id='expiry' name='expiry' onChange={handleInputChange} className='form-select'>
                               {expiryOptions.map((option) => <option value={option.value}>{option.label}</option>)}
                             </select>
-                          </div>
+                        </div>
                         </div>
                         <div className='mb-3 row'>
                           <label for='method' className='col-sm-6 col-form-label'>Encryption method</label>
@@ -253,7 +334,7 @@ const Form = ({formResponse}) => {
             </div>
           </div>
           <div className='col-12'>
-            <button type='submit' className='btn btn-primary d-block w-100'>Submit secret</button>
+            <button onClick={validateInput} type='submit' className='btn btn-primary d-block w-100'>Submit secret</button>
           </div>
         </div>
       </form>
