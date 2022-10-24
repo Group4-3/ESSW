@@ -14,7 +14,10 @@
     "react-scripts": "^5.0.1",
     "react-syntax-highlighter": "^15.5.0",
     "sass": "^1.54.9",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "lang-detector": "^1.0.6",
+    "react-syntax-highlighter": "^15.5.0",
+    "use-local-storage": "^2.3.6"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^5.16.5",

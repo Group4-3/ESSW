@@ -1,7 +1,0 @@
-{
-  "dependencies": {
-    "lang-detector": "^1.0.6",
-    "react-syntax-highlighter": "^15.5.0",
-    "use-local-storage": "^2.3.6"
-  }
-}
