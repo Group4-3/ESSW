@@ -185,6 +185,7 @@ const Form = ({formResponse}) => {
                     <button id='priv-key-copy-button' type='button' className='btn btn-light disabled w-50 ms-2' onClick={copyPrivateKey}>Copy private key</button>
                   </div>
                 </div>
+                <div className='alert alert-light text-danger col-12' role='alert'>It is strongly recommended that the person you are sharing this secret with generates their own key pair and provides you with <i>their</i> public key. Avoid sharing private keys to best maintain secret security.</div>
               </div>
             }
           </div>
