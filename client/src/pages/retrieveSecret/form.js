@@ -38,9 +38,9 @@ const Form = ({formResponse}) => {
         else {
           encodedValue = encodeURIComponent(value)
         }
-        formBody.push(encodedKey + "=" + encodedValue)
+        formBody.push(encodedKey + '=' + encodedValue)
       };
-      formBody = formBody.join("&");
+      formBody = formBody.join('&');
 
       let res = await fetch(Constants.getApiAddress() + '/api/v2/secret/' + id, {
         method: 'POST',
@@ -68,10 +68,20 @@ const Form = ({formResponse}) => {
   };
 
   const handlePubkeyChange = async (e) => {
-    isPubkey = e.target.checked;
+    e.preventDefault();
+
+    const method = e.target.getAttribute('data-method');
+    const targets = e.target.getAttribute('data-toggle');
+    const toggles = document.querySelectorAll('[data-toggle="' + targets + '"]');
+
+    toggles.forEach((t) => {
+      t.classList.remove('active');
+    });
+    e.target.classList.add('active');
+
     updateIsPublicKey({
       ...isPubkey,
-      ['checked']: e.target.checked
+      ['checked']: (method === 'pubkey')
     });
   };
 
@@ -82,35 +92,37 @@ const Form = ({formResponse}) => {
       )}
       <form onSubmit={handleSubmit}>
         <div className='row g-3'>
-          <div id="files-list" className="row row-cols-4 g-1 mt-1"></div>
-          <div className="col">
-            <div className="row">
-              <label for="pubkey" className="col-sm-2 col-form-label">Passphrase</label>
-              <div className='col-sm-1'>
-                <div className='form-check form-switch row' style={{justifyContent: 'center'}}>
-                  <input className='form-check-input' type='checkbox' id='pubkey' name='pubkey' onChange={handlePubkeyChange} style={{width: '50%'}} />
-                </div>
-              </div>
-              <label for="pubkey" className="col-sm-2 col-form-label">Private Key</label>
-            </div>
-            <div className="row">
-              <div className="col-sm-10">
-                {Object.entries(isPubkey)[0][1] === false &&
-                  <>
-                    <label for="passphrase" className="col-sm-2 col-form-label">Passphrase</label>
-                    <input type="password" id="passphrase" name="passphrase" onChange={handleInputChange} className="form-control"/>
-                  </>
-                }
-                {Object.entries(isPubkey)[0][1] === true &&
-                  <>
-                    <label for="passphrase" className="col-sm-10 col-form-label">Private Key (Will never be sent to the server!)</label>
+          <div className='col-12'>
+            <label>Decryption Mode</label>
+            <nav class='nav nav-pills nav-justified mt-1'>
+              <a class='nav-link active' onClick={handlePubkeyChange} data-toggle='method' data-method='passphrase'>Passphrase</a>
+              <a class='nav-link' onClick={handlePubkeyChange} data-toggle='method' data-method='pubkey'>Private Key</a>
+            </nav>
+          </div>
+          <div className='col-12'>
+            <div className='row g-3'>
+              {Object.entries(isPubkey)[0][1] === false &&
+                <>
+                  <label for='passphrase' className='col-sm-2 col-form-label'>Passphrase</label>
+                  <div className='col-sm-10'>
+                    <input type='password' id='passphrase' name='passphrase' onChange={handleInputChange} className='form-control'/>
+                  </div>
+                </>
+              }
+              {Object.entries(isPubkey)[0][1] === true &&
+                <>
+                  <div className='col-sm-2'>
+                    <label for='passphrase' className='col-form-label'>Private Key</label>
+                  </div>
+                  <div className='col-sm-10'>
                     <textarea rows='7' cols='80' id='passphrase' name='passphrase' placeholder='-----BEGIN PRIVATE KEY-----&#10;MIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAvk3&#10;...&#10;-----END PRIVATE KEY-----' onChange={handleInputChange} className='form-control'/>
-                  </>
-                }
-              </div>
+                    <span className='small text-muted'>Your private key is not sent to the server. Decryption is done entirely on the client.</span>
+                  </div>
+                </>
+              }
             </div>
           </div>
-          <button type="submit" className="btn btn-primary d-block w-100">Retrieve secret</button>
+          <button type='submit' className='btn btn-primary d-block w-100'>Retrieve secret</button>
         </div>
       </form>
     </>
