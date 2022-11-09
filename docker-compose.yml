@@ -16,21 +16,25 @@ services:
       - 'azure:/home/node/app/build_final'
     networks:
       backend_connection:
-        ipv4_address: 172.60.0.3
+        ipv4_address: 192.168.0.3
 
   essw-server:
+    container_name: backend
     image: esswreg.azurecr.io/essw-server
     user: node
     build:
       context: server
       dockerfile: Dockerfile
+    ports:
+      - '3001:3001'
     env_file:
       - .env
     networks:
       backend_connection:
-        ipv4_address: 172.60.0.4
+        ipv4_address: 192.168.0.4
 
   essw-nginx:
+    container_name: proxy
     image: esswreg.azurecr.io/essw-nginx
     domainname: esswdemo
     user: nginx
@@ -46,7 +50,7 @@ services:
       - .env
     networks:
       backend_connection:
-        ipv4_address: 172.60.0.2
+        ipv4_address: 192.168.0.2
     volumes:
       #- 'azure:/ssl_gen/user_nginx_certificates'
       - 'azure:/usr/share/nginx/html'
@@ -56,8 +60,8 @@ networks:
     ipam:
       driver: default
       config:
-        - subnet: 172.60.0.0/24
-          gateway: 172.60.0.1
+        - subnet: 192.168.0.0/24
+          gateway: 192.168.0.1
 
 volumes:
     azure:
