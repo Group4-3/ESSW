@@ -130,7 +130,7 @@ const Form = ({formResponse}) => {
         formResponse(json);
       } else {
         // TODO error message should come from client validations
-        updateErrorMessage(JSON.stringify(json, null, 4))
+        updateErrorMessage(json.message)
       }
     } catch (err) {
       console.log(err)

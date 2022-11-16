@@ -40,8 +40,14 @@ const Confirmation = ({secretData}) => {
       <p>Your secret has been encrypted and saved securely.</p>
       <p>Copy the URL or use the Share button to share your unique secret with someone else.</p>
       <div className='row g-2 mb-2'>
-        <div className='col-8'>
+        <div className='col-6'>
           <input id='share-url-input' type='text' className='form-control' value={shareUrl} readOnly={true}/>
+        </div>
+        <div className='col-2'>
+          <a className='btn btn-primary w-100' href={shareUrl} target="_blank">
+            <i className='bi bi-eye-fill me-2'></i>
+            View
+          </a>
         </div>
         <div className='col-2'>
           <button id='copy-btn' className='btn btn-primary w-100' onClick={copyUrl} data-url={shareUrl}>

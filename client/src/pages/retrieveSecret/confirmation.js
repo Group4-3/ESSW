@@ -6,10 +6,12 @@ import { Buffer } from "buffer";
 import { getFileIcon, humanReadableSize } from '../../helpers/file';
 import { unescape } from '../../helpers/text';
 import { languages } from '../../helpers/syntaxHighlighterAvailableLanguages';
+import { useTitle } from '../../components/title';
 
 
 var detectLang = require('lang-detector');
 const Confirmation = ({secretData}) => {
+  const setTitle = useTitle("Unlocked - ESSW Demo");
   const [languageType, setLanguageType] = React.useState(detectLang(unescape(secretData.text)).toLowerCase());
 
   return (
