@@ -36,8 +36,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '2'
-          memory: '2G'
+          cpus: '1.5'
+          memory: '1.5G'
       restart_policy:
         condition: none
         max_attempts: 1
@@ -62,8 +62,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '2'
-          memory: '2G'
+          cpus: '1.5'
+          memory: '1.5G'
       restart_policy:
         condition: none
         max_attempts: 1

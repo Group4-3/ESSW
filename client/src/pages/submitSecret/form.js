@@ -35,7 +35,7 @@ const Form = ({formResponse}) => {
     passphrase: '',
     expiry: 5*60,
     method: 'aes',
-    max_access_attempts: -1,
+    max_access_attempts: 3,
     ip_based_access_attempts: false,
     allow_insecure_passphrase: false
   }));
@@ -167,7 +167,6 @@ const Form = ({formResponse}) => {
     // }
   }
 
-  const passphraseSection = document.getElementById('passphrase-gen-section');
   const genPassphrase = async (e) => {
     e.preventDefault();
     let res = await fetch(Constants.getApiAddress() + '/api/v2/passphrase/generate', {
@@ -177,6 +176,7 @@ const Form = ({formResponse}) => {
     let json = await res.json();
     let passphraseField = document.getElementById('passphrase');
     let output = document.getElementById('passphrase-gen-output');
+    let passphraseSection = document.getElementById('passphrase-gen-section');
 
     passphraseField.value = json['passphrase'];
     output.value = json['passphrase'];
@@ -207,6 +207,8 @@ const Form = ({formResponse}) => {
 
   const closePassphrase = async (e) => {
     e.preventDefault();
+
+    let passphraseSection = document.getElementById('passphrase-gen-section');
 
     if (e.target.classList.contains('disabled'))
       return
@@ -307,7 +309,7 @@ const Form = ({formResponse}) => {
                             <small className='text-muted'> (-1 infinite)</small>
                           </label>
                           <div className='col-sm-6'>
-                            <input id='max_access_attempts' name='max_access_attempts' type='number' min='-1' max='999' value='-1' onChange={handleInputChange} className='form-control'/>
+                            <input id='max_access_attempts' name='max_access_attempts' type='number' min='-1' max='999' value='3' onChange={handleInputChange} className='form-control'/>
                             {/* TODO: Set value to -1 if hidden */}
                           </div>
                         </div>
