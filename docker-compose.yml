@@ -14,8 +14,8 @@ services:
           cpus: '0.50'
           memory: '0.1G'
       restart_policy:
-        condition: any
-        max_attempts: 5
+        condition: none
+        max_attempts: 1
     environment:
       - NODE_ENV=production
     env_file:
@@ -36,11 +36,11 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '1'
-          memory: '1.5G'
+          cpus: '2'
+          memory: '2G'
       restart_policy:
-        condition: any
-        max_attempts: 5
+        condition: none
+        max_attempts: 1
     ports:
       - '3001:3001'
     env_file:
@@ -62,11 +62,11 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '1'
-          memory: '1.5G'
+          cpus: '2'
+          memory: '2G'
       restart_policy:
-        condition: any
-        max_attempts: 5
+        condition: none
+        max_attempts: 1
     ports:
       - '80:80'
       - '443:443'
