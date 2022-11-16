@@ -13,14 +13,14 @@ server {
     listen 443 ssl;
     listen [::]:443 ssl;
 
-    server_name ${HOST_NAME};
+    server_name essw.the-index.xyz esswdemo.eastus.azurecontainer.io;
 
     ##
     # User/Generated Certificates
     ##
     ssl_certificate /etc/ssl/${HOST_NAME}/nginx.crt.pem;
     ssl_certificate_key /etc/ssl/${HOST_NAME}/nginx.key.pem;
-    
+
     location / {
        root /usr/share/nginx/html/build;
        try_files $uri /index.html;
